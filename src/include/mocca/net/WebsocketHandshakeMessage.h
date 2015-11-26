@@ -1,0 +1,31 @@
+#pragma once
+
+#include "mocca/net/WebsocketMessage.h"
+
+#define RtlCopyMemory(Destination,Source,Length) memcpy((Destination),(Source),(Length))
+#define CopyMemory RtlCopyMemory
+
+class WebsocketHandshakeMessage : public WebsocketMessage {
+public:
+	WebsocketHandshakeMessage(char* pRaw, int nSize);
+	WebsocketHandshakeMessage();
+	~WebsocketHandshakeMessage(void);
+
+	bool Parse();
+	
+	string GetField(string key);
+	void SetField(string key, string val);
+
+
+	string Serialize();
+
+private:
+	char* pRaw;
+	int nSize;
+	string m_method;
+	string m_uri;
+	string m_version;
+	map<string, string> fields;
+};
+
+
