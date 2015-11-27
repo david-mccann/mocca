@@ -20,8 +20,11 @@ void MoccaConnection::send(ByteArray message) const {
 }
 
 ByteArray MoccaConnection::receive(std::chrono::milliseconds timeout) const {
-    auto sizeData = receiveExactly(*physicalConnection_, sizeof(uint32_t));
+    auto sizeData = receiveExactly(*physicalConnection_, sizeof(uint32_t), timeout);
+    if (sizeData.isEmpty()) {
+        return ByteArray();
+    }
     auto size = sizeData.get<uint32_t>();
-    auto data = receiveExactly(*physicalConnection_, size);
+    auto data = receiveExactly(*physicalConnection_, size, timeout);
     return data;
 }

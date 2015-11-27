@@ -1,5 +1,5 @@
 #include "mocca/testing/NetworkTesting.h"
-#include "mocca/net/LoopbackConnectionAcceptor.h"
+#include "mocca/net/LoopbackConnectionAcceptor_tmp.h"
 
 #include <chrono>
 
@@ -13,11 +13,11 @@ template <> std::string mocca::testing::createBindingString<TCPNetworkService>(i
     return std::to_string(5678 + index);
 }
 
-template <> std::string mocca::testing::createConnectionString<LoopbackNetworkService>(int index) {
+template <> std::string mocca::testing::createConnectionString<LoopbackNetworkService_tmp>(int index) {
     return "messageQueue" + std::to_string(index);
 }
 
-template <> std::string mocca::testing::createBindingString<LoopbackNetworkService>(int index) {
+template <> std::string mocca::testing::createBindingString<LoopbackNetworkService_tmp>(int index) {
     return "messageQueue" + std::to_string(index);
 }
 
@@ -31,12 +31,12 @@ template <> Endpoint mocca::testing::createBindingEndpoint<TCPNetworkService>(in
                     createBindingString<TCPNetworkService>(index));
 }
 
-template <> Endpoint mocca::testing::createConnectionEndpoint<LoopbackNetworkService>(int index) {
-    return Endpoint(LoopbackNetworkService::transportStatic(),
-                    createConnectionString<LoopbackNetworkService>(index));
+template <> Endpoint mocca::testing::createConnectionEndpoint<LoopbackNetworkService_tmp>(int index) {
+    return Endpoint(LoopbackNetworkService_tmp::transportStatic(),
+                    createConnectionString<LoopbackNetworkService_tmp>(index));
 }
 
-template <> Endpoint mocca::testing::createBindingEndpoint<LoopbackNetworkService>(int index) {
-    return Endpoint(LoopbackNetworkService::transportStatic(),
-                    createBindingString<LoopbackNetworkService>(index));
+template <> Endpoint mocca::testing::createBindingEndpoint<LoopbackNetworkService_tmp>(int index) {
+    return Endpoint(LoopbackNetworkService_tmp::transportStatic(),
+                    createBindingString<LoopbackNetworkService_tmp>(index));
 }

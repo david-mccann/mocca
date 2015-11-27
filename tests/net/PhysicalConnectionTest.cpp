@@ -46,8 +46,8 @@ TEST_F(PhysicalConnectionTest, ReceiveExactly_InsufficientData) {
     }
     auto result = receiveExactly(connection, 7, std::chrono::milliseconds(1));
     ASSERT_EQ(0, result.size());
-    // result = receiveExactly(connection, 5, std::chrono::milliseconds(1));  // fixme: if no data is returned, the queue should not be
-    // modified
+    // fixme: if no data is returned, the queue should not be modified
+    // result = receiveExactly(connection, 5, std::chrono::milliseconds(1));
     // ASSERT_EQ(5, result.size());
     // ASSERT_EQ('a', result.data()[0]);
 }
@@ -153,8 +153,8 @@ TEST_F(PhysicalConnectionTest, ReceiveUntil_DelimNotFound) {
     }
     auto result = receiveUntil(connection, "x", std::chrono::milliseconds(1), 2);
     ASSERT_EQ(0, result.size());
-    // result = receiveUntil(connection, "a", std::chrono::milliseconds(1), 2);  // fixme: if no data is returned, the queue should not be
-    // modified
+    // fixme: if no data is returned, the queue should not be modified
+    // result = receiveUntil(connection, "a", std::chrono::milliseconds(1), 2);
     // ASSERT_EQ(1, result.size());
     // ASSERT_EQ('a', result.data()[0]);
 }

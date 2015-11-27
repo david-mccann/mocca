@@ -7,7 +7,7 @@ MoccaConnectionAcceptor::MoccaConnectionAcceptor(std::unique_ptr<IPhysicalConnec
     : physicalConnectionAcceptor_(std::move(physicalConnectionAcceptor)) {}
 
 std::unique_ptr<IProtocolConnection> MoccaConnectionAcceptor::getConnection(std::chrono::milliseconds timeout) {
-    auto physicalConnection = physicalConnectionAcceptor_->getConnection();
+    auto physicalConnection = physicalConnectionAcceptor_->getConnection(timeout);
     if (physicalConnection != nullptr) {
         return std::unique_ptr<IProtocolConnection>(new MoccaConnection(std::move(physicalConnection)));
     }
