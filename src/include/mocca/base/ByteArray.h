@@ -6,8 +6,6 @@
 #include <string>
 #include <cstring>
 
-#define MUI_BYTEARRAY_CHECKS
-
 namespace mocca {
 
 class ByteArray {
@@ -18,6 +16,8 @@ public:
     ByteArray(const ByteArray& other);
     ByteArray(ByteArray&& other);
     ByteArray& operator=(ByteArray other);
+
+    friend void swap(ByteArray& lhs, ByteArray& rhs);
 
     char* data();
     const char* data() const;
