@@ -5,7 +5,7 @@
 using namespace mocca::net;
 
 ConnectionAggregator::ConnectionAggregator(
-    std::unique_ptr<mocca::net::IConnectionListener> connectionListener,
+    std::unique_ptr<mocca::net::IPhysicalConnectionAcceptor> connectionListener,
     DisconnectStrategy disconnectStrategy)
     : disconnectStrategy_(disconnectStrategy)
     , terminate_(false)

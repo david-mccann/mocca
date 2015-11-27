@@ -36,8 +36,8 @@ protected:
 
 TYPED_TEST(ConnectionAggregatorTest, EnqueueDequeue) {
     TypeParam network;
-    auto listener = network.bind(createBindingString<TypeParam>());
-    ConnectionAggregator target(std::move(listener));
+    auto acceptor = network.bind(createBindingString<TypeParam>());
+    ConnectionAggregator target(std::move(acceptor));
     auto clientConnection1 = network.connect(createConnectionString<TypeParam>());
     auto clientConnection2 = network.connect(createConnectionString<TypeParam>());
 
@@ -62,8 +62,8 @@ TYPED_TEST(ConnectionAggregatorTest, EnqueueDequeue) {
 
 TYPED_TEST(ConnectionAggregatorTest, SendReceiveParallel) {
     TypeParam network;
-    auto listener = network.bind(createBindingString<TypeParam>());
-    ConnectionAggregator target(std::move(listener));
+    auto acceptor = network.bind(createBindingString<TypeParam>());
+    ConnectionAggregator target(std::move(acceptor));
     auto clientConnection1 = network.connect(createConnectionString<TypeParam>());
     auto clientConnection2 = network.connect(createConnectionString<TypeParam>());
 
@@ -73,7 +73,7 @@ TYPED_TEST(ConnectionAggregatorTest, SendReceiveParallel) {
         data.push_back("item " + std::to_string(i));
     }
 
-    auto sendFunction = [](AbstractConnection& connection, const std::vector<std::string>& data) {
+    auto sendFunction = [](IPhysicalConnection& connection, const std::vector<std::string>& data) {
         for (auto item : data) {
             connection.send((ByteArray() << item));
             static int sleepTime = 0;
@@ -107,8 +107,8 @@ TYPED_TEST(ConnectionAggregatorTest, SendReceiveParallel) {
 
 TYPED_TEST(ConnectionAggregatorTest, DisconnectStrategyThrowException) {
     TypeParam network;
-    auto listener = network.bind(createBindingString<TypeParam>());
-    ConnectionAggregator target(std::move(listener),
+    auto acceptor = network.bind(createBindingString<TypeParam>());
+    ConnectionAggregator target(std::move(acceptor),
                                 ConnectionAggregator::DisconnectStrategy::ThrowException);
     {
         auto clientConnection = network.connect(createConnectionString<TypeParam>());
@@ -129,8 +129,8 @@ TYPED_TEST(ConnectionAggregatorTest, DisconnectStrategyThrowException) {
 
 TYPED_TEST(ConnectionAggregatorTest, DisconnectStrategyRemoveConnection) {
     TypeParam network;
-    auto listener = network.bind(createBindingString<TypeParam>());
-    ConnectionAggregator target(std::move(listener),
+    auto acceptor = network.bind(createBindingString<TypeParam>());
+    ConnectionAggregator target(std::move(acceptor),
                                 ConnectionAggregator::DisconnectStrategy::RemoveConnection);
     {
         auto clientConnection = network.connect(createConnectionString<TypeParam>());

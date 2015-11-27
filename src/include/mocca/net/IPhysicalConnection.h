@@ -9,21 +9,13 @@ namespace mocca {
     
 namespace net {
 
-class AbstractConnection {
+class IPhysicalConnection {
 public:
-    AbstractConnection();
-    virtual ~AbstractConnection() {}
+    virtual ~IPhysicalConnection() {}
 
-    std::string identifier() const;
-    void setIdentifier(const std::string& identifier);
-
+    virtual std::string identifier() const = 0;
     virtual void send(ByteArray message) const = 0;
     virtual ByteArray receive(std::chrono::milliseconds timeout = std::chrono::milliseconds(500)) const = 0;
-
-private:
-    std::string createIdentifier() const;
-
-    std::string identifier_;
 };
 }
 }

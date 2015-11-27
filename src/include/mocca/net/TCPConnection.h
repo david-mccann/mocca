@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mocca/net/AbstractConnection.h"
+#include "mocca/net/IPhysicalConnection.h"
 #include "mocca/net/Sockets.h"
 #include "mocca/net/TCPNetworkAddress.h"
 
@@ -10,13 +10,14 @@
 namespace mocca {
 namespace net {
 
-class TCPConnection : public AbstractConnection {
+class TCPConnection : public IPhysicalConnection {
 public:
     TCPConnection(const TCPConnection& other) = delete;
     ~TCPConnection();
 
     TCPNetworkAddress networkAddress() const;
 
+    std::string identifier() const override;
     void send(ByteArray message) const override;
     ByteArray receive(std::chrono::milliseconds timeout) const override;
 

@@ -2,7 +2,7 @@
 
 #include "mocca/base/ByteArray.h"
 #include "mocca/base/MessageQueue.h"
-#include "mocca/net/AbstractConnection.h"
+#include "mocca/net/IPhysicalConnection.h"
 
 #include <string>
 #include <atomic>
@@ -23,7 +23,7 @@ using EnvelopeQueue = mocca::MessageQueue<MessageEnvelope>;
 
 class QueueingConnection {
 public:
-    QueueingConnection(std::unique_ptr<mocca::net::AbstractConnection> connection,
+    QueueingConnection(std::unique_ptr<mocca::net::IPhysicalConnection> connection,
                        EnvelopeQueue& sendQueue, EnvelopeQueue& receiveQueue);
     ~QueueingConnection();
 
@@ -34,7 +34,7 @@ private:
     void runReceive();
 
 private:
-    std::unique_ptr<mocca::net::AbstractConnection> connection_;
+    std::unique_ptr<mocca::net::IPhysicalConnection> connection_;
     EnvelopeQueue& sendQueue_;
     EnvelopeQueue& receiveQueue_;
     std::atomic<bool> terminate_;

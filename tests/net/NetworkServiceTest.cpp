@@ -41,21 +41,21 @@ TYPED_TEST(NetworkServiceTest, Identifier)
     {
         // identifier is not empty
         TypeParam target;
-        auto listener = target.bind(createBindingString<TypeParam>());
+        auto acceptor = target.bind(createBindingString<TypeParam>());
         auto clientConnection = target.connect(createConnectionString<TypeParam>());
         ASSERT_FALSE(clientConnection->identifier().empty());
-        auto serverConnection = listener->getConnection();
+        auto serverConnection = acceptor->getConnection();
         ASSERT_FALSE(serverConnection == nullptr);
         ASSERT_FALSE(serverConnection->identifier().empty());
     }
     {
         // identifiers are distinct
         TypeParam target;
-        auto listener = target.bind(createBindingString<TypeParam>());
+        auto acceptor = target.bind(createBindingString<TypeParam>());
         auto clientConnection1 = target.connect(createConnectionString<TypeParam>());
         auto clientConnection2 = target.connect(createConnectionString<TypeParam>());
-        auto serverConnection1 = listener->getConnection();
-        auto serverConnection2 = listener->getConnection();
+        auto serverConnection1 = acceptor->getConnection();
+        auto serverConnection2 = acceptor->getConnection();
         ASSERT_FALSE(serverConnection1 == nullptr);
         ASSERT_FALSE(serverConnection2 == nullptr);
         ASSERT_NE(clientConnection1->identifier(), clientConnection2->identifier());
@@ -71,38 +71,38 @@ TYPED_TEST(NetworkServiceTest, ListenerConnections) {
         ASSERT_THROW(target.connect(createConnectionString<TypeParam>()), Error);
     }
     {
-        // listener has no connection when no client connects
+        // acceptor has no connection when no client connects
         TypeParam target;
-        auto listener = target.bind(createBindingString<TypeParam>());
-        ASSERT_TRUE(listener->getConnection() == nullptr);
+        auto acceptor = target.bind(createBindingString<TypeParam>());
+        ASSERT_TRUE(acceptor->getConnection() == nullptr);
     }
     {
-        // listener has a connection when a client connects
+        // acceptor has a connection when a client connects
         TypeParam target;
-        auto listener = target.bind(createBindingString<TypeParam>());
+        auto acceptor = target.bind(createBindingString<TypeParam>());
         auto connection = target.connect(createConnectionString<TypeParam>());
-        ASSERT_FALSE(listener->getConnection() == nullptr);
+        ASSERT_FALSE(acceptor->getConnection() == nullptr);
     }
     {
-        // listener has two conenctions when two clients connect
+        // acceptor has two conenctions when two clients connect
         TypeParam target;
-        auto listener = target.bind(createBindingString<TypeParam>());
+        auto acceptor = target.bind(createBindingString<TypeParam>());
         auto connection1 = target.connect(createConnectionString<TypeParam>());
         auto connection2 = target.connect(createConnectionString<TypeParam>());
-        ASSERT_FALSE(listener->getConnection() == nullptr);
-        ASSERT_FALSE(listener->getConnection() == nullptr);
+        ASSERT_FALSE(acceptor->getConnection() == nullptr);
+        ASSERT_FALSE(acceptor->getConnection() == nullptr);
     }
     {
         // connection is removed when dequeued
         TypeParam target;
-        auto listener = target.bind(createBindingString<TypeParam>());
+        auto acceptor = target.bind(createBindingString<TypeParam>());
         auto connection = target.connect(createConnectionString<TypeParam>());
-        auto connectionFromListener = listener->getConnection();
+        auto connectionFromListener = acceptor->getConnection();
         ASSERT_FALSE(connectionFromListener == nullptr);
-        ASSERT_TRUE(listener->getConnection() == nullptr);
+        ASSERT_TRUE(acceptor->getConnection() == nullptr);
     }
     {
-        // each listener has its own queue
+        // each acceptor has its own queue
         TypeParam target;
         auto listener1 = target.bind(createBindingString<TypeParam>());
         auto listener2 = target.bind(createBindingString<TypeParam>(1));
@@ -116,9 +116,9 @@ TYPED_TEST(NetworkServiceTest, SendAndReceive) {
     {
         // client sends to server
         TypeParam target;
-        auto listener = target.bind(createBindingString<TypeParam>());
+        auto acceptor = target.bind(createBindingString<TypeParam>());
         auto clientConnection = target.connect(createConnectionString<TypeParam>());
-        auto serverConnection = listener->getConnection();
+        auto serverConnection = acceptor->getConnection();
         ASSERT_FALSE(serverConnection == nullptr);
         clientConnection->send((ByteArray() << "Hello World"));
         auto recPacket = ByteArray(serverConnection->receive());
@@ -127,9 +127,9 @@ TYPED_TEST(NetworkServiceTest, SendAndReceive) {
     {
         // server sends to client
         TypeParam target;
-        auto listener = target.bind(createBindingString<TypeParam>());
+        auto acceptor = target.bind(createBindingString<TypeParam>());
         auto clientConnection = target.connect(createConnectionString<TypeParam>());
-        auto serverConnection = listener->getConnection();
+        auto serverConnection = acceptor->getConnection();
         ASSERT_FALSE(serverConnection == nullptr);
         serverConnection->send((ByteArray() << "Hello World"));
         auto recPacket = ByteArray(clientConnection->receive());
@@ -138,12 +138,12 @@ TYPED_TEST(NetworkServiceTest, SendAndReceive) {
     {
         // two different clients and two receivers on the same port
         TypeParam target;
-        auto listener = target.bind(createBindingString<TypeParam>());
+        auto acceptor = target.bind(createBindingString<TypeParam>());
         auto clientConnection1 = target.connect(createConnectionString<TypeParam>());
-        auto serverConnection1 = listener->getConnection();
+        auto serverConnection1 = acceptor->getConnection();
         ASSERT_FALSE(serverConnection1 == nullptr);
         auto clientConnection2 = target.connect(createConnectionString<TypeParam>());
-        auto serverConnection2 = listener->getConnection();
+        auto serverConnection2 = acceptor->getConnection();
         ASSERT_FALSE(serverConnection2 == nullptr);
         clientConnection1->send((ByteArray() << "Hello from 1"));
         clientConnection2->send((ByteArray() << "Hello from 2"));
@@ -157,9 +157,9 @@ TYPED_TEST(NetworkServiceTest, SendAndReceive) {
 
 TYPED_TEST(NetworkServiceTest, ReceiveTimeout) {
     TypeParam target;
-    auto listener = target.bind(createBindingString<TypeParam>());
+    auto acceptor = target.bind(createBindingString<TypeParam>());
     auto clientConnection = target.connect(createConnectionString<TypeParam>());
-    auto serverConnection = listener->getConnection();
+    auto serverConnection = acceptor->getConnection();
     ASSERT_FALSE(serverConnection == nullptr);
     auto recPacket = ByteArray(serverConnection->receive(std::chrono::milliseconds(10)));
     ASSERT_TRUE(recPacket.isEmpty());
@@ -167,9 +167,9 @@ TYPED_TEST(NetworkServiceTest, ReceiveTimeout) {
 
 TYPED_TEST(NetworkServiceTest, ReceiveTimeoutClient) {
     TypeParam target;
-    auto listener = target.bind(createBindingString<TypeParam>());
+    auto acceptor = target.bind(createBindingString<TypeParam>());
     auto clientConnection = target.connect(createConnectionString<TypeParam>());
-    auto serverConnection = listener->getConnection();
+    auto serverConnection = acceptor->getConnection();
     ASSERT_FALSE(serverConnection == nullptr);
     auto recPacket = ByteArray(clientConnection->receive(std::chrono::milliseconds(10)));
     ASSERT_TRUE(recPacket.isEmpty());
@@ -177,9 +177,9 @@ TYPED_TEST(NetworkServiceTest, ReceiveTimeoutClient) {
 
 TYPED_TEST(NetworkServiceTest, SendReceiveParallel) {
     TypeParam target;
-    auto listener = target.bind(createBindingString<TypeParam>());
+    auto acceptor = target.bind(createBindingString<TypeParam>());
     auto clientConnection = target.connect(createConnectionString<TypeParam>());
-    auto serverConnection = listener->getConnection();
+    auto serverConnection = acceptor->getConnection();
     ASSERT_FALSE(serverConnection == nullptr);
     
     const int numItems = 200;

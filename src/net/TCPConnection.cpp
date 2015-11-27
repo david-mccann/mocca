@@ -20,6 +20,10 @@ mocca::net::TCPConnection::~TCPConnection()
     }
 }
 
+std::string mocca::net::TCPConnection::identifier() const {
+    return networkAddress_.toString();
+}
+
 TCPNetworkAddress TCPConnection::networkAddress() const { return networkAddress_; }
 
 void TCPConnection::send(ByteArray message) const {
