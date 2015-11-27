@@ -18,7 +18,7 @@ TCPConnectionAcceptor::TCPConnectionAcceptor(int port)
     }
 }
 
-std::unique_ptr<IProtocolConnection> TCPConnectionAcceptor::getConnection(std::chrono::milliseconds timeout) {
+std::unique_ptr<IPhysicalConnection> TCPConnectionAcceptor::getConnection(std::chrono::milliseconds timeout) {
     IVDA::TCPSocket* connectionSocket = nullptr;
     try {
         server_.AcceptNewConnection((IVDA::ConnectionSocket**)&connectionSocket, static_cast<uint32_t>(timeout.count()));
@@ -29,10 +29,7 @@ std::unique_ptr<IProtocolConnection> TCPConnectionAcceptor::getConnection(std::c
     }
     if (connectionSocket) {
         auto socketPtr = std::unique_ptr<IVDA::ConnectionSocket>(connectionSocket);
-        TCPNetworkAddress address(connectionSocket->GetPeerAddress(),
-            connectionSocket->GetPeerPort());
-        return std::unique_ptr<TCPConnection>(
-            new TCPConnection(address, move(socketPtr)));
+        return std::unique_ptr<TCPConnection>(new TCPConnection(move(socketPtr)));
     }
     return nullptr;
 }

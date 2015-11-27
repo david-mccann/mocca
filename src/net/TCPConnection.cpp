@@ -1,69 +1,66 @@
 #include "mocca/net/TCPConnection.h"
 
+
 namespace mocca {
 namespace net {
 
-TCPConnection::TCPConnection(const TCPNetworkAddress& networkAddress,
-                             std::unique_ptr<IVDA::ConnectionSocket> socket)
-    : networkAddress_(networkAddress), socket_(move(socket)) {}
+TCPConnection::TCPConnection(std::unique_ptr<IVDA::ConnectionSocket> socket)
+    : socket_(move(socket))
+    , identifier_(createIdentifier()) {}
 
-mocca::net::TCPConnection::~TCPConnection()
-{
+TCPConnection::~TCPConnection() {
     if (socket_ != nullptr) {
         try {
             socket_->Disconnect();
             socket_->Close();
-        }
-        catch (IVDA::SocketException&) {
+        } catch (IVDA::SocketException&) {
             // ignore exception; exceptions must not escape the destructor!
         }
     }
 }
 
-std::string mocca::net::TCPConnection::identifier() const {
-    return networkAddress_.toString();
+std::string TCPConnection::identifier() const {
+    return identifier_;
 }
 
-TCPNetworkAddress TCPConnection::networkAddress() const { return networkAddress_; }
+std::string TCPConnection::createIdentifier() {
+    static unsigned int count = 0;
+    ++count;
+    return "tcp_" + std::to_string(count);
+}
 
-void TCPConnection::send(ByteArray message) const {
+void TCPConnection::lock() {
+    mutex_.lock();
+}
+
+void mocca::net::TCPConnection::unlock() {
+    mutex_.unlock();
+}
+
+void TCPConnection::send(ByteArray message, std::chrono::milliseconds timeout) const {
     try {
-        std::lock_guard<std::mutex> lock(sendMx_);
-        socket_->SendInt(message.size());
-        socket_->SendData((const int8_t*)message.data(), message.size());
-    }
-    catch (const IVDA::SocketConnectionException& err) {
-        throw ConnectionClosedError("Connection to peer " + socket_->GetPeerAddress() +
-            " lost during send operation (internal error: " + err.what() + ")",
-            __FILE__, __LINE__);
-    }
-    catch (const IVDA::SocketException& err) {
+        socket_->SendData((const int8_t*)message.data(), message.size(), static_cast<uint32_t>(timeout.count()));
+    } catch (const IVDA::SocketConnectionException& err) {
+        throw ConnectionClosedError("Connection to peer " + socket_->GetPeerAddress() + " lost during send operation (internal error: " +
+                                        err.what() + ")",
+                                    __FILE__, __LINE__);
+    } catch (const IVDA::SocketException& err) {
         std::string internalError(err.what());
         throw NetworkError("Network error in send operation (internal error: " + internalError + ")", __FILE__, __LINE__);
     }
 }
 
-ByteArray TCPConnection::receive(std::chrono::milliseconds timeout) const { 
+ByteArray TCPConnection::receive(uint32_t maxSize, std::chrono::milliseconds timeout) const {
     try {
-        int messageSize;
-        std::lock_guard<std::mutex> lock(receiveMx_);
-        auto bytesRead = socket_->ReceiveInt(messageSize, static_cast<uint32_t>(timeout.count() / 2));
-        if (bytesRead == sizeof(int)) {
-            ByteArray message(messageSize);
-            auto bytesRead = socket_->ReceiveData((int8_t*)message.data(), messageSize, static_cast<uint32_t>(timeout.count() / 2));
-            if (bytesRead == messageSize) {
-                message.setSize(messageSize);
-                return message;
-            }
-        }
-        return ByteArray();
-    }
-    catch (const IVDA::SocketConnectionException& err) {
-        throw ConnectionClosedError("Connection to peer " + socket_->GetPeerAddress() +
-            " lost during receive operation (internal error: " + err.what() + ")",
-            __FILE__, __LINE__);
-    }
-    catch (const IVDA::SocketException& err) {
+        ByteArray message(maxSize);
+        auto bytesRead = socket_->ReceiveData((int8_t*)message.data(), maxSize, static_cast<uint32_t>(timeout.count()));
+        message.setSize(bytesRead);
+        return message;
+    } catch (const IVDA::SocketConnectionException& err) {
+        throw ConnectionClosedError("Connection to peer " + socket_->GetPeerAddress() + " lost during receive operation (internal error: " +
+                                        err.what() + ")",
+                                    __FILE__, __LINE__);
+    } catch (const IVDA::SocketException& err) {
         std::string internalErr(err.what());
         throw NetworkError("Network error in receive operation (internal error: " + internalErr + ")", __FILE__, __LINE__);
     }

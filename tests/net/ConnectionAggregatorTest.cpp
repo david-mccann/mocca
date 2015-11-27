@@ -4,10 +4,9 @@
 
 #include "mocca/base/ByteArray.h"
 #include "mocca/net/ConnectionAggregator.h"
-//#include "mocca/net/TCPNetworkAddress.h"
 #include "mocca/net/LoopbackNetworkService_tmp.h"
 #include "mocca/net/LoopbackConnectionAcceptor_tmp.h"
-//#include "mocca/net/TCPNetworkService.h"
+#include "mocca/net/TCPNetworkService.h"
 #include "mocca/net/Error.h"
 #include "mocca/net/MoccaNetworkService.h"
 
@@ -18,7 +17,7 @@ using namespace mocca::net;
 using namespace mocca::testing;
 
 #ifdef MOCCA_TEST_TCP
-typedef ::testing::Types<LoopbackNetworkService, TCPNetworkService> MyTypes;
+typedef ::testing::Types<LoopbackNetworkService_tmp, TCPNetworkService> MyTypes;
 #else
 typedef ::testing::Types<LoopbackNetworkService_tmp> MyTypes;
 #endif
@@ -50,8 +49,8 @@ TYPED_TEST(ConnectionAggregatorTest, EnqueueDequeue) {
     clientConnection1->send(packet1);
     clientConnection2->send(packet2);
 
-    auto data1 = target.receive(std::chrono::milliseconds(1));
-    auto data2 = target.receive(std::chrono::milliseconds(1));
+    auto data1 = target.receive(std::chrono::milliseconds(200));
+    auto data2 = target.receive(std::chrono::milliseconds(200));
     ASSERT_FALSE(data1.isNull());
     ASSERT_FALSE(data2.isNull());
     ByteArray recPacket1(data1.release().message);

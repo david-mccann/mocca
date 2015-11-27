@@ -20,7 +20,7 @@
 namespace mocca {
 namespace net {
 
-std::unique_ptr<IProtocolConnection>
+std::unique_ptr<IPhysicalConnection>
 TCPNetworkService::connect(const std::string& connectionString) {
     TCPNetworkAddress networkAddress(connectionString);
     auto socket = std::unique_ptr<IVDA::TCPSocket>(new IVDA::TCPSocket());
@@ -35,13 +35,12 @@ TCPNetworkService::connect(const std::string& connectionString) {
         throw NetworkError("Network error in connect operation (internal error: " + 
              internalError + ")", __FILE__, __LINE__);
     }
-    return std::unique_ptr<TCPConnection>(
-        new TCPConnection(networkAddress, std::move(socket)));
+    return std::unique_ptr<TCPConnection>(new TCPConnection(std::move(socket)));
 }
 
-std::unique_ptr<IProtocolConnectionAcceptor> TCPNetworkService::bind(const std::string& portString) {
+std::unique_ptr<IPhysicalConnectionAcceptor> TCPNetworkService::bind(const std::string& portString) {
     int port = TCPNetworkAddress::parsePort(portString);
-    return std::unique_ptr<IProtocolConnectionAcceptor>(new TCPConnectionAcceptor(port));
+    return std::unique_ptr<IPhysicalConnectionAcceptor>(new TCPConnectionAcceptor(port));
 }
 
 #ifdef WIN32
