@@ -168,14 +168,14 @@ TEST_F(ByteArrayTest, Bool) {
         target << true;
         bool result = false;
         target >> result;
-        ASSERT_EQ(true, result);
+        ASSERT_TRUE(result);
     }
     {
         ByteArray target;
         target << false;
         bool result = true;
         target >> result;
-        ASSERT_EQ(false, result);
+        ASSERT_FALSE(result);
     }
 }
 
