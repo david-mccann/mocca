@@ -167,9 +167,6 @@ TYPED_TEST(NetworkServiceTest, ReceiveTimeoutClient) {
     ASSERT_TRUE(recPacket.isEmpty());
 }
 
-// fixme: physical connection must be locked during send and receive
-
-/*
 TYPED_TEST(NetworkServiceTest, SendReceiveParallel) {
     auto acceptor = target->bind(createBindingString<TypeParam>());
     auto clientConnection = target->connect(createConnectionString<TypeParam>());
@@ -203,4 +200,4 @@ TYPED_TEST(NetworkServiceTest, SendReceiveParallel) {
     for (auto item : data) {
         ASSERT_TRUE(std::find(begin(result), end(result), item) != end(result));
     }
-}*/
+}

@@ -1,6 +1,8 @@
 #include "mocca/net/MoccaConnection.h"
 #include "mocca/net/PhysicalConnection.h"
 
+#include <mutex>
+
 using namespace mocca;
 using namespace mocca::net;
 
@@ -20,6 +22,7 @@ void MoccaConnection::send(ByteArray message) const {
 }
 
 ByteArray MoccaConnection::receive(std::chrono::milliseconds timeout) const {
+    std::lock_guard<IPhysicalConnection> lock(*physicalConnection_);
     auto sizeData = receiveExactly(*physicalConnection_, sizeof(uint32_t), timeout);
     if (sizeData.isEmpty()) {
         return ByteArray();

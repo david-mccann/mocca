@@ -2,6 +2,8 @@
 
 #include "mocca/net/IPhysicalConnection.h"
 
+#include <mutex>
+
 namespace mocca {
 
 template <typename T> class MessageQueue;
@@ -21,6 +23,8 @@ public:
     ~LoopbackConnection_tmp();
 
     std::string identifier() const override;
+    void lock() override;
+    void unlock() override;
     void send(ByteArray message, std::chrono::milliseconds timeout) const override;
     ByteArray receive(uint32_t maxSize, std::chrono::milliseconds timeout) const override;
 
@@ -37,6 +41,7 @@ private:
 
     mutable int numSendConnections_;
     mutable int numReceiveConnections_;
+    std::mutex mutex_;
 };
 }
 }

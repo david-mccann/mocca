@@ -17,18 +17,26 @@ LoopbackConnection_tmp::LoopbackConnection_tmp(std::shared_ptr<LoopbackMessageQu
     , outSignalQueue_(outSignalQueue)
     , inSignalQueue_(inSignalQueue) {}
 
-mocca::net::LoopbackConnection_tmp::~LoopbackConnection_tmp() {
+LoopbackConnection_tmp::~LoopbackConnection_tmp() {
     outSignalQueue_->enqueue(Signal::Disconnect);
 }
 
-std::string mocca::net::LoopbackConnection_tmp::createIdentifier() {
+std::string LoopbackConnection_tmp::createIdentifier() {
     static unsigned int count = 0;
     ++count;
     return "loopback_" + std::to_string(count);
 }
 
-std::string mocca::net::LoopbackConnection_tmp::identifier() const {
+std::string LoopbackConnection_tmp::identifier() const {
     return identifier_;
+}
+
+void LoopbackConnection_tmp::lock() {
+    mutex_.lock();
+}
+
+void LoopbackConnection_tmp::unlock() {
+    mutex_.unlock();
 }
 
 void LoopbackConnection_tmp::send(ByteArray message, std::chrono::milliseconds timeout) const {
