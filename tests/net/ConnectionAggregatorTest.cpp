@@ -73,7 +73,7 @@ TYPED_TEST(ConnectionAggregatorTest, SendReceiveParallel) {
         data.push_back("item " + std::to_string(i));
     }
 
-    auto sendFunction = [](IPhysicalConnection& connection, const std::vector<std::string>& data) {
+    auto sendFunction = [](IProtocolConnection& connection, const std::vector<std::string>& data) {
         for (auto item : data) {
             connection.send((ByteArray() << item));
             static int sleepTime = 0;

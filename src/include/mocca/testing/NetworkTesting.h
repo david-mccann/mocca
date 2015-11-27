@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mocca/net/IPhysicalConnectionAcceptor.h"
+#include "mocca/net/IProtocolConnectionAcceptor.h"
 #include "mocca/net/NetworkServiceLocator.h"
 #include "mocca/net/LoopbackNetworkService.h"
 #include "mocca/net/TCPNetworkService.h"

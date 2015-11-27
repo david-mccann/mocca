@@ -8,7 +8,7 @@
 //namespace mocca {
 //namespace net {
 //
-//std::unique_ptr<IPhysicalConnection>
+//std::unique_ptr<IProtocolConnection>
 //WSNetworkService::connect(const std::string& connectionString) {
 //    TCPNetworkAddress networkAddress(connectionString);
 //    auto socket = std::unique_ptr<IVDA::TCPSocket>(new IVDA::TCPSocket());
@@ -27,9 +27,9 @@
 //        new WSConnection(networkAddress, std::move(socket)));
 //}
 //
-//std::unique_ptr<IPhysicalConnectionAcceptor> WSNetworkService::bind(const std::string& portString) {
+//std::unique_ptr<IProtocolConnectionAcceptor> WSNetworkService::bind(const std::string& portString) {
 //    int port = TCPNetworkAddress::parsePort(portString);
-//    return std::unique_ptr<IPhysicalConnectionAcceptor>(new WSConnectionListener(port));
+//    return std::unique_ptr<IProtocolConnectionAcceptor>(new WSConnectionListener(port));
 //}
 //
 //}

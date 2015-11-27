@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mocca/net/IPhysicalConnection.h"
+#include "mocca/net/IProtocolConnection.h"
 
 namespace mocca {
 
@@ -9,7 +9,7 @@ class ByteArray;
 
 namespace net {
 
-class LoopbackConnection : public IPhysicalConnection {
+class LoopbackConnection : public IProtocolConnection {
 public:
     enum class Signal { Disconnect };
 

@@ -8,7 +8,7 @@ MessageEnvelope::MessageEnvelope(mocca::ByteArray msg, std::string id)
 MessageEnvelope::MessageEnvelope(MessageEnvelope&& other)
     : message(std::move(other.message)), senderID(std::move(other.senderID)) {}
 
-QueueingConnection::QueueingConnection(std::unique_ptr<mocca::net::IPhysicalConnection> connection,
+QueueingConnection::QueueingConnection(std::unique_ptr<mocca::net::IProtocolConnection> connection,
                                        EnvelopeQueue& sendQueue, EnvelopeQueue& receiveQueue)
     : connection_(std::move(connection)), sendQueue_(sendQueue), receiveQueue_(receiveQueue),
       terminate_(false), sendThread_(std::thread(&QueueingConnection::runSend, this)),

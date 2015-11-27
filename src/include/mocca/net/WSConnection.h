@@ -1,6 +1,6 @@
 //#pragma once
 //
-//#include "mocca/net/IPhysicalConnection.h"
+//#include "mocca/net/IProtocolConnection.h"
 //#include "mocca/net/Sockets.h"
 //#include "mocca/net/TCPNetworkAddress.h"
 //#include "mocca/net/WSConnection.h"
@@ -17,7 +17,7 @@
 //
 //	const int HANDSHAKE_MSG_SIZE_MAX = 512;
 //
-//	class WSConnection : public IPhysicalConnection {
+//	class WSConnection : public IProtocolConnection {
 //public:
 //	WSConnection(const WSConnection& other) = delete;
 //	~WSConnection();

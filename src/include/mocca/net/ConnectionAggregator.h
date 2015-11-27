@@ -2,7 +2,7 @@
 
 #include "mocca/base/Nullable.h"
 #include "mocca/net/QueueingConnection.h"
-#include "mocca/net/IPhysicalConnectionAcceptor.h"
+#include "mocca/net/IProtocolConnectionAcceptor.h"
 
 #include <thread>
 #include <vector>
@@ -16,7 +16,7 @@ public:
     enum class DisconnectStrategy { RemoveConnection, ThrowException };
 
     ConnectionAggregator(
-        std::unique_ptr<mocca::net::IPhysicalConnectionAcceptor> connectionAcceptor,
+        std::unique_ptr<mocca::net::IProtocolConnectionAcceptor> connectionAcceptor,
         DisconnectStrategy disconnectStrategy = DisconnectStrategy::ThrowException);
     ~ConnectionAggregator();
 
@@ -33,7 +33,7 @@ private:
     EnvelopeQueue receiveQueue_;
     std::list<QueueingConnection> connections_;
     std::atomic<bool> terminate_;
-    std::unique_ptr<mocca::net::IPhysicalConnectionAcceptor> connectionAcceptor_;
+    std::unique_ptr<mocca::net::IProtocolConnectionAcceptor> connectionAcceptor_;
     std::thread acceptorThread_;
     std::exception_ptr currentException_;
 };

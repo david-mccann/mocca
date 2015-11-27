@@ -12,7 +12,7 @@ LoopbackConnectionAcceptor::LoopbackConnectionAcceptor(
     std::shared_ptr<LoopbackConnectionQueue> connectionQueue)
     : connectionQueue_(connectionQueue) {}
 
-std::unique_ptr<IPhysicalConnection> LoopbackConnectionAcceptor::getConnection(std::chrono::milliseconds timeout) {
+std::unique_ptr<IProtocolConnection> LoopbackConnectionAcceptor::getConnection(std::chrono::milliseconds timeout) {
     auto connectionNullable = connectionQueue_->tryDequeue(timeout);
     if (connectionNullable.isNull()) {
         return nullptr;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mocca/net/IPhysicalConnection.h"
+#include "mocca/net/IProtocolConnection.h"
 #include "mocca/net/Sockets.h"
 #include "mocca/net/TCPNetworkAddress.h"
 
@@ -10,7 +10,7 @@
 namespace mocca {
 namespace net {
 
-class TCPConnection : public IPhysicalConnection {
+class TCPConnection : public IProtocolConnection {
 public:
     TCPConnection(const TCPConnection& other) = delete;
     ~TCPConnection();
