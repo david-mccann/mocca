@@ -15,7 +15,7 @@
 #include "mocca/net/TCPNetworkService.h"
 #include "mocca/net/TCPNetworkAddress.h"
 #include "mocca/net/TCPConnection.h"
-#include "mocca/net/TCPConnectionListener.h"
+#include "mocca/net/TCPConnectionAcceptor.h"
 
 namespace mocca {
 namespace net {
@@ -41,7 +41,7 @@ TCPNetworkService::connect(const std::string& connectionString) {
 
 std::unique_ptr<IPhysicalConnectionAcceptor> TCPNetworkService::bind(const std::string& portString) {
     int port = TCPNetworkAddress::parsePort(portString);
-    return std::unique_ptr<IPhysicalConnectionAcceptor>(new TCPConnectionListener(port));
+    return std::unique_ptr<IPhysicalConnectionAcceptor>(new TCPConnectionAcceptor(port));
 }
 
 #ifdef WIN32

@@ -23,7 +23,7 @@ public:
 
 private:
     friend class TCPNetworkService;
-    friend class TCPConnectionListener;
+    friend class TCPConnectionAcceptor;
 
     TCPConnection(const TCPNetworkAddress& networkAddress, std::unique_ptr<IVDA::ConnectionSocket> socket);
 

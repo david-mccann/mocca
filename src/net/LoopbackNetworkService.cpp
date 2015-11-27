@@ -2,7 +2,7 @@
 #include "mocca/base/MessageQueue.h"
 #include "mocca/net/LoopbackNetworkService.h"
 #include "mocca/net/LoopbackConnection.h"
-#include "mocca/net/LoopbackConnectionListener.h"
+#include "mocca/net/LoopbackConnectionAcceptor.h"
 #include "mocca/net/TCPNetworkAddress.h"
 #include "mocca/net/Error.h"
 
@@ -33,7 +33,7 @@ std::unique_ptr<IPhysicalConnection> LoopbackNetworkService::connect(const std::
 std::unique_ptr<IPhysicalConnectionAcceptor> LoopbackNetworkService::bind(const std::string& queueName) {
     auto queue = std::make_shared<LoopbackConnectionQueue>();
     spawnedConnections_[queueName] = queue;
-    return std::unique_ptr<IPhysicalConnectionAcceptor>(new LoopbackConnectionListener(queue));
+    return std::unique_ptr<IPhysicalConnectionAcceptor>(new LoopbackConnectionAcceptor(queue));
 }
 }
 }

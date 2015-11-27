@@ -8,10 +8,10 @@ namespace net {
 
 class LoopbackNetworkService;
 
-class LoopbackConnectionListener : public IPhysicalConnectionAcceptor {
+class LoopbackConnectionAcceptor : public IPhysicalConnectionAcceptor {
     using LoopbackConnectionQueue = MessageQueue<std::unique_ptr<LoopbackConnection>>;
 public:
-    LoopbackConnectionListener(std::shared_ptr<LoopbackConnectionQueue> connectionQueue);
+    LoopbackConnectionAcceptor(std::shared_ptr<LoopbackConnectionQueue> connectionQueue);
     virtual std::unique_ptr<IPhysicalConnection> getConnection(std::chrono::milliseconds timeout) override;
 
 private:

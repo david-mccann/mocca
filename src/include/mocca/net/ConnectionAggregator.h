@@ -16,7 +16,7 @@ public:
     enum class DisconnectStrategy { RemoveConnection, ThrowException };
 
     ConnectionAggregator(
-        std::unique_ptr<mocca::net::IPhysicalConnectionAcceptor> connectionListener,
+        std::unique_ptr<mocca::net::IPhysicalConnectionAcceptor> connectionAcceptor,
         DisconnectStrategy disconnectStrategy = DisconnectStrategy::ThrowException);
     ~ConnectionAggregator();
 
@@ -33,8 +33,8 @@ private:
     EnvelopeQueue receiveQueue_;
     std::list<QueueingConnection> connections_;
     std::atomic<bool> terminate_;
-    std::unique_ptr<mocca::net::IPhysicalConnectionAcceptor> connectionListener_;
-    std::thread listenerThread_;
+    std::unique_ptr<mocca::net::IPhysicalConnectionAcceptor> connectionAcceptor_;
+    std::thread acceptorThread_;
     std::exception_ptr currentException_;
 };
 }

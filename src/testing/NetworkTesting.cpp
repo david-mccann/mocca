@@ -1,5 +1,5 @@
 #include "mocca/testing/NetworkTesting.h"
-#include "mocca/net/LoopbackConnectionListener.h"
+#include "mocca/net/LoopbackConnectionAcceptor.h"
 
 #include <chrono>
 

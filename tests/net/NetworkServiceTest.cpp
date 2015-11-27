@@ -5,7 +5,7 @@
 #include "mocca/base/ByteArray.h"
 #include "mocca/net/TCPNetworkAddress.h"
 #include "mocca/net/LoopbackNetworkService.h"
-#include "mocca/net/LoopbackConnectionListener.h"
+#include "mocca/net/LoopbackConnectionAcceptor.h"
 #include "mocca/net/TCPNetworkService.h"
 
 #include "mocca/testing/NetworkTesting.h"
@@ -64,7 +64,7 @@ TYPED_TEST(NetworkServiceTest, Identifier)
     }
 }
 
-TYPED_TEST(NetworkServiceTest, ListenerConnections) {
+TYPED_TEST(NetworkServiceTest, AcceptorConnections) {
     {
         // cannot connect to an unbound port
         TypeParam target;
@@ -97,18 +97,18 @@ TYPED_TEST(NetworkServiceTest, ListenerConnections) {
         TypeParam target;
         auto acceptor = target.bind(createBindingString<TypeParam>());
         auto connection = target.connect(createConnectionString<TypeParam>());
-        auto connectionFromListener = acceptor->getConnection();
-        ASSERT_FALSE(connectionFromListener == nullptr);
+        auto connectionFromAcceptor = acceptor->getConnection();
+        ASSERT_FALSE(connectionFromAcceptor == nullptr);
         ASSERT_TRUE(acceptor->getConnection() == nullptr);
     }
     {
         // each acceptor has its own queue
         TypeParam target;
-        auto listener1 = target.bind(createBindingString<TypeParam>());
-        auto listener2 = target.bind(createBindingString<TypeParam>(1));
+        auto acceptor1 = target.bind(createBindingString<TypeParam>());
+        auto acceptor2 = target.bind(createBindingString<TypeParam>(1));
         auto connection = target.connect(createConnectionString<TypeParam>(1));
-        ASSERT_TRUE(listener1->getConnection() == nullptr);
-        ASSERT_FALSE(listener2->getConnection() == nullptr);
+        ASSERT_TRUE(acceptor1->getConnection() == nullptr);
+        ASSERT_FALSE(acceptor2->getConnection() == nullptr);
     }
 }
 

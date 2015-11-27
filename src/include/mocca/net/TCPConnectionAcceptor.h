@@ -10,15 +10,15 @@
 namespace mocca {
 namespace net {
 
-class TCPConnectionListener : public IPhysicalConnectionAcceptor {
+class TCPConnectionAcceptor : public IPhysicalConnectionAcceptor {
 public:
-    TCPConnectionListener(const TCPConnectionListener& other) = delete;
+    TCPConnectionAcceptor(const TCPConnectionAcceptor& other) = delete;
     std::unique_ptr<IPhysicalConnection> getConnection(std::chrono::milliseconds timeout) override;
 
 private:
     friend class TCPNetworkService;
 
-    TCPConnectionListener(int port);
+    TCPConnectionAcceptor(int port);
 
     IVDA::TCPServer server_;
 };

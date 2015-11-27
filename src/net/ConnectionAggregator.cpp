@@ -5,17 +5,17 @@
 using namespace mocca::net;
 
 ConnectionAggregator::ConnectionAggregator(
-    std::unique_ptr<mocca::net::IPhysicalConnectionAcceptor> connectionListener,
+    std::unique_ptr<mocca::net::IPhysicalConnectionAcceptor> connectionAcceptor,
     DisconnectStrategy disconnectStrategy)
     : disconnectStrategy_(disconnectStrategy)
     , terminate_(false)
-    , connectionListener_(std::move(connectionListener))
-    , listenerThread_(std::thread(&ConnectionAggregator::runListen, this)) {}
+    , connectionAcceptor_(std::move(connectionAcceptor))
+    , acceptorThread_(std::thread(&ConnectionAggregator::runListen, this)) {}
 
 ConnectionAggregator::~ConnectionAggregator() {
     terminate_ = true;
-    if (listenerThread_.joinable()) {
-        listenerThread_.join();
+    if (acceptorThread_.joinable()) {
+        acceptorThread_.join();
     }
     connections_.clear();
 }
@@ -37,7 +37,7 @@ void ConnectionAggregator::send(MessageEnvelope envelope) {
 void ConnectionAggregator::runListen() {
     while (!terminate_) {
         checkConnectionExceptions();
-        auto connection = connectionListener_->getConnection(std::chrono::milliseconds(500));
+        auto connection = connectionAcceptor_->getConnection(std::chrono::milliseconds(500));
         if (connection != nullptr) {
             connections_.emplace_back(std::move(connection), sendQueue_, receiveQueue_);
         }
