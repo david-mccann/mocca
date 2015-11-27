@@ -5,6 +5,8 @@
 static_assert(std::numeric_limits<float>::is_iec559 == true, "Unsupported floating point type");
 static_assert(std::numeric_limits<double>::is_iec559 == true, "Unsupported floating point type");
 
+#define MOCCA_BYTEARRAY_CHECKS
+
 namespace mocca {
 
 const unsigned char ByteArray::trueConst;
@@ -24,7 +26,7 @@ ByteArray::ByteArray(const ByteArray& other)
     memcpy(data_.get(), other.data_.get(), other.size_);
 }
 
-mocca::ByteArray::ByteArray(ByteArray&& other)
+ByteArray::ByteArray(ByteArray&& other)
     : data_(std::move(other.data_))
     , capacity_(other.capacity_)
     , size_(other.size_)
@@ -34,10 +36,17 @@ mocca::ByteArray::ByteArray(ByteArray&& other)
     other.readPos_ = 0;
 }
 
-ByteArray& mocca::ByteArray::operator=(ByteArray other) {
-    ByteArray tmp(std::move(other));
-    std::swap(tmp, *this);
+ByteArray& ByteArray::operator=(ByteArray other) {
+    swap(other, *this);
     return *this;
+}
+
+void swap(ByteArray& lhs, ByteArray& rhs) {
+    using std::swap;
+    swap(lhs.data_, rhs.data_);
+    swap(lhs.capacity_, rhs.capacity_);
+    swap(lhs.size_, rhs.size_);
+    swap(lhs.readPos_, rhs.readPos_);
 }
 
 char* ByteArray::data() {
@@ -89,13 +98,13 @@ ByteArray ByteArray::createFromRaw(const void* raw, uint32_t size) {
     return byteArray;
 }
 
-ByteArray& mocca::ByteArray::operator<<(int32_t val) {
+ByteArray& ByteArray::operator<<(int32_t val) {
     append(&val, sizeof(int32_t));
     return *this;
 }
 
-ByteArray& mocca::ByteArray::operator>>(int32_t& val) {
-#ifdef MUI_BYTEARRAY_CHECKS
+ByteArray& ByteArray::operator>>(int32_t& val) {
+#ifdef MOCCA_BYTEARRAY_CHECKS
     if (readPos_ + sizeof(int32_t) > size_) {
         throw Error("Reading beyond end of packet", __FILE__, __LINE__);
     }
@@ -105,21 +114,21 @@ ByteArray& mocca::ByteArray::operator>>(int32_t& val) {
     return *this;
 }
 
-ByteArray& mocca::ByteArray::operator<<(uint32_t val) {
+ByteArray& ByteArray::operator<<(uint32_t val) {
     return (*this << (int32_t)val);
 }
 
-ByteArray& mocca::ByteArray::operator>>(uint32_t& val) {
+ByteArray& ByteArray::operator>>(uint32_t& val) {
     return (*this >> (int32_t&)val);
 }
 
-ByteArray& mocca::ByteArray::operator<<(int64_t val) {
+ByteArray& ByteArray::operator<<(int64_t val) {
     append(&val, sizeof(int64_t));
     return *this;
 }
 
-ByteArray& mocca::ByteArray::operator>>(int64_t& val) {
-#ifdef MUI_BYTEARRAY_CHECKS
+ByteArray& ByteArray::operator>>(int64_t& val) {
+#ifdef MOCCA_BYTEARRAY_CHECKS
     if (readPos_ + sizeof(int64_t) > size_) {
         throw Error("Reading beyond end of packet", __FILE__, __LINE__);
     }
@@ -129,15 +138,15 @@ ByteArray& mocca::ByteArray::operator>>(int64_t& val) {
     return *this;
 }
 
-ByteArray& mocca::ByteArray::operator<<(uint64_t val) {
+ByteArray& ByteArray::operator<<(uint64_t val) {
     return (*this << (int64_t)val);
 }
 
-ByteArray& mocca::ByteArray::operator>>(uint64_t& val) {
+ByteArray& ByteArray::operator>>(uint64_t& val) {
     return (*this >> (int64_t&)val);
 }
 
-ByteArray& mocca::ByteArray::operator<<(bool val) {
+ByteArray& ByteArray::operator<<(bool val) {
     if (val) {
         append(&trueConst, sizeof(unsigned char));
     } else {
@@ -146,15 +155,15 @@ ByteArray& mocca::ByteArray::operator<<(bool val) {
     return *this;
 }
 
-ByteArray& mocca::ByteArray::operator>>(bool& val) {
-#ifdef MUI_BYTEARRAY_CHECKS
+ByteArray& ByteArray::operator>>(bool& val) {
+#ifdef MOCCA_BYTEARRAY_CHECKS
     if (readPos_ + sizeof(unsigned char) > size_) {
         throw Error("Reading beyond end of packet", __FILE__, __LINE__);
     }
 #endif
     unsigned char code;
     memcpy(&code, data_.get() + readPos_, sizeof(unsigned char));
-#ifdef MUI_BYTEARRAY_CHECKS
+#ifdef MOCCA_BYTEARRAY_CHECKS
     if (code != trueConst && code != falseConst) {
         throw Error("Package corrupted", __FILE__, __LINE__);
     }
@@ -164,13 +173,13 @@ ByteArray& mocca::ByteArray::operator>>(bool& val) {
     return *this;
 }
 
-ByteArray& mocca::ByteArray::operator<<(float val) {
+ByteArray& ByteArray::operator<<(float val) {
     append(&val, sizeof(float));
     return *this;
 }
 
-ByteArray& mocca::ByteArray::operator>>(float& val) {
-#ifdef MUI_BYTEARRAY_CHECKS
+ByteArray& ByteArray::operator>>(float& val) {
+#ifdef MOCCA_BYTEARRAY_CHECKS
     if (readPos_ + sizeof(float) > size_) {
         throw Error("Reading beyond end of packet", __FILE__, __LINE__);
     }
@@ -180,13 +189,13 @@ ByteArray& mocca::ByteArray::operator>>(float& val) {
     return *this;
 }
 
-ByteArray& mocca::ByteArray::operator<<(double val) {
+ByteArray& ByteArray::operator<<(double val) {
     append(&val, sizeof(double));
     return *this;
 }
 
-ByteArray& mocca::ByteArray::operator>>(double& val) {
-#ifdef MUI_BYTEARRAY_CHECKS
+ByteArray& ByteArray::operator>>(double& val) {
+#ifdef MOCCA_BYTEARRAY_CHECKS
     if (readPos_ + sizeof(double) > size_) {
         throw Error("Reading beyond end of packet", __FILE__, __LINE__);
     }
@@ -205,7 +214,7 @@ ByteArray& ByteArray::operator<<(const std::string& val) {
 ByteArray& ByteArray::operator>>(std::string& val) {
     uint32_t strSize;
     *this >> strSize;
-#ifdef MUI_BYTEARRAY_CHECKS
+#ifdef MOCCA_BYTEARRAY_CHECKS
     if (readPos_ + strSize > size_) {
         throw Error("Reading beyond end of packet", __FILE__, __LINE__);
     }
@@ -216,20 +225,20 @@ ByteArray& ByteArray::operator>>(std::string& val) {
     return *this;
 }
 
-ByteArray& mocca::ByteArray::operator<<(const char* val) {
+ByteArray& ByteArray::operator<<(const char* val) {
     return (*this << std::string(val));
 }
 
-ByteArray& mocca::ByteArray::operator<<(const ByteArray& val) {
+ByteArray& ByteArray::operator<<(const ByteArray& val) {
     *this << (int32_t)val.size();
     append(val.data(), val.size());
     return *this;
 }
 
-ByteArray& mocca::ByteArray::operator>>(ByteArray& val) {
+ByteArray& ByteArray::operator>>(ByteArray& val) {
     int32_t innerSize;
     *this >> innerSize;
-#ifdef MUI_BYTEARRAY_CHECKS
+#ifdef MOCCA_BYTEARRAY_CHECKS
     if (readPos_ + innerSize > size_) {
         throw Error("Reading beyond end of packet", __FILE__, __LINE__);
     }
@@ -239,7 +248,7 @@ ByteArray& mocca::ByteArray::operator>>(ByteArray& val) {
     return *this;
 }
 
-void mocca::ByteArray::resetReadPos() {
+void ByteArray::resetReadPos() {
     readPos_ = 0;
 }
 }
