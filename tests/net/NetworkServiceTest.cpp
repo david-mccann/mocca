@@ -3,8 +3,8 @@
 #include "mocca/base/Error.h"
 #include "mocca/base/Thread.h"
 #include "mocca/base/ByteArray.h"
-#include "mocca/net/LoopbackNetworkService_tmp.h"
-#include "mocca/net/LoopbackConnectionAcceptor_tmp.h"
+#include "mocca/testing/LoopbackPhysicalNetworkService.h"
+#include "mocca/testing/LoopbackPhysicalConnectionAcceptor.h"
 #include "mocca/net/TCPNetworkService.h"
 #include "mocca/net/MoccaNetworkService.h"
 #include "mocca/net/MoccaConnection.h"
@@ -19,9 +19,9 @@ using namespace mocca::net;
 using namespace mocca::testing;
 
 #ifdef MOCCA_TEST_TCP
-typedef ::testing::Types<LoopbackNetworkService_tmp, TCPNetworkService> MyTypes;
+typedef ::testing::Types<LoopbackPhysicalNetworkService, TCPNetworkService> MyTypes;
 #else
-typedef ::testing::Types<LoopbackNetworkService_tmp> MyTypes;
+typedef ::testing::Types<LoopbackPhysicalNetworkService> MyTypes;
 #endif
 TYPED_TEST_CASE(NetworkServiceTest, MyTypes);
 

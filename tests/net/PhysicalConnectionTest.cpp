@@ -2,7 +2,7 @@
 
 #include "mocca/base/ByteArray.h"
 #include "mocca/base/MessageQueue.h"
-#include "mocca/net/LoopbackConnection_tmp.h"
+#include "mocca/testing/LoopbackPhysicalConnection.h"
 #include "mocca/net/PhysicalConnection.h"
 
 using namespace mocca;
@@ -11,24 +11,24 @@ using namespace mocca::net;
 class PhysicalConnectionTest : public ::testing::Test {
 protected:
     PhysicalConnectionTest() {
-        sendQueue = std::make_shared<LoopbackConnection_tmp::LoopbackMessageQueue>();
-        receiveQueue = std::make_shared<LoopbackConnection_tmp::LoopbackMessageQueue>();
-        outSignalQueue = std::make_shared<LoopbackConnection_tmp::LoopbackSignalQueue>();
-        inSignalQueue = std::make_shared<LoopbackConnection_tmp::LoopbackSignalQueue>();
+        sendQueue = std::make_shared<LoopbackPhysicalConnection::LoopbackMessageQueue>();
+        receiveQueue = std::make_shared<LoopbackPhysicalConnection::LoopbackMessageQueue>();
+        outSignalQueue = std::make_shared<LoopbackPhysicalConnection::LoopbackSignalQueue>();
+        inSignalQueue = std::make_shared<LoopbackPhysicalConnection::LoopbackSignalQueue>();
     }
 
     virtual ~PhysicalConnectionTest() {
         // You can do clean-up work that doesn't throw exceptions here.
     }
 
-    std::shared_ptr<LoopbackConnection_tmp::LoopbackMessageQueue> sendQueue;
-    std::shared_ptr<LoopbackConnection_tmp::LoopbackMessageQueue> receiveQueue;
-    std::shared_ptr<LoopbackConnection_tmp::LoopbackSignalQueue> outSignalQueue;
-    std::shared_ptr<LoopbackConnection_tmp::LoopbackSignalQueue> inSignalQueue;
+    std::shared_ptr<LoopbackPhysicalConnection::LoopbackMessageQueue> sendQueue;
+    std::shared_ptr<LoopbackPhysicalConnection::LoopbackMessageQueue> receiveQueue;
+    std::shared_ptr<LoopbackPhysicalConnection::LoopbackSignalQueue> outSignalQueue;
+    std::shared_ptr<LoopbackPhysicalConnection::LoopbackSignalQueue> inSignalQueue;
 };
 
 TEST_F(PhysicalConnectionTest, ReceiveExactly_SufficientData) {
-    LoopbackConnection_tmp connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
+    LoopbackPhysicalConnection connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
     for (unsigned char c = 'a'; c <= 'e'; ++c) {
         receiveQueue->enqueue(c);
     }
@@ -40,7 +40,7 @@ TEST_F(PhysicalConnectionTest, ReceiveExactly_SufficientData) {
 }
 
 TEST_F(PhysicalConnectionTest, ReceiveExactly_InsufficientData) {
-    LoopbackConnection_tmp connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
+    LoopbackPhysicalConnection connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
     for (unsigned char c = 'a'; c <= 'e'; ++c) {
         receiveQueue->enqueue(c);
     }
@@ -53,13 +53,13 @@ TEST_F(PhysicalConnectionTest, ReceiveExactly_InsufficientData) {
 }
 
 TEST_F(PhysicalConnectionTest, ReceiveExactly_NoData) {
-    LoopbackConnection_tmp connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
+    LoopbackPhysicalConnection connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
     auto result = receiveExactly(connection, 1, std::chrono::milliseconds(1));
     ASSERT_EQ(0, result.size());
 }
 
 TEST_F(PhysicalConnectionTest, ReceiveUntil_OneCharDelimAtEnd) {
-    LoopbackConnection_tmp connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
+    LoopbackPhysicalConnection connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
     for (unsigned char c = 'a'; c <= 'e'; ++c) {
         receiveQueue->enqueue(c);
     }
@@ -70,7 +70,7 @@ TEST_F(PhysicalConnectionTest, ReceiveUntil_OneCharDelimAtEnd) {
 }
 
 TEST_F(PhysicalConnectionTest, ReceiveUntil_TwoCharDelimAtEnd) {
-    LoopbackConnection_tmp connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
+    LoopbackPhysicalConnection connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
     for (unsigned char c = 'a'; c <= 'e'; ++c) {
         receiveQueue->enqueue(c);
     }
@@ -81,7 +81,7 @@ TEST_F(PhysicalConnectionTest, ReceiveUntil_TwoCharDelimAtEnd) {
 }
 
 TEST_F(PhysicalConnectionTest, ReceiveUntil_TwoCharDelimInMiddle) {
-    LoopbackConnection_tmp connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
+    LoopbackPhysicalConnection connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
     for (unsigned char c = 'a'; c <= 'e'; ++c) {
         receiveQueue->enqueue(c);
     }
@@ -92,7 +92,7 @@ TEST_F(PhysicalConnectionTest, ReceiveUntil_TwoCharDelimInMiddle) {
 }
 
 TEST_F(PhysicalConnectionTest, ReceiveUntil_DelimEqualsChunk) {
-    LoopbackConnection_tmp connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
+    LoopbackPhysicalConnection connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
     for (unsigned char c = 'a'; c <= 'e'; ++c) {
         receiveQueue->enqueue(c);
     }
@@ -103,7 +103,7 @@ TEST_F(PhysicalConnectionTest, ReceiveUntil_DelimEqualsChunk) {
 }
 
 TEST_F(PhysicalConnectionTest, ReceiveUntil_DelimAtEndOfSecondChunk) {
-    LoopbackConnection_tmp connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
+    LoopbackPhysicalConnection connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
     for (unsigned char c = 'a'; c <= 'e'; ++c) {
         receiveQueue->enqueue(c);
     }
@@ -114,7 +114,7 @@ TEST_F(PhysicalConnectionTest, ReceiveUntil_DelimAtEndOfSecondChunk) {
 }
 
 TEST_F(PhysicalConnectionTest, ReceiveUntil_DelimInMiddleOfSecondChunk) {
-    LoopbackConnection_tmp connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
+    LoopbackPhysicalConnection connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
     for (unsigned char c = 'a'; c <= 'f'; ++c) {
         receiveQueue->enqueue(c);
     }
@@ -125,7 +125,7 @@ TEST_F(PhysicalConnectionTest, ReceiveUntil_DelimInMiddleOfSecondChunk) {
 }
 
 TEST_F(PhysicalConnectionTest, ReceiveUntil_DelimBiggerThanChunk) {
-    LoopbackConnection_tmp connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
+    LoopbackPhysicalConnection connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
     for (unsigned char c = 'a'; c <= 'f'; ++c) {
         receiveQueue->enqueue(c);
     }
@@ -136,7 +136,7 @@ TEST_F(PhysicalConnectionTest, ReceiveUntil_DelimBiggerThanChunk) {
 }
 
 TEST_F(PhysicalConnectionTest, ReceiveUntil_DelimOnBorderOfChunk) {
-    LoopbackConnection_tmp connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
+    LoopbackPhysicalConnection connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
     for (unsigned char c = 'a'; c <= 'f'; ++c) {
         receiveQueue->enqueue(c);
     }
@@ -147,7 +147,7 @@ TEST_F(PhysicalConnectionTest, ReceiveUntil_DelimOnBorderOfChunk) {
 }
 
 TEST_F(PhysicalConnectionTest, ReceiveUntil_DelimNotFound) {
-    LoopbackConnection_tmp connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
+    LoopbackPhysicalConnection connection(sendQueue, receiveQueue, outSignalQueue, inSignalQueue);
     for (unsigned char c = 'a'; c <= 'f'; ++c) {
         receiveQueue->enqueue(c);
     }

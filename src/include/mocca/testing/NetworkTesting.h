@@ -2,7 +2,7 @@
 
 #include "mocca/net/IProtocolConnectionAcceptor.h"
 #include "mocca/net/NetworkServiceLocator.h"
-#include "mocca/net/LoopbackNetworkService_tmp.h"
+#include "mocca/testing/LoopbackPhysicalNetworkService.h"
 #include "mocca/net/TCPNetworkService.h"
 
 namespace mocca {    
@@ -23,14 +23,14 @@ namespace mocca {
         template<typename T> std::string createBindingString(int index = 0);
         template<> std::string createConnectionString<net::TCPNetworkService>(int index);
         template<> std::string createBindingString<net::TCPNetworkService>(int index);
-        template<> std::string createConnectionString<net::LoopbackNetworkService_tmp>(int index);
-        template<> std::string createBindingString<net::LoopbackNetworkService_tmp>(int index);
+        template<> std::string createConnectionString<net::LoopbackPhysicalNetworkService>(int index);
+        template<> std::string createBindingString<net::LoopbackPhysicalNetworkService>(int index);
 
         template<typename T> net::Endpoint createConnectionEndpoint(int index = 0);
         template<typename T> net::Endpoint createBindingEndpoint(int index = 0);
         template<> net::Endpoint createConnectionEndpoint<net::TCPNetworkService>(int index);
         template<> net::Endpoint createBindingEndpoint<net::TCPNetworkService>(int index);
-        template<> net::Endpoint createConnectionEndpoint<net::LoopbackNetworkService_tmp>(int index);
-        template<> net::Endpoint createBindingEndpoint<net::LoopbackNetworkService_tmp>(int index);
+        template<> net::Endpoint createConnectionEndpoint<net::LoopbackPhysicalNetworkService>(int index);
+        template<> net::Endpoint createBindingEndpoint<net::LoopbackPhysicalNetworkService>(int index);
 	}
 }

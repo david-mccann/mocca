@@ -11,16 +11,16 @@ class ByteArray;
 
 namespace net {
 
-class LoopbackConnection_tmp : public IPhysicalConnection {
+class LoopbackPhysicalConnection : public IPhysicalConnection {
 public:
     enum class Signal { Disconnect };
 
     using LoopbackMessageQueue = MessageQueue<unsigned char>;
     using LoopbackSignalQueue = MessageQueue<Signal>;
 
-    LoopbackConnection_tmp(std::shared_ptr<LoopbackMessageQueue> sendQueue, std::shared_ptr<LoopbackMessageQueue> receiveQueue,
+    LoopbackPhysicalConnection(std::shared_ptr<LoopbackMessageQueue> sendQueue, std::shared_ptr<LoopbackMessageQueue> receiveQueue,
                            std::shared_ptr<LoopbackSignalQueue> outSignalQueue, std::shared_ptr<LoopbackSignalQueue> inSignalQueue);
-    ~LoopbackConnection_tmp();
+    ~LoopbackPhysicalConnection();
 
     std::string identifier() const override;
     void lock() override;

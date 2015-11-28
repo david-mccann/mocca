@@ -1,13 +1,13 @@
 #include "mocca/base/ByteArray.h"
 #include "mocca/base/MessageQueue.h"
 #include "mocca/net/Error.h"
-#include "mocca/net/LoopbackConnection_tmp.h"
+#include "mocca/testing/LoopbackPhysicalConnection.h"
 #include "mocca/net/LoopbackNetworkService.h"
 
 namespace mocca {
 namespace net {
 
-LoopbackConnection_tmp::LoopbackConnection_tmp(std::shared_ptr<LoopbackMessageQueue> sendQueue,
+LoopbackPhysicalConnection::LoopbackPhysicalConnection(std::shared_ptr<LoopbackMessageQueue> sendQueue,
                                                std::shared_ptr<LoopbackMessageQueue> receiveQueue,
                                                std::shared_ptr<LoopbackSignalQueue> outSignalQueue,
                                                std::shared_ptr<LoopbackSignalQueue> inSignalQueue)
@@ -17,29 +17,29 @@ LoopbackConnection_tmp::LoopbackConnection_tmp(std::shared_ptr<LoopbackMessageQu
     , outSignalQueue_(outSignalQueue)
     , inSignalQueue_(inSignalQueue) {}
 
-LoopbackConnection_tmp::~LoopbackConnection_tmp() {
+LoopbackPhysicalConnection::~LoopbackPhysicalConnection() {
     outSignalQueue_->enqueue(Signal::Disconnect);
 }
 
-std::string LoopbackConnection_tmp::createIdentifier() {
+std::string LoopbackPhysicalConnection::createIdentifier() {
     static unsigned int count = 0;
     ++count;
     return "loopback_" + std::to_string(count);
 }
 
-std::string LoopbackConnection_tmp::identifier() const {
+std::string LoopbackPhysicalConnection::identifier() const {
     return identifier_;
 }
 
-void LoopbackConnection_tmp::lock() {
+void LoopbackPhysicalConnection::lock() {
     mutex_.lock();
 }
 
-void LoopbackConnection_tmp::unlock() {
+void LoopbackPhysicalConnection::unlock() {
     mutex_.unlock();
 }
 
-void LoopbackConnection_tmp::send(ByteArray message, std::chrono::milliseconds timeout) const {
+void LoopbackPhysicalConnection::send(ByteArray message, std::chrono::milliseconds timeout) const {
     auto signal = inSignalQueue_->tryDequeue(std::chrono::milliseconds(0));
     if (!signal.isNull()) {
         if (signal == Signal::Disconnect) {
@@ -54,7 +54,7 @@ void LoopbackConnection_tmp::send(ByteArray message, std::chrono::milliseconds t
     }
 }
 
-ByteArray LoopbackConnection_tmp::receive(uint32_t maxSize, std::chrono::milliseconds timeout) const {
+ByteArray LoopbackPhysicalConnection::receive(uint32_t maxSize, std::chrono::milliseconds timeout) const {
     auto signal = inSignalQueue_->tryDequeue(std::chrono::milliseconds(0));
     if (!signal.isNull()) {
         if (signal == Signal::Disconnect) {
