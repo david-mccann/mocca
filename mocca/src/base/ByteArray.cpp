@@ -5,8 +5,6 @@
 static_assert(std::numeric_limits<float>::is_iec559 == true, "Unsupported floating point type");
 static_assert(std::numeric_limits<double>::is_iec559 == true, "Unsupported floating point type");
 
-#define MOCCA_BYTEARRAY_CHECKS
-
 namespace mocca {
 
 const unsigned char ByteArray::trueConst;
@@ -246,6 +244,24 @@ ByteArray& ByteArray::operator>>(ByteArray& val) {
     val.append(data_.get() + readPos_, innerSize);
     readPos_ += innerSize;
     return *this;
+}
+
+char& mocca::ByteArray::operator[](uint32_t index) {
+#ifdef MOCCA_BYTEARRAY_CHECKS
+    if (index < 0 || index >= size_) {
+        throw Error("Index out of bounds", __FILE__, __LINE__);
+    }
+#endif
+    return data_[index];
+}
+
+const char& mocca::ByteArray::operator[](uint32_t index) const {
+#ifdef MOCCA_BYTEARRAY_CHECKS
+    if (index < 0 || index >= size_) {
+        throw Error("Index out of bounds", __FILE__, __LINE__);
+    }
+#endif
+    return data_[index];
 }
 
 void ByteArray::resetReadPos() {

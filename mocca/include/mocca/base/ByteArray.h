@@ -6,6 +6,8 @@
 #include <string>
 #include <cstring>
 
+#define MOCCA_BYTEARRAY_CHECKS
+
 namespace mocca {
 
 class ByteArray {
@@ -61,6 +63,9 @@ public:
     ByteArray& operator<<(const ByteArray& val);
     ByteArray& operator>>(ByteArray& val);
 
+    char& operator[](uint32_t index);
+    const char& operator[](uint32_t index) const;
+    
     template <typename T> T get() {
         T val;
         *this >> val;

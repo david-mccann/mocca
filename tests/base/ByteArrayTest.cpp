@@ -263,3 +263,16 @@ TEST_F(ByteArrayTest, ReadOutOfBounds) {
         ASSERT_THROW(outer.get<int32_t>(), Error);
     }
 }
+
+TEST_F(ByteArrayTest, SubscriptOperator) {
+    ByteArray target;
+    std::string data = "abc";
+    target.append(data.c_str(), data.size());
+    ASSERT_EQ('a', target[0]);
+    ASSERT_EQ('b', target[1]);
+    ASSERT_EQ('c', target[2]);
+#ifdef MOCCA_BYTEARRAY_CHECKS
+    ASSERT_THROW(target[-1], Error);
+    ASSERT_THROW(target[3], Error);
+#endif
+}

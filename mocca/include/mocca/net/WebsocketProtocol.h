@@ -3,11 +3,9 @@
 #include "mocca/net/WebsocketMessage.h"
 #include "mocca/net/WebsocketDataMessage.h"
 #include "mocca/net/WebsocketHandshakeMessage.h"
-#include "mocca/net/DataBuffer.h"
+#include "mocca/base/ByteArray.h"
 
-//class WebsocketHandshakeMessage;
-
-typedef unsigned char       BYTE;
+typedef unsigned char BYTE;
 
 class WebsocketProtocol {
 public:
@@ -26,13 +24,11 @@ public:
 	WebsocketProtocol(void);
 
     int encodeOutgoingPacket(WebsocketMessage& packet);
-	int outgoingMessage(WebsocketMessage& packet, DataBuffer& buffer, unsigned int& nExtractedBytes, bool binary);
+	int outgoingMessage(WebsocketMessage& packet, mocca::ByteArray& buffer, unsigned int& nExtractedBytes, bool binary);
 
-	int incomingMessage(DataBuffer& buffer, unsigned int& nWrittenBytes, IncomingPacket*& packet);
+	int incomingMessage(mocca::ByteArray& buffer, unsigned int& nWrittenBytes, IncomingPacket*& packet);
 	int decodeIncomingPacket(WebsocketMessage* packet, int& serviceId);
 
     static bool ProcessHandshake( WebsocketHandshakeMessage& request, WebsocketHandshakeMessage& response );
-	
-
 };
 

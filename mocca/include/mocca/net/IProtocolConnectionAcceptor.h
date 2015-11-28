@@ -1,12 +1,12 @@
 #pragma once
 
+#include "mocca/net/IProtocolConnection.h"
+
 #include <chrono>
 #include <memory>
 
 namespace mocca {
 namespace net {
-
-class IProtocolConnection;
 
 class IProtocolConnectionAcceptor {
 public:

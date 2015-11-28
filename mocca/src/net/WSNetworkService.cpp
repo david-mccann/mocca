@@ -3,7 +3,7 @@
 //#include "mocca/net/WSNetworkService.h"
 //#include "mocca/net/TCPNetworkAddress.h"
 //#include "mocca/net/WSConnection.h"
-//#include "mocca/net/WSConnectionListener.h"
+//#include "mocca/net/WSConnectionAcceptor.h"
 //
 //namespace mocca {
 //namespace net {
@@ -29,7 +29,7 @@
 //
 //std::unique_ptr<IProtocolConnectionAcceptor> WSNetworkService::bind(const std::string& portString) {
 //    int port = TCPNetworkAddress::parsePort(portString);
-//    return std::unique_ptr<IProtocolConnectionAcceptor>(new WSConnectionListener(port));
+//    return std::unique_ptr<IProtocolConnectionAcceptor>(new WSConnectionAcceptor(port));
 //}
 //
 //}

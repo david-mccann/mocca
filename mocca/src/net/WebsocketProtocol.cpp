@@ -32,7 +32,6 @@
 #include "mocca/net/WebsocketProtocol.h"
 #include "mocca/net/WebsocketHandshakeMessage.h"
 #include "mocca/net/WebsocketDataMessage.h"
-#include "mocca/net/DataBuffer.h"
 
 #include "base64/base64.h"
 #include "sha1/sha1.h"
@@ -47,30 +46,29 @@ WebsocketProtocol::WebsocketProtocol()
 	return;
 }
 
-int WebsocketProtocol::incomingMessage(DataBuffer& buffer, unsigned int& nExtractedBytes, IncomingPacket*& packet)
+int WebsocketProtocol::incomingMessage(mocca::ByteArray& buffer, unsigned int& nExtractedBytes, IncomingPacket*& packet)
 {
-	std::string message(buffer.GetBuffer());
-
-	if (message.length() == 0)
+	if (buffer.isEmpty())
         return eIncompletePacket;
 
-	if (message.substr(0, 3) == "GET")
+    std::string message(buffer.data(), 3); // fixme: can do better
+	if (message == "GET")
 	{
-		WebsocketHandshakeMessage* pMessage = new WebsocketHandshakeMessage(buffer.GetBuffer(), buffer.GetDataSize());
+		WebsocketHandshakeMessage* pMessage = new WebsocketHandshakeMessage(buffer.data(), buffer.size());
 		packet = pMessage;
 		return Success;
 	}
 
 	//In the other cases, we should expect a data message : 
 	int nMinExpectedSize = 6;
-	if (buffer.GetDataSize() < nMinExpectedSize)
+	if (buffer.size() < nMinExpectedSize)
 		return eIncompletePacket;
 
-	BYTE payloadFlags = buffer.getAt(0);
+	BYTE payloadFlags = buffer[0];
 	if (payloadFlags != 129)
 		return eUndefinedFailure;
 
-	BYTE basicSize = buffer.getAt(1) & 0x7F;
+	BYTE basicSize = buffer[1] & 0x7F;
 	unsigned long int payloadSize;
 	int masksOffset;
 
@@ -82,31 +80,31 @@ int WebsocketProtocol::incomingMessage(DataBuffer& buffer, unsigned int& nExtrac
 	else if (basicSize == 126)
 	{
 		nMinExpectedSize += 2;
-		if (buffer.GetDataSize() < nMinExpectedSize)
+		if (buffer.size() < nMinExpectedSize)
 			return eIncompletePacket;
-		payloadSize = ntohs(*(u_short*)(buffer.GetBuffer() + 2));
+		payloadSize = ntohs(*(u_short*)(buffer.data() + 2));
 		masksOffset = 4;
 	}
 	else if (basicSize == 127)
 	{
 		nMinExpectedSize += 8;
-		if (buffer.GetDataSize() < nMinExpectedSize)
+		if (buffer.size() < nMinExpectedSize)
 			return eIncompletePacket;
-		payloadSize = ntohl(*(u_long*)(buffer.GetBuffer() + 2));
+		payloadSize = ntohl(*(u_long*)(buffer.data() + 2));
 		masksOffset = 10;
 	}
 	else
 		return eUndefinedFailure;
 
 	nMinExpectedSize += payloadSize;
-	if (buffer.GetDataSize() < nMinExpectedSize)
+	if (buffer.size() < nMinExpectedSize)
 		return eIncompletePacket;
 
 	BYTE masks[4];
-	memcpy(masks, buffer.GetBuffer() + masksOffset, 4);
+	memcpy(masks, buffer.data() + masksOffset, 4);
 
 	char* payload = new char[payloadSize + 1];
-	memcpy(payload, buffer.GetBuffer() + masksOffset + 4, payloadSize);
+	memcpy(payload, buffer.data() + masksOffset + 4, payloadSize);
 	for (unsigned long int i = 0; i < payloadSize; i++) {
 		payload[i] = (payload[i] ^ masks[i % 4]);
 	}
@@ -121,7 +119,7 @@ int WebsocketProtocol::incomingMessage(DataBuffer& buffer, unsigned int& nExtrac
 	return Success;
 }
 
-int WebsocketProtocol::outgoingMessage(WebsocketMessage& packet, DataBuffer& buffer, unsigned int& nWrittenBytes, bool binary)
+int WebsocketProtocol::outgoingMessage(WebsocketMessage& packet, mocca::ByteArray& buffer, unsigned int& nWrittenBytes, bool binary)
 {
 	WebsocketMessage& message = (WebsocketMessage&) packet;
 
@@ -130,10 +128,10 @@ int WebsocketProtocol::outgoingMessage(WebsocketMessage& packet, DataBuffer& buf
 		WebsocketHandshakeMessage& handshake = (WebsocketHandshakeMessage&) message;
 
         string strRaw = handshake.Serialize();
-        if(strRaw.size() > buffer.getRemainingSize())
-            return eInsufficientBuffer;
+        /*if(strRaw.size() > buffer.getRemainingSize())
+            return eInsufficientBuffer;*/
 
-        buffer.Append((char*)strRaw.c_str(), strRaw.size());
+        buffer.append(strRaw.c_str(), strRaw.size());
         nWrittenBytes = strRaw.size();
         return Success;
 	}
@@ -159,8 +157,8 @@ int WebsocketProtocol::outgoingMessage(WebsocketMessage& packet, DataBuffer& buf
 		else
 			expectedSize += 9;
 
-		if (expectedSize > buffer.getRemainingSize())
-			return eInsufficientBuffer;
+		/*if (expectedSize > buffer.getRemainingSize())
+			return eInsufficientBuffer;*/
 
 		//create the flags byte
 		char payloadFlags = 129;
@@ -168,28 +166,28 @@ int WebsocketProtocol::outgoingMessage(WebsocketMessage& packet, DataBuffer& buf
 		if (binary)
 			payloadFlags = 130;
 
-		buffer.Append(&payloadFlags, 1);
+		buffer.append(&payloadFlags, 1);
 
 		//create the length byte
 		if (payloadSize <= 125)
 		{
 			char basicSize = payloadSize;
-			buffer.Append(&basicSize, 1);
+			buffer.append(&basicSize, 1);
 		}
 		else if (payloadSize > 125 & payloadSize <= 65535)
 		{
 			char basicSize = 126;
-			buffer.Append(&basicSize, 1);
+			buffer.append(&basicSize, 1);
 
 			char len[2];
 			len[0] = ( payloadSize >> 8 ) & 255;
 			len[1] = ( payloadSize ) & 255;
-			buffer.Append(len, 2);
+			buffer.append(len, 2);
 		}
 		else
 		{
 			char basicSize = 127;
-			buffer.Append(&basicSize, 1);
+			buffer.append(&basicSize, 1);
 
 			char len[8];
 			len[0] = ( payloadSize >> 56 ) & 255;
@@ -200,15 +198,15 @@ int WebsocketProtocol::outgoingMessage(WebsocketMessage& packet, DataBuffer& buf
 			len[5] = ( payloadSize >> 16  ) & 255;
 			len[6] = ( payloadSize >> 8 ) & 255;
 			len[7] = ( payloadSize ) & 255;
-			buffer.Append(len, 8);
+			buffer.append(len, 8);
 		}
 
-        buffer.Append((char*)strData.c_str(), strData.size());
+        buffer.append((char*)strData.c_str(), strData.size());
 
 		if (binary)
 		{
 			char nonAsci = 150;
-			buffer.Append(&nonAsci, 1);
+			buffer.append(&nonAsci, 1);
 		}
 
         nWrittenBytes = expectedSize;
