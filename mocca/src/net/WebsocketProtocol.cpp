@@ -30,12 +30,13 @@
 #include <set>
 
 #include "mocca/net/WebsocketProtocol.h"
-#include "mocca/base64/base64.h"
-#include "mocca/sha1/sha1.h"
-
 #include "mocca/net/WebsocketHandshakeMessage.h"
 #include "mocca/net/WebsocketDataMessage.h"
 #include "mocca/net/DataBuffer.h"
+
+#include "base64/base64.h"
+#include "sha1/sha1.h"
+
 
 using namespace std;
 

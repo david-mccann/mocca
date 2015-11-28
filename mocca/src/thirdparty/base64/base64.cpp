@@ -25,7 +25,7 @@
 
 */
 
-#include "mocca/base64/base64.h"
+#include "base64/base64.h"
 #include <iostream>
 
 static const std::string base64_chars = 
