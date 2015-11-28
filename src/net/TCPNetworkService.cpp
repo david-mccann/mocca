@@ -1,41 +1,47 @@
 #ifdef WIN32
 #include <winsock2.h>
 #else
-#include <stdio.h>
-#include <sys/types.h>
-#include <ifaddrs.h>
-#include <netinet/in.h>
-#include <string.h>
 #include <arpa/inet.h>
+#include <ifaddrs.h>
 #include <iostream>
+#include <netinet/in.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
 #endif
 
 #include "mocca/base/ByteArray.h"
 #include "mocca/net/Error.h"
-#include "mocca/net/TCPNetworkService.h"
-#include "mocca/net/TCPNetworkAddress.h"
 #include "mocca/net/TCPConnection.h"
 #include "mocca/net/TCPConnectionAcceptor.h"
+#include "mocca/net/TCPNetworkAddress.h"
+#include "mocca/net/TCPNetworkService.h"
 
 namespace mocca {
 namespace net {
 
-std::unique_ptr<IPhysicalConnection>
-TCPNetworkService::connect(const std::string& connectionString) {
+std::unique_ptr<IPhysicalConnection> TCPNetworkService::connect(const std::string& connectionString) {
     TCPNetworkAddress networkAddress(connectionString);
     auto socket = std::unique_ptr<IVDA::TCPSocket>(new IVDA::TCPSocket());
     socket->SetNonBlocking(true);
     try {
         socket->Connect(IVDA::NetworkAddress(networkAddress.ip(), networkAddress.port()));
     } catch (const IVDA::SocketConnectionException& err) {
-        throw ConnectFailedError("Could not connect to " + networkAddress.toString() +
-             " (internal error: " + err.what() + ")", __FILE__, __LINE__);
+        throw ConnectFailedError("Could not connect to " + networkAddress.toString() + " (internal error: " + err.what() + ")", __FILE__,
+                                 __LINE__);
     } catch (const IVDA::SocketException& err) {
         std::string internalError(err.what());
-        throw NetworkError("Network error in connect operation (internal error: " + 
-             internalError + ")", __FILE__, __LINE__);
+        throw NetworkError("Network error in connect operation (internal error: " + internalError + ")", __FILE__, __LINE__);
     }
     return std::unique_ptr<TCPConnection>(new TCPConnection(std::move(socket)));
+}
+
+std::string mocca::net::TCPNetworkService::transportStatic() {
+    return "tcp";
+}
+
+std::string mocca::net::TCPNetworkService::transport() const {
+    return transportStatic();
 }
 
 std::unique_ptr<IPhysicalConnectionAcceptor> TCPNetworkService::bind(const std::string& portString) {
@@ -46,9 +52,8 @@ std::unique_ptr<IPhysicalConnectionAcceptor> TCPNetworkService::bind(const std::
 #ifdef WIN32
 std::string TCPNetworkService::getLastWinsockError() const {
     LPSTR s = nullptr;
-    FormatMessage(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL, WSAGetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&s, 0, NULL);
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, WSAGetLastError(),
+                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&s, 0, NULL);
     std::string result(s);
     LocalFree(s);
     return result;
@@ -59,16 +64,14 @@ std::string TCPNetworkService::localIp() const {
 
     // Initialize winsock dll
     if (WSAStartup(MAKEWORD(1, 0), &WSAData)) {
-        throw NetworkError("Error initializing Winsock (" + getLastWinsockError() + ")", __FILE__,
-                           __LINE__);
+        throw NetworkError("Error initializing Winsock (" + getLastWinsockError() + ")", __FILE__, __LINE__);
     }
 
     // Get local host name
     char szHostName[128];
     if (gethostname(szHostName, sizeof(szHostName))) {
         WSACleanup();
-        throw NetworkError("Error retrieving hostname (" + getLastWinsockError() + ")", __FILE__,
-                           __LINE__);
+        throw NetworkError("Error retrieving hostname (" + getLastWinsockError() + ")", __FILE__, __LINE__);
     }
 
     // Get local IP addresses
@@ -77,8 +80,7 @@ std::string TCPNetworkService::localIp() const {
     pHost = ::gethostbyname(szHostName);
     if (!pHost) {
         WSACleanup();
-        throw NetworkError("Error resolving ip address (" + getLastWinsockError() + ")", __FILE__,
-                           __LINE__);
+        throw NetworkError("Error resolving ip address (" + getLastWinsockError() + ")", __FILE__, __LINE__);
     }
 
     // take the first ip address from the list; not sure if this is always the right one(?)

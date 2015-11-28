@@ -2,16 +2,20 @@
 
 using namespace mocca::net;
 
-Endpoint::Endpoint(const std::string& transport, const std::string& connectionString)
+Endpoint::Endpoint(const std::string& protocol, const std::string& transport, const std::string& connectionString)
     : transport_(transport)
     , connectionString_(connectionString) {}
 
 bool Endpoint::equals(const Endpoint& other) const {
-    return transport_ == other.transport_ && connectionString_ == other.connectionString_;
+    return protocol_ == other.protocol_ && transport_ == other.transport_ && connectionString_ == other.connectionString_;
 }
 
 std::string Endpoint::toString() const {
-    return transport_ + ":" + connectionString_;
+    return protocol_ + ":" + transport_ + ":" + connectionString_;
+}
+
+std::string mocca::net::Endpoint::protocol() const {
+    return protocol_;
 }
 
 std::string Endpoint::transport() const {

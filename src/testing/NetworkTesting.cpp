@@ -22,21 +22,21 @@ template <> std::string mocca::testing::createBindingString<LoopbackPhysicalNetw
 }
 
 template <> Endpoint mocca::testing::createConnectionEndpoint<TCPNetworkService>(int index) {
-    return Endpoint(TCPNetworkService::transportStatic(),
+    return Endpoint(MoccaNetworkService::protocolStatic(), TCPNetworkService::transportStatic(),
                     createConnectionString<TCPNetworkService>(index));
 }
 
 template <> Endpoint mocca::testing::createBindingEndpoint<TCPNetworkService>(int index) {
-    return Endpoint(TCPNetworkService::transportStatic(),
+    return Endpoint(MoccaNetworkService::protocolStatic(), TCPNetworkService::transportStatic(),
                     createBindingString<TCPNetworkService>(index));
 }
 
 template <> Endpoint mocca::testing::createConnectionEndpoint<LoopbackPhysicalNetworkService>(int index) {
-    return Endpoint(LoopbackPhysicalNetworkService::transportStatic(),
+    return Endpoint(MoccaNetworkService::protocolStatic(), LoopbackPhysicalNetworkService::transportStatic(),
                     createConnectionString<LoopbackPhysicalNetworkService>(index));
 }
 
 template <> Endpoint mocca::testing::createBindingEndpoint<LoopbackPhysicalNetworkService>(int index) {
-    return Endpoint(LoopbackPhysicalNetworkService::transportStatic(),
+    return Endpoint(MoccaNetworkService::protocolStatic(), LoopbackPhysicalNetworkService::transportStatic(),
                     createBindingString<LoopbackPhysicalNetworkService>(index));
 }

@@ -4,6 +4,7 @@
 #include "mocca/net/NetworkServiceLocator.h"
 #include "mocca/testing/LoopbackPhysicalNetworkService.h"
 #include "mocca/net/TCPNetworkService.h"
+#include "mocca/net/MoccaNetworkService.h"
 
 namespace mocca {    
     namespace testing

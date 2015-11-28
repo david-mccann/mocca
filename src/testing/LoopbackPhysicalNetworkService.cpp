@@ -7,6 +7,14 @@
 namespace mocca {
 namespace net {
 
+std::string mocca::net::LoopbackPhysicalNetworkService::transportStatic() {
+    return "loopback_physical";
+}
+
+std::string mocca::net::LoopbackPhysicalNetworkService::transport() const {
+    return transportStatic();
+}
+
 std::unique_ptr<IPhysicalConnection> LoopbackPhysicalNetworkService::connect(const std::string& queueName) {
     if (!spawnedConnections_.count(queueName)) {
         throw NetworkError("No connection acceptor bound to queue " + queueName, __FILE__, __LINE__);
@@ -18,8 +26,8 @@ std::unique_ptr<IPhysicalConnection> LoopbackPhysicalNetworkService::connect(con
     auto signalQueue1 = std::make_shared<LoopbackPhysicalConnection::LoopbackSignalQueue>();
     auto signalQueue2 = std::make_shared<LoopbackPhysicalConnection::LoopbackSignalQueue>();
 
-    auto serverConnection =
-        std::unique_ptr<LoopbackPhysicalConnection>(new LoopbackPhysicalConnection(messageQueue1, messageQueue2, signalQueue1, signalQueue2));
+    auto serverConnection = std::unique_ptr<LoopbackPhysicalConnection>(
+        new LoopbackPhysicalConnection(messageQueue1, messageQueue2, signalQueue1, signalQueue2));
     auto clientConnection =
         std::unique_ptr<IPhysicalConnection>(new LoopbackPhysicalConnection(messageQueue2, messageQueue1, signalQueue2, signalQueue1));
 

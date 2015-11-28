@@ -11,6 +11,14 @@ std::string MoccaNetworkService::transport() const {
     return physicalNetworkService_->transport();
 }
 
+std::string mocca::net::MoccaNetworkService::protocolStatic() {
+    return "mocca";
+}
+
+std::string mocca::net::MoccaNetworkService::protocol() const {
+    return protocolStatic();
+}
+
 std::unique_ptr<IProtocolConnection> MoccaNetworkService::connect(const std::string& connectionString) {
     auto physicalConnection = physicalNetworkService_->connect(connectionString);
     if (physicalConnection != nullptr) {

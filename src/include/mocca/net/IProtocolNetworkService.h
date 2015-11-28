@@ -14,6 +14,7 @@ public:
     virtual ~IProtocolNetworkService() {}
 
     virtual std::string transport() const = 0;
+    virtual std::string protocol() const = 0;
     virtual std::unique_ptr<IProtocolConnection> connect(const std::string& connectionString) = 0;
     virtual std::unique_ptr<IProtocolConnectionAcceptor> bind(const std::string& bindingString) = 0;
 };

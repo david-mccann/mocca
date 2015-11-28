@@ -11,9 +11,9 @@ using namespace mocca::net;
 
 std::vector<std::shared_ptr<IProtocolNetworkService>> NetworkServiceLocator::services_;
 
-std::shared_ptr<IProtocolNetworkService> NetworkServiceLocator::service(const std::string& transport) {
+std::shared_ptr<IProtocolNetworkService> NetworkServiceLocator::service(const std::string& protocol, const std::string& transport) {
     for (auto& service : services_) {
-        if (service->transport() == transport) {
+        if (service->protocol() == protocol && service->transport() == transport) {
             return service;
         }
     }
@@ -34,12 +34,12 @@ void mocca::net::NetworkServiceLocator::removeAll() { services_.clear(); }
 
 std::unique_ptr<IProtocolConnectionAcceptor>
 mocca::net::NetworkServiceLocator::bind(const Endpoint& endpoint) {
-    auto serv = service(endpoint.transport());
+    auto serv = service(endpoint.protocol(), endpoint.transport());
     return serv->bind(endpoint.connectionString());
 }
 
 std::unique_ptr<IProtocolConnection>
 mocca::net::NetworkServiceLocator::connect(const Endpoint& endpoint) {
-    auto serv = service(endpoint.transport());
+    auto serv = service(endpoint.protocol(), endpoint.transport());
     return serv->connect(endpoint.connectionString());
 }

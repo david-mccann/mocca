@@ -1,13 +1,21 @@
 #include "mocca/base/ByteArray.h"
 #include "mocca/base/MessageQueue.h"
-#include "mocca/net/LoopbackNetworkService.h"
+#include "mocca/net/Error.h"
 #include "mocca/net/LoopbackConnection.h"
 #include "mocca/net/LoopbackConnectionAcceptor.h"
+#include "mocca/net/LoopbackNetworkService.h"
 #include "mocca/net/TCPNetworkAddress.h"
-#include "mocca/net/Error.h"
 
 namespace mocca {
 namespace net {
+
+std::string mocca::net::LoopbackNetworkService::transportStatic() {
+    return "loopback";
+}
+
+std::string mocca::net::LoopbackNetworkService::transport() const {
+    return transportStatic();
+}
 
 std::unique_ptr<IProtocolConnection> LoopbackNetworkService::connect(const std::string& queueName) {
     if (!spawnedConnections_.count(queueName)) {
@@ -20,10 +28,10 @@ std::unique_ptr<IProtocolConnection> LoopbackNetworkService::connect(const std::
     auto signalQueue1 = std::make_shared<LoopbackConnection::LoopbackSignalQueue>();
     auto signalQueue2 = std::make_shared<LoopbackConnection::LoopbackSignalQueue>();
 
-    auto serverConnection = std::unique_ptr<LoopbackConnection>(
-        new LoopbackConnection(messageQueue1, messageQueue2, signalQueue1, signalQueue2));
-    auto clientConnection = std::unique_ptr<IProtocolConnection>(
-        new LoopbackConnection(messageQueue2, messageQueue1, signalQueue2, signalQueue1));
+    auto serverConnection =
+        std::unique_ptr<LoopbackConnection>(new LoopbackConnection(messageQueue1, messageQueue2, signalQueue1, signalQueue2));
+    auto clientConnection =
+        std::unique_ptr<IProtocolConnection>(new LoopbackConnection(messageQueue2, messageQueue1, signalQueue2, signalQueue1));
 
     spawnedConnections_[queueName]->enqueue(std::move(serverConnection));
 
