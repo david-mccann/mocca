@@ -21,8 +21,8 @@ public:
 
     friend void swap(ByteArray& lhs, ByteArray& rhs);
 
-    char* data();
-    const char* data() const;
+    unsigned char* data();
+    const unsigned char* data() const;
 
     uint32_t capacity() const;
 
@@ -64,8 +64,8 @@ public:
     ByteArray& operator<<(const ByteArray& val);
     ByteArray& operator>>(ByteArray& val);
 
-    char& operator[](uint32_t index);
-    const char& operator[](uint32_t index) const;
+    unsigned char& operator[](uint32_t index);
+    const unsigned char& operator[](uint32_t index) const;
     
     template <typename T> T get() {
         T val;
@@ -78,7 +78,7 @@ public:
 private:
     void resize(uint32_t newCapacity);
 
-    std::unique_ptr<char[]> data_;
+    std::unique_ptr<unsigned char[]> data_;
     uint32_t capacity_;
     uint32_t size_;
     uint32_t readPos_;

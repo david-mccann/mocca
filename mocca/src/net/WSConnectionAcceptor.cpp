@@ -18,7 +18,7 @@ std::unique_ptr<IProtocolConnection> WSConnectionAcceptor::getConnection(std::ch
         return nullptr;
     }
     auto header = receiveUntil(*physicalConnection, "\r\n\r\n");
-    std::string headerStr(header.data(), header.size());
+    std::string headerStr((char*)header.data(), header.size());
     LINFO("Websocket header received: " << headerStr);
 
     auto connectionInfo = mocca::net::parseWSHandshake(headerStr);

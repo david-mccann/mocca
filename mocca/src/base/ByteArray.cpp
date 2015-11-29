@@ -11,13 +11,13 @@ const unsigned char ByteArray::trueConst;
 const unsigned char ByteArray::falseConst;
 
 ByteArray::ByteArray(uint32_t capacity)
-    : data_(new char[capacity])
+    : data_(new unsigned char[capacity])
     , capacity_(capacity)
     , size_(0)
     , readPos_(0) {}
 
 ByteArray::ByteArray(const ByteArray& other)
-    : data_(new char[other.capacity_])
+    : data_(new unsigned char[other.capacity_])
     , capacity_(other.capacity_)
     , size_(other.size_)
     , readPos_(other.readPos_) {
@@ -47,11 +47,11 @@ void swap(ByteArray& lhs, ByteArray& rhs) {
     swap(lhs.readPos_, rhs.readPos_);
 }
 
-char* ByteArray::data() {
+unsigned char* ByteArray::data() {
     return data_.get();
 }
 
-const char* ByteArray::data() const {
+const unsigned char* ByteArray::data() const {
     return data_.get();
 }
 
@@ -75,7 +75,7 @@ uint32_t ByteArray::capacity() const {
 }
 
 void ByteArray::resize(uint32_t newCapacity) {
-    auto newData = std::unique_ptr<char[]>(new char[newCapacity]);
+    auto newData = std::unique_ptr<unsigned char[]>(new unsigned char[newCapacity]);
     memcpy(newData.get(), data_.get(), size_);
     data_ = std::move(newData);
     capacity_ = newCapacity;
@@ -222,7 +222,7 @@ ByteArray& ByteArray::operator>>(std::string& val) {
     }
 #endif
     val.reserve(strSize);
-    val = std::string(data_.get() + readPos_, strSize);
+    val = std::string((char*)data_.get() + readPos_, strSize);
     readPos_ += strSize;
     return *this;
 }
@@ -250,7 +250,7 @@ ByteArray& ByteArray::operator>>(ByteArray& val) {
     return *this;
 }
 
-char& mocca::ByteArray::operator[](uint32_t index) {
+unsigned char& mocca::ByteArray::operator[](uint32_t index) {
 #ifdef MOCCA_BYTEARRAY_CHECKS
     if (index < 0 || index >= size_) {
         throw Error("Index out of bounds", __FILE__, __LINE__);
@@ -259,7 +259,7 @@ char& mocca::ByteArray::operator[](uint32_t index) {
     return data_[index];
 }
 
-const char& mocca::ByteArray::operator[](uint32_t index) const {
+const unsigned char& mocca::ByteArray::operator[](uint32_t index) const {
 #ifdef MOCCA_BYTEARRAY_CHECKS
     if (index < 0 || index >= size_) {
         throw Error("Index out of bounds", __FILE__, __LINE__);

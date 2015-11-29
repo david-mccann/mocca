@@ -51,10 +51,10 @@ int WebsocketProtocol::incomingMessage(mocca::ByteArray& buffer, unsigned int& n
 	if (buffer.isEmpty())
         return eIncompletePacket;
 
-    std::string message(buffer.data(), 3); // fixme: can do better
+    std::string message((char*)buffer.data(), 3); // fixme: can do better
 	if (message == "GET")
 	{
-		WebsocketHandshakeMessage* pMessage = new WebsocketHandshakeMessage(buffer.data(), buffer.size());
+		WebsocketHandshakeMessage* pMessage = new WebsocketHandshakeMessage((char*)buffer.data(), buffer.size());
 		packet = pMessage;
 		return Success;
 	}
