@@ -15,7 +15,7 @@ ByteArray mocca::net::receiveUntil(IPhysicalConnection& connection, const std::s
             return ByteArray(); // fixme: if no data is returned, the queue should not be modified
         }
         auto offset = result.size() - std::min(delim.size(), result.size());
-        result.append(chunk.data(), chunk.size());
+        result.append(chunk);
         auto searchBegin = result.data() + offset;
         auto searchEnd = result.data() + result.size();
         auto searchIt = std::search(searchBegin, searchEnd, begin(delim), end(delim));
@@ -34,7 +34,7 @@ ByteArray mocca::net::receiveExactly(IPhysicalConnection& connection, uint32_t s
         if (chunk.isEmpty()) {
             return ByteArray(); // fixme: if no data is returned, the queue should not be modified
         }
-        result.append(chunk.data(), chunk.size());
+        result.append(chunk);
     }
     return result;
 }

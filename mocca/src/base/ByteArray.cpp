@@ -89,6 +89,10 @@ void ByteArray::append(const void* data, uint32_t size) {
     size_ += size;
 }
 
+void mocca::ByteArray::append(const ByteArray& byteArray) {
+    append(byteArray.data(), byteArray.size());
+}
+
 ByteArray ByteArray::createFromRaw(const void* raw, uint32_t size) {
     auto byteArray = ByteArray(size);
     memcpy(byteArray.data_.get(), raw, size);

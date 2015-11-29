@@ -17,7 +17,7 @@ void MoccaConnection::send(ByteArray message) const {
     // fixme: performance loss; implement prepend method for ByteArray
     ByteArray newMessage(message.size() + sizeof(uint32_t));
     newMessage << message.size();
-    newMessage.append(message.data(), message.size());
+    newMessage.append(message);
     physicalConnection_->send(std::move(newMessage));
 }
 

@@ -58,7 +58,7 @@ TEST_F(ByteArrayTest, AppendDoesNotExceedCapacity) {
     memset(other.data(), 2, 4);
     other.setSize(4);
 
-    target.append(other.data(), other.size());
+    target.append(other);
 
     ASSERT_EQ(10, target.capacity());
 
@@ -78,7 +78,7 @@ TEST_F(ByteArrayTest, AppendExceedsCapacity) {
     memset(other.data(), 2, 4);
     other.setSize(4);
 
-    target.append(other.data(), other.size());
+    target.append(other);
 
     ASSERT_GT(target.capacity(), size_t{5});
 
@@ -91,7 +91,7 @@ TEST_F(ByteArrayTest, AppendReservesEnoughSpace) {
     ByteArray target(5);
     ByteArray other(2048);
     other.setSize(2048);
-    target.append(other.data(), other.size());
+    target.append(other);
     ASSERT_TRUE(target.capacity() >= 2048+5);
 }
 
