@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 namespace mocca {
     // http://stackoverflow.com/questions/2182002/convert-big-endian-to-little-endian-in-c-without-using-provided-func
     // Do not use these functions where performance is crucial. Use built-in (non-portable) functions instead.
