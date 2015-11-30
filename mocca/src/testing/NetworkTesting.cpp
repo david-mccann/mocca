@@ -1,5 +1,7 @@
 #include "mocca/testing/NetworkTesting.h"
+
 #include "mocca/testing/LoopbackPhysicalConnectionAcceptor.h"
+#include "mocca/net/MoccaNetworkService.h"
 
 #include <chrono>
 
@@ -14,10 +16,18 @@ template <> std::string mocca::testing::createBindingString<TCPNetworkService>(i
 }
 
 template <> std::string mocca::testing::createConnectionString<LoopbackPhysicalNetworkService>(int index) {
-    return "messageQueue" + std::to_string(index);
+    return "physicalMessageQueue" + std::to_string(index);
 }
 
 template <> std::string mocca::testing::createBindingString<LoopbackPhysicalNetworkService>(int index) {
+    return "physicalMessageQueue" + std::to_string(index);
+}
+
+template <> std::string mocca::testing::createConnectionString<LoopbackNetworkService>(int index) {
+    return "messageQueue" + std::to_string(index);
+}
+
+template <> std::string mocca::testing::createBindingString<LoopbackNetworkService>(int index) {
     return "messageQueue" + std::to_string(index);
 }
 
@@ -39,4 +49,14 @@ template <> Endpoint mocca::testing::createConnectionEndpoint<LoopbackPhysicalNe
 template <> Endpoint mocca::testing::createBindingEndpoint<LoopbackPhysicalNetworkService>(int index) {
     return Endpoint(MoccaNetworkService::protocolStatic(), LoopbackPhysicalNetworkService::transportStatic(),
                     createBindingString<LoopbackPhysicalNetworkService>(index));
+}
+
+template <> Endpoint mocca::testing::createConnectionEndpoint<LoopbackNetworkService>(int index) {
+    return Endpoint(LoopbackNetworkService::protocolStatic(), LoopbackNetworkService::transportStatic(),
+        createConnectionString<LoopbackNetworkService>(index));
+}
+
+template <> Endpoint mocca::testing::createBindingEndpoint<LoopbackNetworkService>(int index) {
+    return Endpoint(LoopbackNetworkService::protocolStatic(), LoopbackNetworkService::transportStatic(),
+        createBindingString<LoopbackNetworkService>(index));
 }

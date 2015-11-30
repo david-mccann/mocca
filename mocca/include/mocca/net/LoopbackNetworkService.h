@@ -15,6 +15,8 @@ class LoopbackNetworkService : public IProtocolNetworkService {
 public:
     static std::string transportStatic();
     std::string transport() const override;
+    static std::string protocolStatic();
+    std::string protocol() const override;
     std::unique_ptr<IProtocolConnection> connect(const std::string& queueName) override;
     std::unique_ptr<IProtocolConnectionAcceptor> bind(const std::string& queueName) override;
 

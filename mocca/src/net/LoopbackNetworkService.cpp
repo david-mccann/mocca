@@ -17,6 +17,14 @@ std::string mocca::net::LoopbackNetworkService::transport() const {
     return transportStatic();
 }
 
+std::string mocca::net::LoopbackNetworkService::protocolStatic() {
+    return "loopback";
+}
+
+std::string mocca::net::LoopbackNetworkService::protocol() const {
+    return protocolStatic();
+}
+
 std::unique_ptr<IProtocolConnection> LoopbackNetworkService::connect(const std::string& queueName) {
     if (!spawnedConnections_.count(queueName)) {
         throw NetworkError("No connection acceptor bound to queue " + queueName, __FILE__, __LINE__);
