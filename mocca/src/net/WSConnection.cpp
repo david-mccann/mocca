@@ -75,6 +75,9 @@ ByteArray WSConnection::receive(std::chrono::milliseconds timeout) const {
 
     // read the flags byte and the basic payload-size byte
     auto data = receiveExactly(*physicalConnection_, 2, timeout);
+    if (data.isEmpty()) {
+        return ByteArray();
+    }
 #ifdef MOCCA_CHECK_WS_FRAME
     if (data[0] != 0x81) { // final fragment, text frame
         throw Error("Invalid WebSocket frame: unsupported or malformed", __FILE__, __LINE__);

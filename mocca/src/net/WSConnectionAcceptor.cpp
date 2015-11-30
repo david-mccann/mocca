@@ -21,8 +21,8 @@ std::unique_ptr<IProtocolConnection> WSConnectionAcceptor::getConnection(std::ch
     std::string headerStr((char*)header.data(), header.size());
     auto connectionInfo = mocca::net::parseWSHandshake(headerStr);
 
-    ByteArray handshakeResponse;
-    handshakeResponse << mocca::net::createWSHandshakeResponse(connectionInfo);
+    auto responseStr = createWSHandshakeResponse(connectionInfo);
+    ByteArray handshakeResponse = ByteArray::createFromRaw(responseStr.c_str(), responseStr.size());
     physicalConnection->send(handshakeResponse);
 
     return std::unique_ptr<IProtocolConnection>(new WSConnection(std::move(physicalConnection), connectionInfo));
