@@ -1,18 +1,11 @@
 #include "mocca/net/WSHandshake.h"
 
+#include "mocca/base/Endian.h"
 #include "mocca/net/Error.h"
 #include "mocca/net/WSConnection.h"
 
 #include "base64/base64.h"
 #include "sha1/sha1.h"
-
-#ifdef _WIN32
-#include <winsock2.h>
-#else
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#endif
 
 #include <sstream>
 
@@ -59,14 +52,14 @@ std::string mocca::net::createWSHandshakeResponse(const mocca::net::WSConnection
     auto serverKey = connectionInfo.header.find("Sec-WebSocket-Key")->second;
     serverKey += "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
     SHA1 sha;
-    unsigned int messageDigest[5];
+    uint32_t messageDigest[5];
     sha.Reset();
     sha << serverKey.c_str();
     sha.Result(messageDigest);
     // convert sha1 hash bytes to network byte order because this sha1
     // library works on ints rather than bytes
     for (int i = 0; i < 5; ++i) {
-        messageDigest[i] = htonl(messageDigest[i]);
+        messageDigest[i] = swap_uint32(messageDigest[i]);
     }
     serverKey = base64_encode(reinterpret_cast<const unsigned char*>(messageDigest), 20);
 
