@@ -3,7 +3,8 @@
 using namespace mocca::net;
 
 Endpoint::Endpoint(const std::string& protocol, const std::string& transport, const std::string& connectionString)
-    : transport_(transport)
+    : protocol_(protocol)
+    , transport_(transport)
     , connectionString_(connectionString) {}
 
 bool Endpoint::equals(const Endpoint& other) const {

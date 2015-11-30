@@ -14,7 +14,7 @@ ByteArray mocca::net::receiveUntil(IPhysicalConnection& connection, const std::s
         if (chunk.isEmpty()) {
             return ByteArray(); // fixme: if no data is returned, the queue should not be modified
         }
-        auto offset = result.size() - std::min(delim.size(), result.size());
+        auto offset = result.size() - std::min(static_cast<uint32_t>(delim.size()), result.size());
         result.append(chunk);
         auto searchBegin = result.data() + offset;
         auto searchEnd = result.data() + result.size();
