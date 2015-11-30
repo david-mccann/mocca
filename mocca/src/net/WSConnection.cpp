@@ -1,10 +1,10 @@
 #include "mocca/net/WSConnection.h"
 
-#include "mocca/net/PhysicalConnection.h"
 #include "mocca/base/Endian.h"
+#include "mocca/net/PhysicalConnection.h"
 
-#include <mutex>
 #include <limits>
+#include <mutex>
 
 using namespace mocca;
 using namespace mocca::net;
@@ -77,7 +77,7 @@ ByteArray WSConnection::receive(std::chrono::milliseconds timeout) const {
     auto data = receiveExactly(*physicalConnection_, 2, timeout);
 #ifdef MOCCA_CHECK_WS_FRAME
     if (data[0] != 0x81) { // final fragment, text frame
-        throw Error("Invalid WebSocket frame: Unsupported or malformed", __FILE__, __LINE__);
+        throw Error("Invalid WebSocket frame: unsupported or malformed", __FILE__, __LINE__);
     }
 #endif
 
@@ -99,11 +99,16 @@ ByteArray WSConnection::receive(std::chrono::milliseconds timeout) const {
         payloadSize = swap_uint64(*reinterpret_cast<uint64_t*>(data.data() + 2));
 #ifdef MOCCA_CHECK_WS_FRAME
         if (payloadSize > std::numeric_limits<uint32_t>::max()) {
-            throw Error("Frame size exceeds buffer size", __FILE__, __LINE__);
+            throw Error("Invalid WebSocket frame: frame size exceeds buffer size", __FILE__, __LINE__);
         }
 #endif
         maskOffset = 10;
     }
+#ifdef MOCCA_CHECK_WS_FRAME
+    else {
+        throw Error("Invalid WebSocket frame: malformed payload-size", __FILE__, __LINE__);
+    }
+#endif
 
     // read and unmask payload data
     ByteArray payload = receiveExactly(*physicalConnection_, static_cast<uint32_t>(payloadSize), timeout);
