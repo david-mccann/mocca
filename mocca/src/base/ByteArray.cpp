@@ -253,7 +253,7 @@ ByteArray& ByteArray::operator>>(ByteArray& val) {
 
 unsigned char& mocca::ByteArray::operator[](uint32_t index) {
 #ifdef MOCCA_BYTEARRAY_CHECKS
-    if (index < 0 || index >= size_) {
+    if (index >= size_) {
         throw Error("Index out of bounds", __FILE__, __LINE__);
     }
 #endif
@@ -262,7 +262,7 @@ unsigned char& mocca::ByteArray::operator[](uint32_t index) {
 
 const unsigned char& mocca::ByteArray::operator[](uint32_t index) const {
 #ifdef MOCCA_BYTEARRAY_CHECKS
-    if (index < 0 || index >= size_) {
+    if (index >= size_) {
         throw Error("Index out of bounds", __FILE__, __LINE__);
     }
 #endif
