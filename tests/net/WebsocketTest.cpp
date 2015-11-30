@@ -4,6 +4,7 @@
 #include "mocca/testing/LoopbackPhysicalNetworkService.h"
 #include "mocca/net/WSNetworkService.h"
 #include "mocca/net/WSConnectionAcceptor.h"
+#include "mocca/net/PhysicalConnection.h"
 
 using namespace mocca;
 using namespace mocca::net;
@@ -62,7 +63,6 @@ TEST_F(WebsocketTest, ReceiveSmallPayload) {
     auto wsAcceptor = wsService.bind("mq");
     auto& lbService = wsService.physicalService();
     auto lbClientConnection = lbService.connect("mq");
-
     lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
     auto wsServerConnection = wsAcceptor->getConnection();
 
@@ -84,7 +84,6 @@ TEST_F(WebsocketTest, ReceiveMediumPayload) {
     auto wsAcceptor = wsService.bind("mq");
     auto& lbService = wsService.physicalService();
     auto lbClientConnection = lbService.connect("mq");
-
     lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
     auto wsServerConnection = wsAcceptor->getConnection();
 
@@ -108,7 +107,6 @@ TEST_F(WebsocketTest, ReceiveBigPayload) {
     auto wsAcceptor = wsService.bind("mq");
     auto& lbService = wsService.physicalService();
     auto lbClientConnection = lbService.connect("mq");
-
     lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
     auto wsServerConnection = wsAcceptor->getConnection();
 
@@ -125,4 +123,77 @@ TEST_F(WebsocketTest, ReceiveBigPayload) {
     auto receivedData = wsServerConnection->receive();
     ASSERT_EQ(payloadSize, receivedData.size());
     ASSERT_TRUE(std::memcmp(payload.data(), receivedData.data(), static_cast<uint32_t>(payloadSize)) == 0);
+}
+
+TEST_F(WebsocketTest, SendSmallPayload) {
+    WSNetworkService wsService(std::unique_ptr<IPhysicalNetworkService>(new LoopbackPhysicalNetworkService()));
+    auto wsAcceptor = wsService.bind("mq");
+    auto& lbService = wsService.physicalService();
+    auto lbClientConnection = lbService.connect("mq");
+    lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
+    auto wsServerConnection = wsAcceptor->getConnection();
+    receiveUntil(*lbClientConnection, "\r\n\r\n"); // remove hanshake response from client buffer
+
+    unsigned char payloadSize = 125;
+    auto payload = createPayloadData(payloadSize);
+    wsServerConnection->send(payload);
+
+    ByteArray expectedData(payloadSize + 2); // 2 bytes header
+    expectedData.append(&flags, 1);
+    expectedData.append(&payloadSize, 1);
+    expectedData.append(payload);
+
+    auto receivedData = lbClientConnection->receive(200);
+    ASSERT_EQ(expectedData.size(), receivedData.size());
+    ASSERT_TRUE(std::memcmp(expectedData.data(), receivedData.data(), expectedData.size()) == 0);
+}
+
+TEST_F(WebsocketTest, SendMediumPayload) {
+    WSNetworkService wsService(std::unique_ptr<IPhysicalNetworkService>(new LoopbackPhysicalNetworkService()));
+    auto wsAcceptor = wsService.bind("mq");
+    auto& lbService = wsService.physicalService();
+    auto lbClientConnection = lbService.connect("mq");
+    lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
+    auto wsServerConnection = wsAcceptor->getConnection();
+    receiveUntil(*lbClientConnection, "\r\n\r\n"); // remove hanshake response from client buffer
+
+    uint16_t payloadSize = 40000;
+    uint16_t payloadSizeBE = swap_uint16(payloadSize);
+    auto payload = createPayloadData(payloadSize);
+    wsServerConnection->send(payload);
+
+    ByteArray expectedData(payloadSize + 4); // 4 bytes header
+    expectedData.append(&flags, 1);
+    expectedData.append(&mediumPayload, 1);
+    expectedData.append(&payloadSizeBE, 2);
+    expectedData.append(payload);
+
+    auto receivedData = lbClientConnection->receive(41000);
+    ASSERT_EQ(expectedData.size(), receivedData.size());
+    ASSERT_TRUE(std::memcmp(expectedData.data(), receivedData.data(), expectedData.size()) == 0);
+}
+
+TEST_F(WebsocketTest, SendBigPayload) {
+    WSNetworkService wsService(std::unique_ptr<IPhysicalNetworkService>(new LoopbackPhysicalNetworkService()));
+    auto wsAcceptor = wsService.bind("mq");
+    auto& lbService = wsService.physicalService();
+    auto lbClientConnection = lbService.connect("mq");
+    lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
+    auto wsServerConnection = wsAcceptor->getConnection();
+    receiveUntil(*lbClientConnection, "\r\n\r\n"); // remove hanshake response from client buffer
+
+    uint64_t payloadSize = 70000;
+    uint64_t payloadSizeBE = swap_uint64(payloadSize);
+    auto payload = createPayloadData(static_cast<uint32_t>(payloadSize));
+    wsServerConnection->send(payload);
+
+    ByteArray expectedData(static_cast<uint32_t>(payloadSize) + 12); // 12 bytes header
+    expectedData.append(&flags, 1);
+    expectedData.append(&bigPayload, 1);
+    expectedData.append(&payloadSizeBE, 8);
+    expectedData.append(payload);
+
+    auto receivedData = lbClientConnection->receive(71000);
+    ASSERT_EQ(expectedData.size(), receivedData.size());
+    ASSERT_TRUE(std::memcmp(expectedData.data(), receivedData.data(), expectedData.size()) == 0);
 }

@@ -1,6 +1,7 @@
 #include "mocca/base/ByteArray.h"
 
 #include <limits>
+#include <algorithm>
 
 static_assert(std::numeric_limits<float>::is_iec559 == true, "Unsupported floating point type");
 static_assert(std::numeric_limits<double>::is_iec559 == true, "Unsupported floating point type");
@@ -83,7 +84,7 @@ void ByteArray::resize(uint32_t newCapacity) {
 
 void ByteArray::append(const void* data, uint32_t size) {
     if (capacity_ < size_ + size) {
-        resize(size_ + 2 * size);
+        resize(size_ + std::max(2 * size, 256u));
     }
     memcpy(data_.get() + size_, data, size);
     size_ += size;
