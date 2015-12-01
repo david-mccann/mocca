@@ -269,7 +269,7 @@ TEST_F(ByteArrayTest, BuildByteArray) {
     ASSERT_EQ(23, std::get<0>(x));
     ASSERT_EQ(17.0f, std::get<1>(x));
     ASSERT_EQ("blubb", std::get<2>(x));
-    ASSERT_EQ(false, std::get<3>(x));
+    ASSERT_FALSE(std::get<3>(x));
     ASSERT_EQ(20.0, std::get<4>(x));
     ASSERT_EQ("blubb2", std::get<5>(x));
 }

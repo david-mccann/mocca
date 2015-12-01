@@ -44,8 +44,8 @@ TYPED_TEST(NetworkServiceTest, Identifier)
 {
     {
         // identifier is not empty
-        auto acceptor = target->bind(createBindingString<TypeParam>());
-        auto clientConnection = target->connect(createConnectionString<TypeParam>());
+        auto acceptor = this->target->bind(createBindingString<TypeParam>());
+        auto clientConnection = this->target->connect(createConnectionString<TypeParam>());
         ASSERT_FALSE(clientConnection->identifier().empty());
         auto serverConnection = acceptor->getConnection();
         ASSERT_FALSE(serverConnection == nullptr);
@@ -53,9 +53,9 @@ TYPED_TEST(NetworkServiceTest, Identifier)
     }
     {
         // identifiers are distinct
-        auto acceptor = target->bind(createBindingString<TypeParam>());
-        auto clientConnection1 = target->connect(createConnectionString<TypeParam>());
-        auto clientConnection2 = target->connect(createConnectionString<TypeParam>());
+        auto acceptor = this->target->bind(createBindingString<TypeParam>());
+        auto clientConnection1 = this->target->connect(createConnectionString<TypeParam>());
+        auto clientConnection2 = this->target->connect(createConnectionString<TypeParam>());
         auto serverConnection1 = acceptor->getConnection();
         auto serverConnection2 = acceptor->getConnection();
         ASSERT_FALSE(serverConnection1 == nullptr);
@@ -69,40 +69,40 @@ TYPED_TEST(NetworkServiceTest, Identifier)
 TYPED_TEST(NetworkServiceTest, AcceptorConnections) {
     {
         // cannot connect to an unbound port
-        ASSERT_THROW(target->connect(createConnectionString<TypeParam>()), Error);
+        ASSERT_THROW(this->target->connect(createConnectionString<TypeParam>()), Error);
     }
     {
         // acceptor has no connection when no client connects
-        auto acceptor = target->bind(createBindingString<TypeParam>());
+        auto acceptor = this->target->bind(createBindingString<TypeParam>());
         ASSERT_TRUE(acceptor->getConnection(std::chrono::milliseconds(1)) == nullptr);
     }
     {
         // acceptor has a connection when a client connects
-        auto acceptor = target->bind(createBindingString<TypeParam>());
-        auto connection = target->connect(createConnectionString<TypeParam>());
+        auto acceptor = this->target->bind(createBindingString<TypeParam>());
+        auto connection = this->target->connect(createConnectionString<TypeParam>());
         ASSERT_FALSE(acceptor->getConnection() == nullptr);
     }
     {
         // acceptor has two conenctions when two clients connect
-        auto acceptor = target->bind(createBindingString<TypeParam>());
-        auto connection1 = target->connect(createConnectionString<TypeParam>());
-        auto connection2 = target->connect(createConnectionString<TypeParam>());
+        auto acceptor = this->target->bind(createBindingString<TypeParam>());
+        auto connection1 = this->target->connect(createConnectionString<TypeParam>());
+        auto connection2 = this->target->connect(createConnectionString<TypeParam>());
         ASSERT_FALSE(acceptor->getConnection() == nullptr);
         ASSERT_FALSE(acceptor->getConnection() == nullptr);
     }
     {
         // connection is removed when dequeued
-        auto acceptor = target->bind(createBindingString<TypeParam>());
-        auto connection = target->connect(createConnectionString<TypeParam>());
+        auto acceptor = this->target->bind(createBindingString<TypeParam>());
+        auto connection = this->target->connect(createConnectionString<TypeParam>());
         auto connectionFromAcceptor = acceptor->getConnection();
         ASSERT_FALSE(connectionFromAcceptor == nullptr);
         ASSERT_TRUE(acceptor->getConnection(std::chrono::milliseconds(1)) == nullptr);
     }
     {
         // each acceptor has its own queue
-        auto acceptor1 = target->bind(createBindingString<TypeParam>());
-        auto acceptor2 = target->bind(createBindingString<TypeParam>(1));
-        auto connection = target->connect(createConnectionString<TypeParam>(1));
+        auto acceptor1 = this->target->bind(createBindingString<TypeParam>());
+        auto acceptor2 = this->target->bind(createBindingString<TypeParam>(1));
+        auto connection = this->target->connect(createConnectionString<TypeParam>(1));
         ASSERT_TRUE(acceptor1->getConnection(std::chrono::milliseconds(1)) == nullptr);
         ASSERT_FALSE(acceptor2->getConnection() == nullptr);
     }
@@ -111,8 +111,8 @@ TYPED_TEST(NetworkServiceTest, AcceptorConnections) {
 TYPED_TEST(NetworkServiceTest, SendAndReceive) {
     {
         // client sends to server
-        auto acceptor = target->bind(createBindingString<TypeParam>());
-        auto clientConnection = target->connect(createConnectionString<TypeParam>());
+        auto acceptor = this->target->bind(createBindingString<TypeParam>());
+        auto clientConnection = this->target->connect(createConnectionString<TypeParam>());
         auto serverConnection = acceptor->getConnection();
         ASSERT_FALSE(serverConnection == nullptr);
         clientConnection->send(mocca::makeFormattedByteArray("Hello World"));
@@ -121,8 +121,8 @@ TYPED_TEST(NetworkServiceTest, SendAndReceive) {
     }
     {
         // server sends to client
-        auto acceptor = target->bind(createBindingString<TypeParam>());
-        auto clientConnection = target->connect(createConnectionString<TypeParam>());
+        auto acceptor = this->target->bind(createBindingString<TypeParam>());
+        auto clientConnection = this->target->connect(createConnectionString<TypeParam>());
         auto serverConnection = acceptor->getConnection();
         ASSERT_FALSE(serverConnection == nullptr);
         serverConnection->send(mocca::makeFormattedByteArray("Hello World"));
@@ -131,11 +131,11 @@ TYPED_TEST(NetworkServiceTest, SendAndReceive) {
     }
     {
         // two different clients and two receivers on the same port
-        auto acceptor = target->bind(createBindingString<TypeParam>());
-        auto clientConnection1 = target->connect(createConnectionString<TypeParam>());
+        auto acceptor = this->target->bind(createBindingString<TypeParam>());
+        auto clientConnection1 = this->target->connect(createConnectionString<TypeParam>());
         auto serverConnection1 = acceptor->getConnection();
         ASSERT_FALSE(serverConnection1 == nullptr);
-        auto clientConnection2 = target->connect(createConnectionString<TypeParam>());
+        auto clientConnection2 = this->target->connect(createConnectionString<TypeParam>());
         auto serverConnection2 = acceptor->getConnection();
         ASSERT_FALSE(serverConnection2 == nullptr);
         clientConnection1->send(mocca::makeFormattedByteArray("Hello from 1"));
@@ -149,8 +149,8 @@ TYPED_TEST(NetworkServiceTest, SendAndReceive) {
 }
 
 TYPED_TEST(NetworkServiceTest, ReceiveTimeout) {
-    auto acceptor = target->bind(createBindingString<TypeParam>());
-    auto clientConnection = target->connect(createConnectionString<TypeParam>());
+    auto acceptor = this->target->bind(createBindingString<TypeParam>());
+    auto clientConnection = this->target->connect(createConnectionString<TypeParam>());
     auto serverConnection = acceptor->getConnection();
     ASSERT_FALSE(serverConnection == nullptr);
     auto recPacket = ByteArray(serverConnection->receive(std::chrono::milliseconds(10)));
@@ -158,8 +158,8 @@ TYPED_TEST(NetworkServiceTest, ReceiveTimeout) {
 }
 
 TYPED_TEST(NetworkServiceTest, ReceiveTimeoutClient) {
-    auto acceptor = target->bind(createBindingString<TypeParam>());
-    auto clientConnection = target->connect(createConnectionString<TypeParam>());
+    auto acceptor = this->target->bind(createBindingString<TypeParam>());
+    auto clientConnection = this->target->connect(createConnectionString<TypeParam>());
     auto serverConnection = acceptor->getConnection();
     ASSERT_FALSE(serverConnection == nullptr);
     auto recPacket = ByteArray(clientConnection->receive(std::chrono::milliseconds(10)));
@@ -167,8 +167,8 @@ TYPED_TEST(NetworkServiceTest, ReceiveTimeoutClient) {
 }
 
 //TYPED_TEST(NetworkServiceTest, SendReceiveParallel) {
-//    auto acceptor = target->bind(createBindingString<TypeParam>());
-//    auto clientConnection = target->connect(createConnectionString<TypeParam>());
+//    auto acceptor = this->target->bind(createBindingString<TypeParam>());
+//    auto clientConnection = this->target->connect(createConnectionString<TypeParam>());
 //    auto serverConnection = acceptor->getConnection();
 //    ASSERT_FALSE(serverConnection == nullptr);
 //    
