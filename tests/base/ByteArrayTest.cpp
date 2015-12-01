@@ -95,15 +95,6 @@ TEST_F(ByteArrayTest, AppendReservesEnoughSpace) {
     ASSERT_TRUE(target.capacity() >= 2048+5);
 }
 
-TEST_F(ByteArrayTest, Copy) {
-    ByteArray target(1);
-    memset(target.data(), 1, 1);
-    ByteArray copy(target);
-    memset(copy.data(), 2, 1);
-    ASSERT_EQ(1, *target.data());
-    ASSERT_EQ(2, *copy.data());
-}
-
 TEST_F(ByteArrayTest, Move) {
     ByteArray target(1);
     memset(target.data(), 1, 1);

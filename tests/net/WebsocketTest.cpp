@@ -6,12 +6,16 @@
 #include "mocca/net/WSConnectionAcceptor.h"
 #include "mocca/net/PhysicalConnection.h"
 
+#include <array>
+
 using namespace mocca;
 using namespace mocca::net;
 
 class WebsocketTest : public ::testing::Test {
 protected:
-    WebsocketTest() {
+    WebsocketTest()
+        : mask({ { 0x11, 0x22, 0x33, 0x44 } })
+    {
         // You can do set-up work for each test here.
     }
 
@@ -46,7 +50,7 @@ protected:
     const unsigned char mediumPayload = 126;
     const unsigned char bigPayload = 127;
     const unsigned char flags = 0x81;
-    const char mask[4] = { 0x11, 0x22, 0x33, 0x44 };
+    std::array<unsigned char, 4> mask;
 
     ByteArray maskData(const ByteArray& data) {
         ByteArray result(data.size());
@@ -73,7 +77,7 @@ TEST_F(WebsocketTest, ReceiveSmallPayload) {
     data.append(&mask, 4);
     auto payload = createPayloadData(payloadSize);
     data.append(maskData(payload));
-    lbClientConnection->send(data);
+    lbClientConnection->send(std::move(data));
     auto receivedData = wsServerConnection->receive();
     ASSERT_EQ(payloadSize, receivedData.size());
     ASSERT_TRUE(std::memcmp(payload.data(), receivedData.data(), payloadSize) == 0);
@@ -96,7 +100,7 @@ TEST_F(WebsocketTest, ReceiveMediumPayload) {
     data.append(&mask, 4);
     auto payload = createPayloadData(payloadSize);
     data.append(maskData(payload));
-    lbClientConnection->send(data);
+    lbClientConnection->send(std::move(data));
     auto receivedData = wsServerConnection->receive();
     ASSERT_EQ(payloadSize, receivedData.size());
     ASSERT_TRUE(std::memcmp(payload.data(), receivedData.data(), payloadSize) == 0);
@@ -119,7 +123,7 @@ TEST_F(WebsocketTest, ReceiveBigPayload) {
     data.append(&mask, 4);
     auto payload = createPayloadData(static_cast<uint32_t>(payloadSize));
     data.append(maskData(payload));
-    lbClientConnection->send(data);
+    lbClientConnection->send(std::move(data));
     auto receivedData = wsServerConnection->receive();
     ASSERT_EQ(payloadSize, receivedData.size());
     ASSERT_TRUE(std::memcmp(payload.data(), receivedData.data(), static_cast<uint32_t>(payloadSize)) == 0);
@@ -136,7 +140,7 @@ TEST_F(WebsocketTest, SendSmallPayload) {
 
     unsigned char payloadSize = 125;
     auto payload = createPayloadData(payloadSize);
-    wsServerConnection->send(payload);
+    wsServerConnection->send(payload.clone());
 
     ByteArray expectedData(payloadSize + 2); // 2 bytes header
     expectedData.append(&flags, 1);
@@ -160,7 +164,7 @@ TEST_F(WebsocketTest, SendMediumPayload) {
     uint16_t payloadSize = 40000;
     uint16_t payloadSizeBE = swap_uint16(payloadSize);
     auto payload = createPayloadData(payloadSize);
-    wsServerConnection->send(payload);
+    wsServerConnection->send(payload.clone());
 
     ByteArray expectedData(payloadSize + 4); // 4 bytes header
     expectedData.append(&flags, 1);
@@ -185,7 +189,7 @@ TEST_F(WebsocketTest, SendBigPayload) {
     uint64_t payloadSize = 70000;
     uint64_t payloadSizeBE = swap_uint64(payloadSize);
     auto payload = createPayloadData(static_cast<uint32_t>(payloadSize));
-    wsServerConnection->send(payload);
+    wsServerConnection->send(payload.clone());
 
     ByteArray expectedData(static_cast<uint32_t>(payloadSize) + 12); // 12 bytes header
     expectedData.append(&flags, 1);

@@ -115,7 +115,7 @@ TYPED_TEST(NetworkServiceTest, SendAndReceive) {
         auto clientConnection = target->connect(createConnectionString<TypeParam>());
         auto serverConnection = acceptor->getConnection();
         ASSERT_FALSE(serverConnection == nullptr);
-        clientConnection->send((ByteArray() << "Hello World"));
+        clientConnection->send(std::move(ByteArray() << "Hello World"));
         auto recPacket = ByteArray(serverConnection->receive());
         ASSERT_EQ("Hello World", recPacket.get<std::string>());
     }
@@ -125,7 +125,7 @@ TYPED_TEST(NetworkServiceTest, SendAndReceive) {
         auto clientConnection = target->connect(createConnectionString<TypeParam>());
         auto serverConnection = acceptor->getConnection();
         ASSERT_FALSE(serverConnection == nullptr);
-        serverConnection->send((ByteArray() << "Hello World"));
+        serverConnection->send(std::move(ByteArray() << "Hello World"));
         auto recPacket = ByteArray(clientConnection->receive());
         ASSERT_EQ("Hello World", recPacket.get<std::string>());
     }
@@ -138,8 +138,8 @@ TYPED_TEST(NetworkServiceTest, SendAndReceive) {
         auto clientConnection2 = target->connect(createConnectionString<TypeParam>());
         auto serverConnection2 = acceptor->getConnection();
         ASSERT_FALSE(serverConnection2 == nullptr);
-        clientConnection1->send((ByteArray() << "Hello from 1"));
-        clientConnection2->send((ByteArray() << "Hello from 2"));
+        clientConnection1->send(std::move(ByteArray() << "Hello from 1"));
+        clientConnection2->send(std::move(ByteArray() << "Hello from 2"));
  
         auto recPacket1 = ByteArray(serverConnection1->receive());
         ASSERT_EQ("Hello from 1", recPacket1.get<std::string>());
@@ -180,7 +180,7 @@ TYPED_TEST(NetworkServiceTest, SendReceiveParallel) {
 
     mocca::Thread t(std::thread([&clientConnection, data] {
         for (auto item : data) {
-            clientConnection->send((ByteArray() << item));
+            clientConnection->send(std::move(ByteArray() << item));
         }
     }));
 

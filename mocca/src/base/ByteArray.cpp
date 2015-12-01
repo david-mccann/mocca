@@ -17,14 +17,6 @@ ByteArray::ByteArray(uint32_t capacity)
     , size_(0)
     , readPos_(0) {}
 
-ByteArray::ByteArray(const ByteArray& other)
-    : data_(new unsigned char[other.capacity_])
-    , capacity_(other.capacity_)
-    , size_(other.size_)
-    , readPos_(other.readPos_) {
-    memcpy(data_.get(), other.data_.get(), other.size_);
-}
-
 ByteArray::ByteArray(ByteArray&& other)
     : data_(std::move(other.data_))
     , capacity_(other.capacity_)
@@ -35,17 +27,16 @@ ByteArray::ByteArray(ByteArray&& other)
     other.readPos_ = 0;
 }
 
-ByteArray& ByteArray::operator=(ByteArray other) {
-    swap(other, *this);
-    return *this;
-}
-
 void swap(ByteArray& lhs, ByteArray& rhs) {
     using std::swap;
     swap(lhs.data_, rhs.data_);
     swap(lhs.capacity_, rhs.capacity_);
     swap(lhs.size_, rhs.size_);
     swap(lhs.readPos_, rhs.readPos_);
+}
+
+ByteArray mocca::ByteArray::clone() {
+    return ByteArray::createFromRaw(data(), size());
 }
 
 unsigned char* ByteArray::data() {
@@ -95,10 +86,10 @@ void mocca::ByteArray::append(const ByteArray& byteArray) {
 }
 
 ByteArray ByteArray::createFromRaw(const void* raw, uint32_t size) {
-    auto byteArray = ByteArray(size);
+    ByteArray byteArray(size);
     memcpy(byteArray.data_.get(), raw, size);
     byteArray.size_ = size;
-    return byteArray;
+    return std::move(byteArray);
 }
 
 ByteArray& ByteArray::operator<<(int32_t val) {

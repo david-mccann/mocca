@@ -13,13 +13,12 @@ namespace mocca {
 class ByteArray {
 public:
     ByteArray(uint32_t capacity = 256);
-    virtual ~ByteArray() = default;
-
-    ByteArray(const ByteArray& other);
+    ByteArray(const ByteArray& other) = delete;
     ByteArray(ByteArray&& other);
-    ByteArray& operator=(ByteArray other);
 
     friend void swap(ByteArray& lhs, ByteArray& rhs);
+
+    ByteArray clone();
 
     unsigned char* data();
     const unsigned char* data() const;

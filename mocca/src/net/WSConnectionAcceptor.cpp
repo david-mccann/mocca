@@ -17,13 +17,13 @@ std::unique_ptr<IProtocolConnection> WSConnectionAcceptor::getConnection(std::ch
     if (physicalConnection == nullptr) {
         return nullptr;
     }
-    auto header = receiveUntil(*physicalConnection, "\r\n\r\n");
-    std::string headerStr((char*)header.data(), header.size());
-    auto connectionInfo = mocca::net::parseWSHandshake(headerStr);
+    auto handshake = receiveUntil(*physicalConnection, "\r\n\r\n");
+    std::string handshakeStr((char*)handshake.data(), handshake.size());
+    auto connectionInfo = mocca::net::parseWSHandshake(handshakeStr);
 
-    auto responseStr = createWSHandshakeResponse(connectionInfo);
+    auto responseStr = mocca::net::createWSHandshakeResponse(connectionInfo);
     ByteArray handshakeResponse = ByteArray::createFromRaw(responseStr.c_str(), responseStr.size());
-    physicalConnection->send(handshakeResponse);
+    physicalConnection->send(std::move(handshakeResponse));
 
     return std::unique_ptr<IProtocolConnection>(new WSConnection(std::move(physicalConnection), connectionInfo));
 }

@@ -67,7 +67,7 @@ void WSConnection::send(ByteArray message) const {
     // append payload
     sendBuffer.append(message);
 
-    physicalConnection_->send(sendBuffer);
+    physicalConnection_->send(std::move(sendBuffer));
 }
 
 ByteArray WSConnection::receive(std::chrono::milliseconds timeout) const {

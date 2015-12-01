@@ -46,8 +46,8 @@ TYPED_TEST(ConnectionAggregatorTest, EnqueueDequeue) {
     packet1 << "Hello 1";
     packet2 << "Hello 2";
 
-    clientConnection1->send(packet1);
-    clientConnection2->send(packet2);
+    clientConnection1->send(std::move(packet1));
+    clientConnection2->send(std::move(packet2));
 
     auto data1 = target.receive(std::chrono::milliseconds(200));
     auto data2 = target.receive(std::chrono::milliseconds(200));
@@ -76,7 +76,7 @@ TYPED_TEST(ConnectionAggregatorTest, SendReceiveParallel) {
 
     auto sendFunction = [](IProtocolConnection& connection, const std::vector<std::string>& data) {
         for (auto item : data) {
-            connection.send((ByteArray() << item));
+            connection.send(std::move(ByteArray() << item));
             static int sleepTime = 0;
             sleepTime = (sleepTime + 1) % 3;
             std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
@@ -93,7 +93,7 @@ TYPED_TEST(ConnectionAggregatorTest, SendReceiveParallel) {
             auto envelopeNullable = aggregator.receive(std::chrono::milliseconds(50));
             if (!envelopeNullable.isNull()) {
                 auto envelope = envelopeNullable.release();
-                ByteArray recPacket(envelope.message);
+                ByteArray recPacket(std::move(envelope.message));
                 result.push_back(recPacket.get<std::string>());
             }
         }
