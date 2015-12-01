@@ -92,6 +92,30 @@ ByteArray ByteArray::createFromRaw(const void* raw, uint32_t size) {
     return std::move(byteArray);
 }
 
+ByteArray& ByteArray::operator<<(int16_t val) {
+    append(&val, sizeof(int16_t));
+    return *this;
+}
+
+ByteArray& ByteArray::operator>>(int16_t& val) {
+#ifdef MOCCA_BYTEARRAY_CHECKS
+    if (readPos_ + sizeof(int16_t) > size_) {
+        throw Error("Reading beyond end of packet", __FILE__, __LINE__);
+    }
+#endif
+    memcpy(&val, data_.get() + readPos_, sizeof(int16_t));
+    readPos_ += sizeof(int16_t);
+    return *this;
+}
+
+ByteArray& ByteArray::operator<<(uint16_t val) {
+    return (*this << (int16_t)val);
+}
+
+ByteArray& ByteArray::operator>>(uint16_t& val) {
+    return (*this >> (int16_t&)val);
+}
+
 ByteArray& ByteArray::operator<<(int32_t val) {
     append(&val, sizeof(int32_t));
     return *this;

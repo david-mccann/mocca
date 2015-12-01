@@ -34,6 +34,12 @@ public:
     void append(const void* data, uint32_t size);
     void append(const ByteArray& byteArray);
 
+    ByteArray& operator<<(int16_t val);
+    ByteArray& operator>>(int16_t& val);
+
+    ByteArray& operator<<(uint16_t val);
+    ByteArray& operator>>(uint16_t& val);
+
     ByteArray& operator<<(int32_t val);
     ByteArray& operator>>(int32_t& val);
 
