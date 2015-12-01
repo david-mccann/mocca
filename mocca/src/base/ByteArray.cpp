@@ -261,13 +261,13 @@ void ByteArray::resetReadPos() {
     readPos_ = 0;
 }
 
-ByteArray makeFormattedByteArray(const std::string& str) {
+template <> ByteArray makeFormattedByteArray<std::string>(const std::string& str) {
     ByteArray result;
     result << static_cast<uint32_t>(str.size());
     result.append(str.c_str(), static_cast<uint32_t>(str.size()));
     return result;
 }
-ByteArray makeFormattedByteArray(const char* str) {
+template <> ByteArray makeFormattedByteArray<const char *>(const char* const& str) {
     return makeFormattedByteArray(std::string(str));
 }
 

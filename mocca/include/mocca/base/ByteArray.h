@@ -89,8 +89,8 @@ template <typename T> ByteArray makeFormattedByteArray(const T& value) {
     result << value;
     return result;
 }
-ByteArray makeFormattedByteArray(const std::string& str);
-ByteArray makeFormattedByteArray(const char* str);
+template <> ByteArray makeFormattedByteArray<std::string>(const std::string& str);
+template <> ByteArray makeFormattedByteArray<const char*>(const char* const& str);
 template <typename T, typename... Args>
 ByteArray makeFormattedByteArray(const T& value, const Args&... args) {
     ByteArray result = makeFormattedByteArray(value);
