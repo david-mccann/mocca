@@ -27,7 +27,7 @@ ByteArray MoccaConnection::receive(std::chrono::milliseconds timeout) const {
     if (sizeData.isEmpty()) {
         return ByteArray();
     }
-    auto size = sizeData.get<uint32_t>();
+    auto size = sizeData.read<uint32_t>();
     auto data = receiveExactly(*physicalConnection_, size, timeout);
     return data;
 }

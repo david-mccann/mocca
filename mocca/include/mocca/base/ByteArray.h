@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <cstring>
+#include <tuple>
 
 #define MOCCA_BYTEARRAY_CHECKS
 
@@ -58,7 +59,7 @@ public:
 
     ByteArray& operator<<(const char* val);
     ByteArray& operator<<(const std::string& val);
-    ByteArray& operator>>(std::string& val);
+    std::string read(uint32_t size);
 
     ByteArray& operator<<(const ByteArray& val);
     ByteArray& operator>>(ByteArray& val);
@@ -66,7 +67,7 @@ public:
     unsigned char& operator[](uint32_t index);
     const unsigned char& operator[](uint32_t index) const;
     
-    template <typename T> T get() {
+    template <typename T> T read() {
         T val;
         *this >> val;
         return val;
@@ -82,4 +83,32 @@ private:
     uint32_t size_;
     uint32_t readPos_;
 };
+
+template <typename T> ByteArray makeFormattedByteArray(const T& value) {
+    ByteArray result;
+    result << value;
+    return result;
+}
+ByteArray makeFormattedByteArray(const std::string& str);
+ByteArray makeFormattedByteArray(const char* str);
+template <typename T, typename... Args>
+ByteArray makeFormattedByteArray(const T& value, const Args&... args) {
+    ByteArray result = makeFormattedByteArray(value);
+    result.append(makeFormattedByteArray(args...));
+    return result;
+}
+
+template <typename T>
+std::tuple<T> parseFormattedByteArray(ByteArray& byteArray) {
+    T value;
+    byteArray >> value;
+    return std::tuple<T>(value);
+}
+template <> std::tuple<std::string> parseFormattedByteArray<std::string>(ByteArray& byteArray);
+template <typename T, typename Arg, typename... Args>
+std::tuple<T, Arg, Args...> parseFormattedByteArray(ByteArray& byteArray) {
+    auto value = parseFormattedByteArray<T>(byteArray);
+    return std::tuple_cat(value, parseFormattedByteArray<Arg, Args...>(byteArray));
+}
+
 }

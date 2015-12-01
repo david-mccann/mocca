@@ -42,9 +42,8 @@ TYPED_TEST(ConnectionAggregatorTest, EnqueueDequeue) {
     auto clientConnection1 = service->connect(createConnectionString<TypeParam>());
     auto clientConnection2 = service->connect(createConnectionString<TypeParam>());
 
-    ByteArray packet1, packet2;
-    packet1 << "Hello 1";
-    packet2 << "Hello 2";
+    ByteArray packet1 = mocca::makeFormattedByteArray("Hello 1");
+    ByteArray packet2 = mocca::makeFormattedByteArray("Hello 2");
 
     clientConnection1->send(std::move(packet1));
     clientConnection2->send(std::move(packet2));
@@ -55,8 +54,8 @@ TYPED_TEST(ConnectionAggregatorTest, EnqueueDequeue) {
     ASSERT_FALSE(data2.isNull());
     ByteArray recPacket1(data1.release().message);
     ByteArray recPacket2(data2.release().message);
-    auto recStr1 = recPacket1.get<std::string>();
-    auto recStr2 = recPacket2.get<std::string>();
+    auto recStr1 = std::get<0>(mocca::parseFormattedByteArray<std::string>(recPacket1));
+    auto recStr2 = std::get<0>(mocca::parseFormattedByteArray<std::string>(recPacket2));
     ASSERT_TRUE(recStr1 == "Hello 1" && recStr2 == "Hello 2" ||
                 recStr1 == "Hello 2" && recStr2 == "Hello 1");
 }
@@ -76,7 +75,7 @@ TYPED_TEST(ConnectionAggregatorTest, SendReceiveParallel) {
 
     auto sendFunction = [](IProtocolConnection& connection, const std::vector<std::string>& data) {
         for (auto item : data) {
-            connection.send(std::move(ByteArray() << item));
+            connection.send(mocca::makeFormattedByteArray(item));
             static int sleepTime = 0;
             sleepTime = (sleepTime + 1) % 3;
             std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
@@ -94,7 +93,7 @@ TYPED_TEST(ConnectionAggregatorTest, SendReceiveParallel) {
             if (!envelopeNullable.isNull()) {
                 auto envelope = envelopeNullable.release();
                 ByteArray recPacket(std::move(envelope.message));
-                result.push_back(recPacket.get<std::string>());
+                result.push_back(std::get<0>(mocca::parseFormattedByteArray<std::string>(recPacket)));
             }
         }
         return result;

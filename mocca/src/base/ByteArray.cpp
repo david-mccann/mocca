@@ -200,22 +200,8 @@ ByteArray& ByteArray::operator>>(double& val) {
 }
 
 ByteArray& ByteArray::operator<<(const std::string& val) {
-    *this << (uint32_t)val.size();
+    //*this << (uint32_t)val.size();
     append(val.c_str(), (uint32_t)val.size());
-    return *this;
-}
-
-ByteArray& ByteArray::operator>>(std::string& val) {
-    uint32_t strSize;
-    *this >> strSize;
-#ifdef MOCCA_BYTEARRAY_CHECKS
-    if (readPos_ + strSize > size_) {
-        throw Error("Reading beyond end of packet", __FILE__, __LINE__);
-    }
-#endif
-    val.reserve(strSize);
-    val = std::string((char*)data_.get() + readPos_, strSize);
-    readPos_ += strSize;
     return *this;
 }
 
@@ -260,7 +246,38 @@ const unsigned char& mocca::ByteArray::operator[](uint32_t index) const {
     return data_[index];
 }
 
+std::string ByteArray::read(uint32_t size) {
+#ifdef MOCCA_BYTEARRAY_CHECKS
+    if (readPos_ + size > size_) {
+        throw Error("Reading beyond end of packet", __FILE__, __LINE__);
+    }
+#endif
+    std::string result((char*)(data_.get() + readPos_), size);
+    readPos_ += size;
+    return result;
+}
+
 void ByteArray::resetReadPos() {
     readPos_ = 0;
 }
+
+ByteArray makeFormattedByteArray(const std::string& str) {
+    ByteArray result;
+    result << static_cast<uint32_t>(str.size());
+    result.append(str.c_str(), static_cast<uint32_t>(str.size()));
+    return result;
+}
+ByteArray makeFormattedByteArray(const char* str) {
+    return makeFormattedByteArray(std::string(str));
+}
+
+template <>
+std::tuple<std::string> parseFormattedByteArray<std::string>(ByteArray& byteArray) {
+    uint32_t size;
+    byteArray >> size;
+    std::string value = byteArray.read(size);
+    return std::tuple<std::string>(value);
+}
+
+
 }

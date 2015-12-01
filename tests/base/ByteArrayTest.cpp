@@ -172,53 +172,48 @@ TEST_F(ByteArrayTest, Bool) {
 
 TEST_F(ByteArrayTest, String) {
     ByteArray target;
-    target << "Hello World";
-    std::string result;
-    target >> result;
-    ASSERT_EQ("Hello World", result);
+    std::string str("Hello World");
+    target << str;
+    std::string result = target.read(str.size());
+    ASSERT_EQ(str, result);
 }
 
 TEST_F(ByteArrayTest, NestedByteArray) {
     ByteArray outer;
-    outer << "Hello World";
-    outer << 23;
+    outer << 17;
+    outer << 18;
     ByteArray inner;
-    inner << "Good Bye";
+    inner << 41;
     inner << 42;
     outer << inner;
-    outer << "The End";
-    ASSERT_EQ("Hello World", outer.get<std::string>());
-    ASSERT_EQ(23, outer.get<int32_t>());
+    outer << 19;
+    ASSERT_EQ(17, outer.read<int32_t>());
+    ASSERT_EQ(18, outer.read<int32_t>());
     ByteArray innerResult;
     outer >> innerResult;
-    ASSERT_EQ("Good Bye", innerResult.get<std::string>());
-    ASSERT_EQ(42, innerResult.get<int32_t>());
-    ASSERT_EQ("The End", outer.get<std::string>());
+    ASSERT_EQ(41, innerResult.read<int32_t>());
+    ASSERT_EQ(42, innerResult.read<int32_t>());
+    ASSERT_EQ(19, outer.read<int32_t>());
 }
 
 TEST_F(ByteArrayTest, MixedTypes) {
     ByteArray target;
-    target << "Hello World" << 42 << 17.0f << true << "Good Bye";
-    std::string str1, str2;
+    target << 42 << 17.0f << true;
     int32_t i = 0;
     float f = 0.0f;
     bool b = false;
-    target >> str1 >> i >> f >> b >> str2;
-    ASSERT_EQ("Hello World", str1);
+    target >> i >> f >> b;
     ASSERT_EQ(42, i);
     ASSERT_EQ(17.0f, f);
     ASSERT_EQ(true, b);
-    ASSERT_EQ("Good Bye", str2);
 }
 
 TEST_F(ByteArrayTest, Get) {
     ByteArray target;
-    target << "Hello World" << 42 << 17.0f << true << "Good Bye";
-    ASSERT_EQ("Hello World", target.get<std::string>());
-    ASSERT_EQ(42, target.get<int32_t>());
-    ASSERT_EQ(17.0f, target.get<float>());
-    ASSERT_EQ(true, target.get<bool>());
-    ASSERT_EQ("Good Bye", target.get<std::string>());
+    target << 42 << 17.0f << true;
+    ASSERT_EQ(42, target.read<int32_t>());
+    ASSERT_EQ(17.0f, target.read<float>());
+    ASSERT_EQ(true, target.read<bool>());
 }
 
 TEST_F(ByteArrayTest, ReadOutOfBounds) {
@@ -248,10 +243,10 @@ TEST_F(ByteArrayTest, ReadOutOfBounds) {
         ByteArray inner;
         inner << 42 << 17;
         outer << 23 << inner << 7;
-        ASSERT_NO_THROW(outer.get<int32_t>());
-        ASSERT_NO_THROW(outer.get<ByteArray>());
-        ASSERT_NO_THROW(outer.get<int32_t>());
-        ASSERT_THROW(outer.get<int32_t>(), Error);
+        ASSERT_NO_THROW(outer.read<int32_t>());
+        ASSERT_NO_THROW(outer.read<ByteArray>());
+        ASSERT_NO_THROW(outer.read<int32_t>());
+        ASSERT_THROW(outer.read<int32_t>(), Error);
     }
 }
 
@@ -266,4 +261,15 @@ TEST_F(ByteArrayTest, SubscriptOperator) {
     ASSERT_THROW(target[-1], Error);
     ASSERT_THROW(target[3], Error);
 #endif
+}
+
+TEST_F(ByteArrayTest, BuildByteArray) {
+    ByteArray target = makeFormattedByteArray(23, 17.0f, "blubb", false, 20.0, std::string("blubb2"));
+    auto x = parseFormattedByteArray<int, float, std::string, bool, double, std::string>(target);
+    ASSERT_EQ(23, std::get<0>(x));
+    ASSERT_EQ(17.0f, std::get<1>(x));
+    ASSERT_EQ("blubb", std::get<2>(x));
+    ASSERT_EQ(false, std::get<3>(x));
+    ASSERT_EQ(20.0, std::get<4>(x));
+    ASSERT_EQ("blubb2", std::get<5>(x));
 }
