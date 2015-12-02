@@ -1,7 +1,7 @@
 #include "mocca/base/ByteArray.h"
 
-#include <limits>
 #include <algorithm>
+#include <limits>
 
 static_assert(std::numeric_limits<float>::is_iec559 == true, "Unsupported floating point type");
 static_assert(std::numeric_limits<double>::is_iec559 == true, "Unsupported floating point type");
@@ -284,24 +284,4 @@ std::string ByteArray::read(uint32_t size) {
 void ByteArray::resetReadPos() {
     readPos_ = 0;
 }
-
-template <> ByteArray makeFormattedByteArray<std::string>(const std::string& str) {
-    ByteArray result;
-    result << static_cast<uint32_t>(str.size());
-    result.append(str.c_str(), static_cast<uint32_t>(str.size()));
-    return result;
-}
-template <> ByteArray makeFormattedByteArray<const char *>(const char* const& str) {
-    return makeFormattedByteArray(std::string(str));
-}
-
-template <>
-std::tuple<std::string> parseFormattedByteArray<std::string>(ByteArray& byteArray) {
-    uint32_t size;
-    byteArray >> size;
-    std::string value = byteArray.read(size);
-    return std::tuple<std::string>(value);
-}
-
-
 }

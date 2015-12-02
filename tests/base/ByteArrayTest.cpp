@@ -264,8 +264,8 @@ TEST_F(ByteArrayTest, SubscriptOperator) {
 }
 
 TEST_F(ByteArrayTest, BuildByteArray) {
-    ByteArray target = makeFormattedByteArray(23, 17.0f, "blubb", false, 20.0, std::string("blubb2"));
-    auto x = parseFormattedByteArray<int, float, std::string, bool, double, std::string>(target);
+    ByteArray target = makeFormattedByteArray((int16_t)23, 17.0f, "blubb", false, 20.0, std::string("blubb2"));
+    auto x = parseFormattedByteArray<int16_t, float, std::string, bool, double, std::string>(target);
     ASSERT_EQ(23, std::get<0>(x));
     ASSERT_EQ(17.0f, std::get<1>(x));
     ASSERT_EQ("blubb", std::get<2>(x));
