@@ -91,30 +91,6 @@ private:
     uint32_t readPos_;
 };
 
-template <typename T> void makeFormattedByteArray(ByteArray& result, const T& val) {
-    impl::makeFormattedByteArray(result, val, typename isString<T>::type());
-}
-
-template <typename T, typename... Args> void makeFormattedByteArray(ByteArray& result, const T& value, const Args&... args) {
-    makeFormattedByteArray(result, value);
-    makeFormattedByteArray(result, args...);
-}
-
-template <typename T, typename... Args> ByteArray makeFormattedByteArray(const T& value, const Args&... args) {
-    ByteArray result;
-    makeFormattedByteArray(result, value, args...);
-    return result;
-}
-
-template <typename T> std::tuple<T> parseFormattedByteArray(ByteArray& byteArray) {
-    return impl::parseFormattedByteArray<T>(byteArray, typename isString<T>::type());
-}
-
-template <typename T, typename Arg, typename... Args> std::tuple<T, Arg, Args...> parseFormattedByteArray(ByteArray& byteArray) {
-    auto value = parseFormattedByteArray<T>(byteArray);
-    return std::tuple_cat(value, parseFormattedByteArray<Arg, Args...>(byteArray));
-}
-
 
 // tag-dispatch impementation details
 namespace impl {
@@ -140,5 +116,30 @@ template <typename T> std::tuple<T> parseFormattedByteArray(ByteArray& byteArray
     byteArray >> value;
     return std::tuple<T>(value);
 }
+} // end impl
+
+
+template <typename T> void makeFormattedByteArray(ByteArray& result, const T& val) {
+    impl::makeFormattedByteArray(result, val, typename isString<T>::type());
+}
+
+template <typename T, typename... Args> void makeFormattedByteArray(ByteArray& result, const T& value, const Args&... args) {
+    makeFormattedByteArray(result, value);
+    makeFormattedByteArray(result, args...);
+}
+
+template <typename T, typename... Args> ByteArray makeFormattedByteArray(const T& value, const Args&... args) {
+    ByteArray result;
+    makeFormattedByteArray(result, value, args...);
+    return result;
+}
+
+template <typename T> std::tuple<T> parseFormattedByteArray(ByteArray& byteArray) {
+    return impl::parseFormattedByteArray<T>(byteArray, typename isString<T>::type());
+}
+
+template <typename T, typename Arg, typename... Args> std::tuple<T, Arg, Args...> parseFormattedByteArray(ByteArray& byteArray) {
+    auto value = parseFormattedByteArray<T>(byteArray);
+    return std::tuple_cat(value, parseFormattedByteArray<Arg, Args...>(byteArray));
 }
 }
