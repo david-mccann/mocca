@@ -67,6 +67,26 @@ private:
 
 
 template <typename T, typename U>
+typename std::vector<T>::const_iterator findMemberEqual(const std::vector<T>& vec, const U T::*Mem, const U& val) {
+    for (typename std::vector<T>::const_iterator it = begin(vec); it != end(vec); ++it) {
+        if (*it.*Mem == val) {
+            return it;
+        }
+    }
+    return end(vec);
+}
+
+template <typename T, typename U>
+typename std::vector<T>::iterator findMemberEqual(std::vector<T>& vec, const U T::*Mem, const U& val) {
+    for (typename std::vector<T>::iterator it = begin(vec); it != end(vec); ++it) {
+        if (*it.*Mem == val) {
+            return it;
+        }
+    }
+    return end(vec);
+}
+
+template <typename T, typename U>
 typename std::vector<T>::const_iterator findMemberEqual(const std::vector<T>& vec, U(T::*MemFn)() const, const U& val) {
     for (typename std::vector<T>::const_iterator it = begin(vec); it != end(vec); ++it) {
         if ((*it.*MemFn)() == val) {

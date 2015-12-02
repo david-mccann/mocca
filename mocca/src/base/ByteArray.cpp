@@ -8,9 +8,6 @@ static_assert(std::numeric_limits<double>::is_iec559 == true, "Unsupported float
 
 namespace mocca {
 
-const unsigned char ByteArray::trueConst;
-const unsigned char ByteArray::falseConst;
-
 ByteArray::ByteArray(uint32_t capacity)
     : data_(new unsigned char[capacity])
     , capacity_(capacity)
@@ -35,7 +32,7 @@ void swap(ByteArray& lhs, ByteArray& rhs) {
     swap(lhs.readPos_, rhs.readPos_);
 }
 
-ByteArray mocca::ByteArray::clone() {
+ByteArray mocca::ByteArray::clone() const {
     return ByteArray::createFromRaw(data(), size());
 }
 
@@ -164,33 +161,6 @@ ByteArray& ByteArray::operator>>(uint64_t& val) {
     return (*this >> (int64_t&)val);
 }
 
-ByteArray& ByteArray::operator<<(bool val) {
-    if (val) {
-        append(&trueConst, sizeof(unsigned char));
-    } else {
-        append(&falseConst, sizeof(unsigned char));
-    }
-    return *this;
-}
-
-ByteArray& ByteArray::operator>>(bool& val) {
-#ifdef MOCCA_BYTEARRAY_CHECKS
-    if (readPos_ + sizeof(unsigned char) > size_) {
-        throw Error("Reading beyond end of packet", __FILE__, __LINE__);
-    }
-#endif
-    unsigned char code;
-    memcpy(&code, data_.get() + readPos_, sizeof(unsigned char));
-#ifdef MOCCA_BYTEARRAY_CHECKS
-    if (code != trueConst && code != falseConst) {
-        throw Error("Package corrupted", __FILE__, __LINE__);
-    }
-#endif
-    val = (code & trueConst) != 0;
-    readPos_ += sizeof(unsigned char);
-    return *this;
-}
-
 ByteArray& ByteArray::operator<<(float val) {
     append(&val, sizeof(float));
     return *this;
@@ -284,4 +254,15 @@ std::string ByteArray::read(uint32_t size) {
 void ByteArray::resetReadPos() {
     readPos_ = 0;
 }
+
+std::string readAt(const ByteArray & byteArray, uint32_t index, uint32_t size)
+{
+#ifdef MOCCA_BYTEARRAY_CHECKS
+    if (index + size > byteArray.size()) {
+        throw Error("Index out of bounds", __FILE__, __LINE__);
+    }
+#endif
+    return std::string((char*)(byteArray.data() + index), size);
+}
+
 }

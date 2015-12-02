@@ -20,7 +20,7 @@ public:
 
     friend void swap(ByteArray& lhs, ByteArray& rhs);
 
-    ByteArray clone();
+    ByteArray clone() const;
 
     unsigned char* data();
     const unsigned char* data() const;
@@ -52,11 +52,6 @@ public:
 
     ByteArray& operator<<(uint64_t val);
     ByteArray& operator>>(uint64_t& val);
-
-    static const unsigned char falseConst = 0x01;
-    static const unsigned char trueConst = 0x02;
-    ByteArray& operator<<(bool val);
-    ByteArray& operator>>(bool& val);
 
     ByteArray& operator<<(float val);
     ByteArray& operator>>(float& val);
@@ -91,6 +86,41 @@ private:
     uint32_t readPos_;
 };
 
+template <typename T> T readAt(const ByteArray& byteArray, uint32_t index) {
+#ifdef MOCCA_BYTEARRAY_CHECKS
+    if (index + sizeof(T) > byteArray.size()) {
+        throw Error("Index out of bounds", __FILE__, __LINE__);
+    }
+#endif
+    return *reinterpret_cast<const T*>(byteArray.data() + index);
+}
+
+std::string readAt(const ByteArray& byteArray, uint32_t index, uint32_t size);
+
+template <typename T> void makeFormattedByteArray(ByteArray& result, const T& val) {
+    impl::makeFormattedByteArray(result, val, typename isString<T>::type());
+}
+
+template <typename T, typename... Args> void makeFormattedByteArray(ByteArray& result, const T& value, const Args&... args) {
+    makeFormattedByteArray(result, value);
+    makeFormattedByteArray(result, args...);
+}
+
+template <typename T, typename... Args> ByteArray makeFormattedByteArray(const T& value, const Args&... args) {
+    ByteArray result;
+    makeFormattedByteArray(result, value, args...);
+    return result;
+}
+
+template <typename T> std::tuple<T> parseFormattedByteArray(ByteArray& byteArray) {
+    return impl::parseFormattedByteArray<T>(byteArray, typename isString<T>::type());
+}
+
+template <typename T, typename Arg, typename... Args> std::tuple<T, Arg, Args...> parseFormattedByteArray(ByteArray& byteArray) {
+    auto value = parseFormattedByteArray<T>(byteArray);
+    return std::tuple_cat(value, parseFormattedByteArray<Arg, Args...>(byteArray));
+}
+
 
 // tag-dispatch impementation details
 namespace impl {
@@ -116,30 +146,5 @@ template <typename T> std::tuple<T> parseFormattedByteArray(ByteArray& byteArray
     byteArray >> value;
     return std::tuple<T>(value);
 }
-} // end impl
-
-
-template <typename T> void makeFormattedByteArray(ByteArray& result, const T& val) {
-    impl::makeFormattedByteArray(result, val, typename isString<T>::type());
-}
-
-template <typename T, typename... Args> void makeFormattedByteArray(ByteArray& result, const T& value, const Args&... args) {
-    makeFormattedByteArray(result, value);
-    makeFormattedByteArray(result, args...);
-}
-
-template <typename T, typename... Args> ByteArray makeFormattedByteArray(const T& value, const Args&... args) {
-    ByteArray result;
-    makeFormattedByteArray(result, value, args...);
-    return result;
-}
-
-template <typename T> std::tuple<T> parseFormattedByteArray(ByteArray& byteArray) {
-    return impl::parseFormattedByteArray<T>(byteArray, typename isString<T>::type());
-}
-
-template <typename T, typename Arg, typename... Args> std::tuple<T, Arg, Args...> parseFormattedByteArray(ByteArray& byteArray) {
-    auto value = parseFormattedByteArray<T>(byteArray);
-    return std::tuple_cat(value, parseFormattedByteArray<Arg, Args...>(byteArray));
 }
 }

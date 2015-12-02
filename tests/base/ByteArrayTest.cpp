@@ -153,23 +153,6 @@ TEST_F(ByteArrayTest, Double) {
     ASSERT_EQ(42.0, result);
 }
 
-TEST_F(ByteArrayTest, Bool) {
-    {
-        ByteArray target;
-        target << true;
-        bool result = false;
-        target >> result;
-        ASSERT_TRUE(result);
-    }
-    {
-        ByteArray target;
-        target << false;
-        bool result = true;
-        target >> result;
-        ASSERT_FALSE(result);
-    }
-}
-
 TEST_F(ByteArrayTest, String) {
     ByteArray target;
     std::string str("Hello World");
@@ -198,22 +181,19 @@ TEST_F(ByteArrayTest, NestedByteArray) {
 
 TEST_F(ByteArrayTest, MixedTypes) {
     ByteArray target;
-    target << 42 << 17.0f << true;
+    target << 42 << 17.0f;
     int32_t i = 0;
     float f = 0.0f;
-    bool b = false;
-    target >> i >> f >> b;
+    target >> i >> f;
     ASSERT_EQ(42, i);
     ASSERT_EQ(17.0f, f);
-    ASSERT_EQ(true, b);
 }
 
 TEST_F(ByteArrayTest, Get) {
     ByteArray target;
-    target << 42 << 17.0f << true;
+    target << 42 << 17.0f;
     ASSERT_EQ(42, target.read<int32_t>());
     ASSERT_EQ(17.0f, target.read<float>());
-    ASSERT_EQ(true, target.read<bool>());
 }
 
 TEST_F(ByteArrayTest, ReadOutOfBounds) {
@@ -264,12 +244,11 @@ TEST_F(ByteArrayTest, SubscriptOperator) {
 }
 
 TEST_F(ByteArrayTest, BuildByteArray) {
-    ByteArray target = makeFormattedByteArray((int16_t)23, 17.0f, "blubb", false, 20.0, std::string("blubb2"));
-    auto x = parseFormattedByteArray<int16_t, float, std::string, bool, double, std::string>(target);
+    ByteArray target = makeFormattedByteArray((int16_t)23, 17.0f, "blubb", 20.0, std::string("blubb2"));
+    auto x = parseFormattedByteArray<int16_t, float, std::string, double, std::string>(target);
     ASSERT_EQ(23, std::get<0>(x));
     ASSERT_EQ(17.0f, std::get<1>(x));
     ASSERT_EQ("blubb", std::get<2>(x));
-    ASSERT_FALSE(std::get<3>(x));
-    ASSERT_EQ(20.0, std::get<4>(x));
-    ASSERT_EQ("blubb2", std::get<5>(x));
+    ASSERT_EQ(20.0, std::get<3>(x));
+    ASSERT_EQ("blubb2", std::get<4>(x));
 }
