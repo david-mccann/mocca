@@ -43,6 +43,15 @@ std::string formatString(const std::string& str, const T& value, const Args&... 
     return formatString(formatString(str, value), args...);
 }
 
+template <typename Iter> std::string makeString(Iter it, Iter itEnd, const std::string& separator = ", ") {
+    std::ostringstream oss;
+    for (; it != itEnd - 1; ++it) {
+        oss << *it << separator;
+    }
+    oss << *it;
+    return oss.str();
+}
+
 // join a number of items to a string, e.g., join("Hello ", 42) -> "Hello 42"
 template <typename T> std::string joinString(const T& value) {
     std::ostringstream oss;

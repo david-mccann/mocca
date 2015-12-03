@@ -65,6 +65,15 @@ private:
     std::vector<V> second_;
 };
 
+template <typename Iter> using IterValueType = typename std::iterator_traits<Iter>::value_type;
+template <typename Iter, typename U>
+std::vector<U> collectMembers(Iter it, Iter itEnd, const U IterValueType<typename Iter>::*Mem) {
+    std::vector<U> result;
+    for (; it != itEnd; ++it) {
+        result.push_back(*it.*Mem);
+    }
+    return result;
+}
 
 template <typename T, typename U>
 typename std::vector<T>::const_iterator findMemberEqual(const std::vector<T>& vec, const U T::*Mem, const U& val) {
