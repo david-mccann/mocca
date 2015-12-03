@@ -95,7 +95,7 @@ ByteArray& ByteArray::operator<<(int16_t val) {
 }
 
 ByteArray& ByteArray::operator>>(int16_t& val) {
-#ifdef MOCCA_BYTEARRAY_CHECKS
+#ifdef MOCCA_RUNTIME_CHECKS
     if (readPos_ + sizeof(int16_t) > size_) {
         throw Error("Reading beyond end of packet", __FILE__, __LINE__);
     }
@@ -119,7 +119,7 @@ ByteArray& ByteArray::operator<<(int32_t val) {
 }
 
 ByteArray& ByteArray::operator>>(int32_t& val) {
-#ifdef MOCCA_BYTEARRAY_CHECKS
+#ifdef MOCCA_RUNTIME_CHECKS
     if (readPos_ + sizeof(int32_t) > size_) {
         throw Error("Reading beyond end of packet", __FILE__, __LINE__);
     }
@@ -143,7 +143,7 @@ ByteArray& ByteArray::operator<<(int64_t val) {
 }
 
 ByteArray& ByteArray::operator>>(int64_t& val) {
-#ifdef MOCCA_BYTEARRAY_CHECKS
+#ifdef MOCCA_RUNTIME_CHECKS
     if (readPos_ + sizeof(int64_t) > size_) {
         throw Error("Reading beyond end of packet", __FILE__, __LINE__);
     }
@@ -167,7 +167,7 @@ ByteArray& ByteArray::operator<<(float val) {
 }
 
 ByteArray& ByteArray::operator>>(float& val) {
-#ifdef MOCCA_BYTEARRAY_CHECKS
+#ifdef MOCCA_RUNTIME_CHECKS
     if (readPos_ + sizeof(float) > size_) {
         throw Error("Reading beyond end of packet", __FILE__, __LINE__);
     }
@@ -183,7 +183,7 @@ ByteArray& ByteArray::operator<<(double val) {
 }
 
 ByteArray& ByteArray::operator>>(double& val) {
-#ifdef MOCCA_BYTEARRAY_CHECKS
+#ifdef MOCCA_RUNTIME_CHECKS
     if (readPos_ + sizeof(double) > size_) {
         throw Error("Reading beyond end of packet", __FILE__, __LINE__);
     }
@@ -203,7 +203,7 @@ ByteArray& ByteArray::operator<<(const char* val) {
 }
 
 unsigned char& mocca::ByteArray::operator[](uint32_t index) {
-#ifdef MOCCA_BYTEARRAY_CHECKS
+#ifdef MOCCA_RUNTIME_CHECKS
     if (index >= size_) {
         throw Error("Index out of bounds", __FILE__, __LINE__);
     }
@@ -212,7 +212,7 @@ unsigned char& mocca::ByteArray::operator[](uint32_t index) {
 }
 
 const unsigned char& mocca::ByteArray::operator[](uint32_t index) const {
-#ifdef MOCCA_BYTEARRAY_CHECKS
+#ifdef MOCCA_RUNTIME_CHECKS
     if (index >= size_) {
         throw Error("Index out of bounds", __FILE__, __LINE__);
     }
@@ -221,7 +221,7 @@ const unsigned char& mocca::ByteArray::operator[](uint32_t index) const {
 }
 
 std::string ByteArray::read(uint32_t size) {
-#ifdef MOCCA_BYTEARRAY_CHECKS
+#ifdef MOCCA_RUNTIME_CHECKS
     if (readPos_ + size > size_) {
         throw Error("Reading beyond end of packet", __FILE__, __LINE__);
     }
@@ -237,7 +237,7 @@ void ByteArray::resetReadPos() {
 
 std::string readAt(const ByteArray & byteArray, uint32_t index, uint32_t size)
 {
-#ifdef MOCCA_BYTEARRAY_CHECKS
+#ifdef MOCCA_RUNTIME_CHECKS
     if (index + size > byteArray.size()) {
         throw Error("Index out of bounds", __FILE__, __LINE__);
     }

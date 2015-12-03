@@ -7,8 +7,6 @@
 #include <string>
 #include <tuple>
 
-#define MOCCA_BYTEARRAY_CHECKS
-
 namespace mocca {
 
 class ByteArray {
@@ -83,7 +81,7 @@ private:
 };
 
 template <typename T> T readAt(const ByteArray& byteArray, uint32_t index) {
-#ifdef MOCCA_BYTEARRAY_CHECKS
+#ifdef MOCCA_RUNTIME_CHECKS
     if (index + sizeof(T) > byteArray.size()) {
         throw Error("Index out of bounds", __FILE__, __LINE__);
     }

@@ -9,8 +9,6 @@
 using namespace mocca;
 using namespace mocca::net;
 
-#define MOCCA_CHECK_WS_FRAME
-
 /*
 0                   1                   2                   3
 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -78,7 +76,7 @@ ByteArray WSConnection::receive(std::chrono::milliseconds timeout) const {
     if (data.isEmpty()) {
         return ByteArray();
     }
-#ifdef MOCCA_CHECK_WS_FRAME
+#ifdef MOCCA_RUNTIME_CHECKS
     if (data[0] != 0x81) { // final fragment, text frame
         throw Error("Invalid WebSocket frame: unsupported or malformed", __FILE__, __LINE__);
     }
@@ -100,14 +98,14 @@ ByteArray WSConnection::receive(std::chrono::milliseconds timeout) const {
         const int numPayloadBytes = 8;
         data.append(receiveExactly(*physicalConnection_, 12, timeout)); // 8 bytes payload length + 4 bytes mask
         payloadSize = swap_uint64(*reinterpret_cast<uint64_t*>(data.data() + 2));
-#ifdef MOCCA_CHECK_WS_FRAME
+#ifdef MOCCA_RUNTIME_CHECKS
         if (payloadSize > std::numeric_limits<uint32_t>::max()) {
             throw Error("Invalid WebSocket frame: frame size exceeds buffer size", __FILE__, __LINE__);
         }
 #endif
         maskOffset = 10;
     }
-#ifdef MOCCA_CHECK_WS_FRAME
+#ifdef MOCCA_RUNTIME_CHECKS
     else {
         throw Error("Invalid WebSocket frame: malformed payload-size", __FILE__, __LINE__);
     }
