@@ -58,7 +58,7 @@ TEST_F(ByteArrayTest, AppendDoesNotExceedCapacity) {
     memset(other.data(), 2, 4);
     other.setSize(4);
 
-    target.append(other.data(), other.size());
+    target.append(other);
 
     ASSERT_EQ(10, target.capacity());
 
@@ -78,7 +78,7 @@ TEST_F(ByteArrayTest, AppendExceedsCapacity) {
     memset(other.data(), 2, 4);
     other.setSize(4);
 
-    target.append(other.data(), other.size());
+    target.append(other);
 
     ASSERT_GT(target.capacity(), size_t{5});
 
@@ -91,17 +91,8 @@ TEST_F(ByteArrayTest, AppendReservesEnoughSpace) {
     ByteArray target(5);
     ByteArray other(2048);
     other.setSize(2048);
-    target.append(other.data(), other.size());
+    target.append(other);
     ASSERT_TRUE(target.capacity() >= 2048+5);
-}
-
-TEST_F(ByteArrayTest, Copy) {
-    ByteArray target(1);
-    memset(target.data(), 1, 1);
-    ByteArray copy(target);
-    memset(copy.data(), 2, 1);
-    ASSERT_EQ(1, *target.data());
-    ASSERT_EQ(2, *copy.data());
 }
 
 TEST_F(ByteArrayTest, Move) {
@@ -162,72 +153,30 @@ TEST_F(ByteArrayTest, Double) {
     ASSERT_EQ(42.0, result);
 }
 
-TEST_F(ByteArrayTest, Bool) {
-    {
-        ByteArray target;
-        target << true;
-        bool result = false;
-        target >> result;
-        ASSERT_TRUE(result);
-    }
-    {
-        ByteArray target;
-        target << false;
-        bool result = true;
-        target >> result;
-        ASSERT_FALSE(result);
-    }
-}
-
 TEST_F(ByteArrayTest, String) {
     ByteArray target;
-    target << "Hello World";
-    std::string result;
-    target >> result;
-    ASSERT_EQ("Hello World", result);
+    std::string str("Hello World");
+    target << str;
+    std::string result = target.read(str.size());
+    ASSERT_EQ(str, result);
 }
 
-TEST_F(ByteArrayTest, NestedByteArray) {
-    ByteArray outer;
-    outer << "Hello World";
-    outer << 23;
-    ByteArray inner;
-    inner << "Good Bye";
-    inner << 42;
-    outer << inner;
-    outer << "The End";
-    ASSERT_EQ("Hello World", outer.get<std::string>());
-    ASSERT_EQ(23, outer.get<int32_t>());
-    ByteArray innerResult;
-    outer >> innerResult;
-    ASSERT_EQ("Good Bye", innerResult.get<std::string>());
-    ASSERT_EQ(42, innerResult.get<int32_t>());
-    ASSERT_EQ("The End", outer.get<std::string>());
-}
 
 TEST_F(ByteArrayTest, MixedTypes) {
     ByteArray target;
-    target << "Hello World" << 42 << 17.0f << true << "Good Bye";
-    std::string str1, str2;
+    target << 42 << 17.0f;
     int32_t i = 0;
     float f = 0.0f;
-    bool b = false;
-    target >> str1 >> i >> f >> b >> str2;
-    ASSERT_EQ("Hello World", str1);
+    target >> i >> f;
     ASSERT_EQ(42, i);
     ASSERT_EQ(17.0f, f);
-    ASSERT_EQ(true, b);
-    ASSERT_EQ("Good Bye", str2);
 }
 
 TEST_F(ByteArrayTest, Get) {
     ByteArray target;
-    target << "Hello World" << 42 << 17.0f << true << "Good Bye";
-    ASSERT_EQ("Hello World", target.get<std::string>());
-    ASSERT_EQ(42, target.get<int32_t>());
-    ASSERT_EQ(17.0f, target.get<float>());
-    ASSERT_EQ(true, target.get<bool>());
-    ASSERT_EQ("Good Bye", target.get<std::string>());
+    target << 42 << 17.0f;
+    ASSERT_EQ(42, target.read<int32_t>());
+    ASSERT_EQ(17.0f, target.read<float>());
 }
 
 TEST_F(ByteArrayTest, ReadOutOfBounds) {
@@ -252,14 +201,27 @@ TEST_F(ByteArrayTest, ReadOutOfBounds) {
         target >> d;
         ASSERT_THROW(target >> i, Error);
     }
-    {
-        ByteArray outer;
-        ByteArray inner;
-        inner << 42 << 17;
-        outer << 23 << inner << 7;
-        ASSERT_NO_THROW(outer.get<int32_t>());
-        ASSERT_NO_THROW(outer.get<ByteArray>());
-        ASSERT_NO_THROW(outer.get<int32_t>());
-        ASSERT_THROW(outer.get<int32_t>(), Error);
-    }
+}
+
+TEST_F(ByteArrayTest, SubscriptOperator) {
+    ByteArray target;
+    std::string data = "abc";
+    target.append(data.c_str(), data.size());
+    ASSERT_EQ('a', target[0]);
+    ASSERT_EQ('b', target[1]);
+    ASSERT_EQ('c', target[2]);
+#ifdef MOCCA_BYTEARRAY_CHECKS
+    ASSERT_THROW(target[-1], Error);
+    ASSERT_THROW(target[3], Error);
+#endif
+}
+
+TEST_F(ByteArrayTest, BuildByteArray) {
+    ByteArray target = makeFormattedByteArray((int16_t)23, 17.0f, "blubb", 20.0, std::string("blubb2"));
+    auto x = parseFormattedByteArray<int16_t, float, std::string, double, std::string>(target);
+    ASSERT_EQ(23, std::get<0>(x));
+    ASSERT_EQ(17.0f, std::get<1>(x));
+    ASSERT_EQ("blubb", std::get<2>(x));
+    ASSERT_EQ(20.0, std::get<3>(x));
+    ASSERT_EQ("blubb2", std::get<4>(x));
 }

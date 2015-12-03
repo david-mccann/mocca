@@ -106,3 +106,15 @@ TEST_F(ContainersTest, FindMemberEqual) {
         ASSERT_EQ(end(v), result);
     }
 }
+
+TEST_F(ContainersTest, CollectMembers) {
+    struct SomeStruct {
+        std::string val1;
+        int val2;
+    };
+    std::vector<SomeStruct> vec{ {"first", 1}, {"second", 2} };
+    auto res = collectMembers(begin(vec), end(vec), &SomeStruct::val1);
+    ASSERT_EQ(2, res.size());
+    ASSERT_EQ("first", res[0]);
+    ASSERT_EQ("second", res[1]);
+}

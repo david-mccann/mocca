@@ -54,13 +54,33 @@ std::ostream& operator<<(std::ostream& os, const Printable& obj) {
     return os;
 }
 
-TEST_F(StringTest, MakeString) {
+TEST_F(StringTest, JoinString) {
     ASSERT_EQ("Hello World", joinString("Hello", " ", "World"));
     ASSERT_EQ("Hello42", joinString("Hello", 42));
     ASSERT_EQ("1742", joinString(17, 42));
     ASSERT_EQ("42 3.14", joinString(42, " ", 3.14f));
     ASSERT_EQ("Hello<23,42>3.14", joinString("Hello", Printable(23, 42), 3.14f));
 }
+
+TEST_F(StringTest, MakeString) {
+    {
+        std::vector<int> vec{ 1 };
+        ASSERT_EQ("1", makeString(begin(vec), end(vec)));
+    }
+    {
+        std::vector<int> vec{ 1, 2, 3 };
+        ASSERT_EQ("1, 2, 3", makeString(begin(vec), end(vec)));
+    }
+    {
+        std::vector<std::string> vec{ "Hello", "World" };
+        ASSERT_EQ("Hello, World", makeString(begin(vec), end(vec)));
+    }
+    {
+        std::vector<std::string> vec{ "Hello", "World" };
+        ASSERT_EQ("Hello:World", makeString(begin(vec), end(vec), ":"));
+    }
+}
+
 
 TEST_F(StringTest, FormatString) {
     ASSERT_EQ("First Second Third", formatString("First %% Third", "Second"));
