@@ -1,7 +1,6 @@
 #pragma once
 
 #include "mocca/base/Error.h"
-#include "mocca/base/Traits.h"
 
 #include <cstring>
 #include <memory>
@@ -122,7 +121,7 @@ template <typename T> std::tuple<T> parseFormattedByteArray(ByteArray& byteArray
 }
 
 template <typename T> void makeFormattedByteArray(ByteArray& result, const T& val) {
-    impl::makeFormattedByteArray(result, val, typename isString<T>::type());
+    impl::makeFormattedByteArray(result, val, std::is_convertible<T, std::string>());
 }
 
 template <typename T, typename... Args> void makeFormattedByteArray(ByteArray& result, const T& value, const Args&... args) {
@@ -137,7 +136,7 @@ template <typename T, typename... Args> ByteArray makeFormattedByteArray(const T
 }
 
 template <typename T> std::tuple<T> parseFormattedByteArray(ByteArray& byteArray) {
-    return impl::parseFormattedByteArray<T>(byteArray, typename isString<T>::type());
+    return impl::parseFormattedByteArray<T>(byteArray, std::is_convertible<T, std::string>());
 }
 
 template <typename T, typename Arg, typename... Args> std::tuple<T, Arg, Args...> parseFormattedByteArray(ByteArray& byteArray) {
