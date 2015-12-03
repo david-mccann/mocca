@@ -194,32 +194,12 @@ ByteArray& ByteArray::operator>>(double& val) {
 }
 
 ByteArray& ByteArray::operator<<(const std::string& val) {
-    //*this << (uint32_t)val.size();
     append(val.c_str(), (uint32_t)val.size());
     return *this;
 }
 
 ByteArray& ByteArray::operator<<(const char* val) {
     return (*this << std::string(val));
-}
-
-ByteArray& ByteArray::operator<<(const ByteArray& val) {
-    *this << (int32_t)val.size();
-    append(val.data(), val.size());
-    return *this;
-}
-
-ByteArray& ByteArray::operator>>(ByteArray& val) {
-    int32_t innerSize;
-    *this >> innerSize;
-#ifdef MOCCA_BYTEARRAY_CHECKS
-    if (readPos_ + innerSize > size_) {
-        throw Error("Reading beyond end of packet", __FILE__, __LINE__);
-    }
-#endif
-    val.append(data_.get() + readPos_, innerSize);
-    readPos_ += innerSize;
-    return *this;
 }
 
 unsigned char& mocca::ByteArray::operator[](uint32_t index) {

@@ -161,23 +161,6 @@ TEST_F(ByteArrayTest, String) {
     ASSERT_EQ(str, result);
 }
 
-TEST_F(ByteArrayTest, NestedByteArray) {
-    ByteArray outer;
-    outer << 17;
-    outer << 18;
-    ByteArray inner;
-    inner << 41;
-    inner << 42;
-    outer << inner;
-    outer << 19;
-    ASSERT_EQ(17, outer.read<int32_t>());
-    ASSERT_EQ(18, outer.read<int32_t>());
-    ByteArray innerResult;
-    outer >> innerResult;
-    ASSERT_EQ(41, innerResult.read<int32_t>());
-    ASSERT_EQ(42, innerResult.read<int32_t>());
-    ASSERT_EQ(19, outer.read<int32_t>());
-}
 
 TEST_F(ByteArrayTest, MixedTypes) {
     ByteArray target;
@@ -217,16 +200,6 @@ TEST_F(ByteArrayTest, ReadOutOfBounds) {
         int32_t i;
         target >> d;
         ASSERT_THROW(target >> i, Error);
-    }
-    {
-        ByteArray outer;
-        ByteArray inner;
-        inner << 42 << 17;
-        outer << 23 << inner << 7;
-        ASSERT_NO_THROW(outer.read<int32_t>());
-        ASSERT_NO_THROW(outer.read<ByteArray>());
-        ASSERT_NO_THROW(outer.read<int32_t>());
-        ASSERT_THROW(outer.read<int32_t>(), Error);
     }
 }
 

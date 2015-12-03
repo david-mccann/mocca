@@ -63,9 +63,6 @@ public:
     ByteArray& operator<<(const std::string& val);
     std::string read(uint32_t size);
 
-    ByteArray& operator<<(const ByteArray& val);
-    ByteArray& operator>>(ByteArray& val);
-
     unsigned char& operator[](uint32_t index);
     const unsigned char& operator[](uint32_t index) const;
 
@@ -106,12 +103,12 @@ template <typename T> void makeFormattedByteArray(ByteArray& result, const T& va
 
 template <typename T> void makeFormattedByteArray(ByteArray& result, const T& val, std::true_type) {
     std::string str(val);
-    result << static_cast<uint32_t>(str.size());
-    result.append(str.c_str(), static_cast<uint32_t>(str.size()));
+    result << static_cast<uint16_t>(str.size());
+    result.append(str.c_str(), static_cast<uint16_t>(str.size()));
 }
 
 template <typename T> std::tuple<T> parseFormattedByteArray(ByteArray& byteArray, std::true_type) {
-    uint32_t size;
+    uint16_t size;
     byteArray >> size;
     std::string value = byteArray.read(size);
     return std::tuple<T>(value);
