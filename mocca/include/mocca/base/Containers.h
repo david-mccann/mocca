@@ -67,7 +67,7 @@ private:
 
 template <typename Iter> using IterValueType = typename std::iterator_traits<Iter>::value_type;
 template <typename Iter, typename U>
-std::vector<U> collectMembers(Iter it, Iter itEnd, const U IterValueType<typename Iter>::*Mem) {
+std::vector<U> collectMembers(Iter it, Iter itEnd, const U IterValueType<Iter>::*Mem) {
     std::vector<U> result;
     for (; it != itEnd; ++it) {
         result.push_back(*it.*Mem);
