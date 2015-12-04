@@ -13,7 +13,7 @@ public:
     virtual ~IPhysicalConnectionAcceptor() {}
 
     virtual std::unique_ptr<IPhysicalConnection> getConnection(std::chrono::milliseconds timeout
-        = std::chrono::milliseconds(500)) = 0;
+        = std::chrono::milliseconds(200)) = 0;
 };
 }
 }

@@ -34,7 +34,7 @@ void ConnectionAggregator::send(MessageEnvelope envelope) {
 void ConnectionAggregator::runListen() {
     while (!acceptorThread_.isInterrupted()) {
         checkConnectionExceptions();
-        auto connection = connectionAcceptor_->getConnection(std::chrono::milliseconds(500));
+        auto connection = connectionAcceptor_->getConnection(std::chrono::milliseconds(200));
         if (connection != nullptr) {
             connections_.emplace_back(std::move(connection), sendQueue_, receiveQueue_);
         }

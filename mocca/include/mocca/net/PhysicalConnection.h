@@ -6,8 +6,8 @@
 namespace mocca {
 namespace net {
 ByteArray receiveUntil(IPhysicalConnection& connection, const std::string& delim,
-                       std::chrono::milliseconds timeout = std::chrono::milliseconds(500), uint32_t chunkSize = 512);
+                       std::chrono::milliseconds timeout = std::chrono::milliseconds(200), uint32_t chunkSize = 512);
 ByteArray receiveExactly(IPhysicalConnection& connection, uint32_t size,
-                         std::chrono::milliseconds timeout = std::chrono::milliseconds(500));
+                         std::chrono::milliseconds timeout = std::chrono::milliseconds(200));
 }
 }

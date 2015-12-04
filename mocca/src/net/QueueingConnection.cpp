@@ -41,7 +41,7 @@ void QueueingConnection::runSend() {
             auto dataNullable =
                 sendQueue_.tryDequeueFiltered([&connectionID](const MessageEnvelope& envelope) {
                 return envelope.senderID == connectionID;
-            }, std::chrono::milliseconds(500));
+            }, std::chrono::milliseconds(200));
             if (!dataNullable.isNull()) {
                 auto data = dataNullable.release();
                 connection_->send(std::move(data.message));
