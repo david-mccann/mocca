@@ -30,6 +30,7 @@ void mocca::CommandLineParser::printUsage(const std::string&) const {
                 stream << "\t" << val.value << ": " << val.help << std::endl;
             }
         }
+        stream << std::endl;
     }
     std::cout << stream.str();
     std::exit(0);
