@@ -42,7 +42,7 @@ void CommandLineParser::parse(int argc, const char** argv) {
         auto separatorIndex = arg.find_first_of("=");
         auto argKey = arg.substr(0, separatorIndex);
         if (findMemberEqual(options_, &Option::key, argKey) == end(options_)) {
-            throw Error(formatString("Unknown option '%%'", argKey), __FILE__, __LINE__);
+            throw ParserError(formatString("Unknown option '%%'", argKey), __FILE__, __LINE__);
         }
         std::string argValue;
         if (separatorIndex != std::string::npos) {
@@ -54,7 +54,7 @@ void CommandLineParser::parse(int argc, const char** argv) {
                     if (findMemberEqual(opt.allowedValues, &OptionValue::value, argValue) == end(opt.allowedValues)) {
                         auto allowedValues = collectMembers(begin(opt.allowedValues), end(opt.allowedValues), &OptionValue::value);
                         auto allowedValuesStr = makeString(begin(allowedValues), end(allowedValues));
-                        throw Error(
+                        throw ParserError(
                             formatString("Invalid value '%%' for option '%%'. Allowed values are: %%", argValue, opt.key, allowedValuesStr),
                             __FILE__, __LINE__);
                     }

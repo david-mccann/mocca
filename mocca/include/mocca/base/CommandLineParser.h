@@ -1,13 +1,21 @@
 #pragma once
 
+#include "mocca/base/Error.h"
+
 #include <functional>
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace mocca {
 
 class CommandLineParser {
 public:
+    class ParserError : public Error {
+    public:
+        ParserError(const std::string& msg, const std::string& file, int line)
+            : Error(msg, file, line) {}
+    };
+
     struct OptionValue {
         std::string value;
         std::string help;
