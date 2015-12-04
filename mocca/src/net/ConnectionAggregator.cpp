@@ -8,15 +8,12 @@ ConnectionAggregator::ConnectionAggregator(
     std::unique_ptr<mocca::net::IProtocolConnectionAcceptor> connectionAcceptor,
     DisconnectStrategy disconnectStrategy)
     : disconnectStrategy_(disconnectStrategy)
-    , terminate_(false)
     , connectionAcceptor_(std::move(connectionAcceptor))
-    , acceptorThread_(std::thread(&ConnectionAggregator::runListen, this)) {}
+    , acceptorThread_(&ConnectionAggregator::runListen, this) {}
 
 ConnectionAggregator::~ConnectionAggregator() {
-    terminate_ = true;
-    if (acceptorThread_.joinable()) {
-        acceptorThread_.join();
-    }
+    acceptorThread_.interrupt();
+    acceptorThread_ = mocca::Thread();
     connections_.clear();
 }
 
@@ -35,7 +32,7 @@ void ConnectionAggregator::send(MessageEnvelope envelope) {
 }
 
 void ConnectionAggregator::runListen() {
-    while (!terminate_) {
+    while (!acceptorThread_.isInterrupted()) {
         checkConnectionExceptions();
         auto connection = connectionAcceptor_->getConnection(std::chrono::milliseconds(500));
         if (connection != nullptr) {

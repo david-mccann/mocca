@@ -3,10 +3,9 @@
 #include "mocca/base/ByteArray.h"
 #include "mocca/base/MessageQueue.h"
 #include "mocca/net/IProtocolConnection.h"
+#include "mocca/base/Thread.h"
 
 #include <string>
-#include <atomic>
-#include <thread>
 
 namespace mocca {
 namespace net {
@@ -25,7 +24,6 @@ class QueueingConnection {
 public:
     QueueingConnection(std::unique_ptr<mocca::net::IProtocolConnection> connection,
                        EnvelopeQueue& sendQueue, EnvelopeQueue& receiveQueue);
-    ~QueueingConnection();
 
     std::exception_ptr currentException();
 
@@ -37,9 +35,8 @@ private:
     std::unique_ptr<mocca::net::IProtocolConnection> connection_;
     EnvelopeQueue& sendQueue_;
     EnvelopeQueue& receiveQueue_;
-    std::atomic<bool> terminate_;
-    std::thread sendThread_;
-    std::thread receiveThread_;
+    Thread sendThread_;
+    Thread receiveThread_;
     std::exception_ptr currentException_;
 };
 }

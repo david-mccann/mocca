@@ -3,10 +3,9 @@
 #include "mocca/base/Nullable.h"
 #include "mocca/net/QueueingConnection.h"
 #include "mocca/net/IProtocolConnectionAcceptor.h"
+#include "mocca/base/Thread.h"
 
-#include <thread>
 #include <vector>
-#include <atomic>
 
 namespace mocca {
 namespace net {
@@ -32,9 +31,8 @@ private:
     EnvelopeQueue sendQueue_;
     EnvelopeQueue receiveQueue_;
     std::list<QueueingConnection> connections_;
-    std::atomic<bool> terminate_;
     std::unique_ptr<mocca::net::IProtocolConnectionAcceptor> connectionAcceptor_;
-    std::thread acceptorThread_;
+    mocca::Thread acceptorThread_;
     std::exception_ptr currentException_;
 };
 }

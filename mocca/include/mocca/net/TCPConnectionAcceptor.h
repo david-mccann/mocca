@@ -1,8 +1,6 @@
 #pragma once
 
-#include <thread>
 #include <deque>
-#include <atomic>
 
 #include "mocca/net/IPhysicalConnectionAcceptor.h"
 #include "mocca/net/TCPConnection.h"

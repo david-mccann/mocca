@@ -2,8 +2,6 @@
 
 #include "mocca/base/Thread.h"
 
-#include <atomic>
-
 using namespace mocca;
 
 class ThreadTest : public ::testing::Test {
@@ -20,26 +18,29 @@ protected:
 TEST_F(ThreadTest, JoinOnDestruction) {
     std::vector<int> x;
     {
-        Thread t1(std::thread([&x] { for (int i = 0; i <= 100000; ++i) x.push_back(i); }));
+        Thread t1([&x] { for (int i = 0; i <= 100000; ++i) x.push_back(i); });
     }
     {
-        Thread t2(std::thread([&x] { for (int i = 0; i <= 100000; ++i) x.pop_back(); }));
+        Thread t2([&x] { for (int i = 0; i <= 100000; ++i) x.pop_back(); });
     }
     ASSERT_TRUE(x.empty());
 }
 
-TEST_F(ThreadTest, TerminateAndJoin) {
-    std::vector<int> x;
+TEST_F(ThreadTest, Interrupt) {
+    struct TestStruct {
+        TestStruct(bool& done) : done_(done), t_(&TestStruct::fun, this) {}
+        ~TestStruct() { t_.interrupt(); }
+        void fun() {
+            while (!t_.isInterrupted()) {}
+            done_ = true;
+        }
+        bool& done_;
+        Thread t_;
+    };
+
+    bool funDone = false;
     {
-        std::atomic<bool> terminate(false);
-        Thread t(std::thread([&]() {
-            int i = 0;
-            while (!terminate) {
-                x.push_back(i++);
-            }
-        }));
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
-        terminate = true;
+        TestStruct s(funDone);
     }
-    ASSERT_FALSE(x.empty());    
+    ASSERT_TRUE(funDone);
 }

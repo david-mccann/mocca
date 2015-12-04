@@ -2,10 +2,15 @@
 
 using mocca::Thread;
 
-Thread::Thread(std::thread t) : thread_(std::move(t)) {}
+Thread::Thread()
+    : interrupt_(true)
+    , thread_() {}
 
-mocca::Thread::Thread(Thread&& other)
-    : thread_(std::move(other.thread_)) {}
+Thread::Thread(Thread&& other)
+    : interrupt_(other.interrupt_.load())
+    , thread_(std::move(other.thread_)) {
+    other.interrupt_ = true;
+}
 
 Thread& Thread::operator=(Thread&& other) {
     if (thread_.joinable()) {
@@ -16,7 +21,16 @@ Thread& Thread::operator=(Thread&& other) {
 }
 
 Thread::~Thread() {
+    interrupt_ = true;
     if (thread_.joinable()) {
         thread_.join();
     }
+}
+
+bool mocca::Thread::isInterrupted() const {
+    return interrupt_;
+}
+
+void mocca::Thread::interrupt() {
+    interrupt_ = true;
 }

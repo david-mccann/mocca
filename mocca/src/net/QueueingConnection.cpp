@@ -11,18 +11,8 @@ MessageEnvelope::MessageEnvelope(MessageEnvelope&& other)
 QueueingConnection::QueueingConnection(std::unique_ptr<mocca::net::IProtocolConnection> connection,
                                        EnvelopeQueue& sendQueue, EnvelopeQueue& receiveQueue)
     : connection_(std::move(connection)), sendQueue_(sendQueue), receiveQueue_(receiveQueue),
-      terminate_(false), sendThread_(std::thread(&QueueingConnection::runSend, this)),
-      receiveThread_(std::thread(&QueueingConnection::runReceive, this)) {}
-
-QueueingConnection::~QueueingConnection() {
-    terminate_ = true;
-    if (sendThread_.joinable()) {
-        sendThread_.join();
-    }
-    if (receiveThread_.joinable()) {
-        receiveThread_.join();
-    }
-}
+      sendThread_(&QueueingConnection::runSend, this),
+      receiveThread_(&QueueingConnection::runReceive, this) {}
 
 std::exception_ptr QueueingConnection::currentException()
 {
@@ -31,7 +21,7 @@ std::exception_ptr QueueingConnection::currentException()
 
 void QueueingConnection::runReceive() {
     try {
-        while (!terminate_) {
+        while (!receiveThread_.isInterrupted()) {
             auto data = connection_->receive();
             if (!data.isEmpty()) {
                 MessageEnvelope envelope(std::move(data), connection_->identifier());
@@ -46,7 +36,7 @@ void QueueingConnection::runReceive() {
 
 void QueueingConnection::runSend() {
     try {
-        while (!terminate_) {
+        while (!sendThread_.isInterrupted()) {
             auto connectionID = connection_->identifier();
             auto dataNullable =
                 sendQueue_.tryDequeueFiltered([&connectionID](const MessageEnvelope& envelope) {
