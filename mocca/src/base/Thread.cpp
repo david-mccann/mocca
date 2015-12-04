@@ -1,5 +1,7 @@
 #include "mocca/base/Thread.h"
 
+#include <algorithm>
+
 using mocca::Thread;
 
 std::mutex Thread::allThreadsMx_;
