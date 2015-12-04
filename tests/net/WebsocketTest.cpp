@@ -1,10 +1,11 @@
 #include "gtest/gtest.h"
 
 #include "mocca/base/Endian.h"
-#include "mocca/testing/LoopbackPhysicalNetworkService.h"
-#include "mocca/net/WSNetworkService.h"
-#include "mocca/net/WSConnectionAcceptor.h"
+#include "mocca/net/Error.h"
 #include "mocca/net/PhysicalConnection.h"
+#include "mocca/net/WSConnectionAcceptor.h"
+#include "mocca/net/WSNetworkService.h"
+#include "mocca/testing/LoopbackPhysicalNetworkService.h"
 
 #include <array>
 
@@ -14,8 +15,7 @@ using namespace mocca::net;
 class WebsocketTest : public ::testing::Test {
 protected:
     WebsocketTest()
-        : mask({ { 0x11, 0x22, 0x33, 0x44 } })
-    {
+        : mask({{0x11, 0x22, 0x33, 0x44}}) {
         // You can do set-up work for each test here.
     }
 
@@ -200,4 +200,16 @@ TEST_F(WebsocketTest, SendBigPayload) {
     auto receivedData = lbClientConnection->receive(71000);
     ASSERT_EQ(expectedData.size(), receivedData.size());
     ASSERT_TRUE(std::memcmp(expectedData.data(), receivedData.data(), expectedData.size()) == 0);
+}
+
+TEST_F(WebsocketTest, CloseConnection) {
+    WSNetworkService wsService(std::unique_ptr<IPhysicalNetworkService>(new LoopbackPhysicalNetworkService()));
+    auto wsAcceptor = wsService.bind("mq");
+    auto& lbService = wsService.physicalService();
+    auto lbClientConnection = lbService.connect("mq");
+    lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
+    auto wsServerConnection = wsAcceptor->getConnection();
+    const unsigned char closeData[] = {0x88};
+    lbClientConnection->send(ByteArray::createFromRaw(&closeData, 1));
+    ASSERT_THROW(wsServerConnection->receive(), ConnectionClosedError);
 }

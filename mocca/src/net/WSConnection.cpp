@@ -1,6 +1,7 @@
 #include "mocca/net/WSConnection.h"
 
 #include "mocca/base/Endian.h"
+#include "mocca/net/Error.h"
 #include "mocca/net/PhysicalConnection.h"
 
 #include <limits>
@@ -71,16 +72,23 @@ void WSConnection::send(ByteArray message) const {
 ByteArray WSConnection::receive(std::chrono::milliseconds timeout) const {
     std::lock_guard<IPhysicalConnection> lock(*physicalConnection_);
 
-    // read the flags byte and the basic payload-size byte
-    auto data = receiveExactly(*physicalConnection_, 2, timeout);
+    // read the flags byte
+    auto data = receiveExactly(*physicalConnection_, 1, timeout);
     if (data.isEmpty()) {
         return ByteArray();
     }
 #ifdef MOCCA_RUNTIME_CHECKS
-    if (data[0] != 0x81) { // final fragment, text frame
+    if (data[0] != 0x81 && data[0] != 0x88) { // 0x81 = final fragment, text frame; 0x88 = final fragment, close connection
         throw Error("Invalid WebSocket frame: unsupported or malformed", __FILE__, __LINE__);
     }
 #endif
+
+    if (data[0] == 0x88) {
+        throw ConnectionClosedError("WebSocket connection closed", __FILE__, __LINE__);
+    }
+
+    // read the basic payload byte
+    data.append(receiveExactly(*physicalConnection_, 1, timeout));
 
     // read additional payload-size bytes and the mask bytes
     unsigned char basicSize = data[1] & 0x7F;
