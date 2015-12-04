@@ -10,18 +10,18 @@
 using namespace mocca;
 
 CommandLineParser::CommandLineParser() {
-    Option help;
-    help.key = "--usage";
-    help.help = "prints usage";
-    help.callback = std::bind(&CommandLineParser::printHelp, this, std::placeholders::_1);
-    options_.push_back(help);
+    Option usage;
+    usage.key = "--usage";
+    usage.help = "prints usage";
+    usage.callback = std::bind(&CommandLineParser::printUsage, this, std::placeholders::_1);
+    options_.push_back(usage);
 }
 
 void CommandLineParser::addOption(const Option& option) {
     options_.push_back(option);
 }
 
-void mocca::CommandLineParser::printHelp(const std::string&) const {
+void mocca::CommandLineParser::printUsage(const std::string&) const {
     std::stringstream stream;
     for (const auto& opt : options_) {
         stream << opt.key << ": " << opt.help << std::endl;

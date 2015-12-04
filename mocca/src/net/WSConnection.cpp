@@ -90,12 +90,10 @@ ByteArray WSConnection::receive(std::chrono::milliseconds timeout) const {
         payloadSize = basicSize;
         data.append(receiveExactly(*physicalConnection_, 4, timeout)); // 4 bytes mask
     } else if (basicSize == 126) {
-        const int numPayloadBytes = 2;
         data.append(receiveExactly(*physicalConnection_, 6, timeout)); // 2 bytes payload length + 4 bytes mask
         payloadSize = swap_uint16(*reinterpret_cast<uint16_t*>(data.data() + 2));
         maskOffset = 4;
     } else if (basicSize == 127) {
-        const int numPayloadBytes = 8;
         data.append(receiveExactly(*physicalConnection_, 12, timeout)); // 8 bytes payload length + 4 bytes mask
         payloadSize = swap_uint64(*reinterpret_cast<uint64_t*>(data.data() + 2));
 #ifdef MOCCA_RUNTIME_CHECKS
