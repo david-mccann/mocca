@@ -41,7 +41,7 @@ void ConnectionAggregator::send(MessageEnvelope envelope) {
     sendQueue_.enqueue(std::move(envelope));
 }
 
-void ConnectionAggregator::ConnectionAggregator::run() {
+void ConnectionAggregator::run() {
     try {
         while (!isInterrupted()) {
             auto connection = connectionAcceptor_->getConnection(std::chrono::milliseconds(100));
