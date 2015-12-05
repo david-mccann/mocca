@@ -58,6 +58,7 @@ TEST_F(ThreadTest, Runnable) {
     {
         TestRunnable target(done);
         target.start();
+        target.join();
     }
     ASSERT_TRUE(done);
 }
