@@ -4,6 +4,7 @@
 #include <mutex>
 #include <thread>
 #include <vector>
+#include <memory>
 
 namespace mocca {
 class AutoJoinThread {
@@ -19,7 +20,7 @@ private:
 
 class Runnable {
 public:
-    virtual ~Runnable() {}
+    virtual ~Runnable() { join(); }
 
     virtual void run() = 0;
     void start();
