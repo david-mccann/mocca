@@ -6,6 +6,7 @@
 
 #include <limits>
 #include <mutex>
+#include <sstream>
 
 using namespace mocca;
 using namespace mocca::net;
@@ -79,7 +80,9 @@ ByteArray WSConnection::receive(std::chrono::milliseconds timeout) const {
     }
 #ifdef MOCCA_RUNTIME_CHECKS
     if (data[0] != 0x81 && data[0] != 0x88) { // 0x81 = final fragment, text frame; 0x88 = final fragment, close connection
-        throw Error("Invalid WebSocket frame: unsupported or malformed", __FILE__, __LINE__);
+        std::stringstream stream;
+        stream << std::hex << static_cast<int>(data[0]);
+        throw Error("Invalid WebSocket frame: unsupported or malformed (flag byte: " + stream.str() + ")", __FILE__, __LINE__);
     }
 #endif
 
