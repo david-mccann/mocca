@@ -66,6 +66,11 @@ private:
     };
 
     struct ThreadedConnection {
+        // ctor only needed because of stupid vs2013
+        ThreadedConnection(std::unique_ptr<IProtocolConnection> connection, std::thread::id receiveThreadID, std::thread::id sendThreadID)
+            : connection(std::move(connection))
+            , receiveThreadID(receiveThreadID)
+            , sendThreadID(sendThreadID) {}
         std::unique_ptr<IProtocolConnection> connection;
         std::thread::id receiveThreadID;
         std::thread::id sendThreadID;
@@ -76,7 +81,7 @@ private:
     DisconnectStrategy disconnectStrategy_;
     EnvelopeQueue sendQueue_;
     EnvelopeQueue receiveQueue_;
-    std::vector<ThreadedConnection> connections_;
+    std::list<ThreadedConnection> connections_;
     RunnableGroup runnables_;
 };
 }

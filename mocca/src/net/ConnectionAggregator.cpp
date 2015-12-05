@@ -48,7 +48,7 @@ void ConnectionAggregator::run() {
             if (connection != nullptr) {
                 auto sendRunnable = std::unique_ptr<SendThread>(new SendThread(*connection, sendQueue_));
                 auto receiveRunnable = std::unique_ptr<ReceiveThread>(new ReceiveThread(*connection, receiveQueue_));
-                connections_.emplace_back(ThreadedConnection{std::move(connection), sendRunnable->id(), receiveRunnable->id()});
+                connections_.emplace_back(std::move(connection), sendRunnable->id(), receiveRunnable->id());
                 runnables_.addRunnable(std::move(sendRunnable));
                 runnables_.addRunnable(std::move(receiveRunnable));
             }

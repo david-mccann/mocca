@@ -115,7 +115,7 @@ TYPED_TEST(ConnectionAggregatorTest, DisconnectStrategyThrowException) {
         } catch (mocca::net::ConnectionClosedError) {
             exceptionCaught = true;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
     ASSERT_TRUE(exceptionCaught);
 }
