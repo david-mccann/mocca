@@ -4,11 +4,11 @@
 
 #include "mocca/base/ByteArray.h"
 #include "mocca/net/ConnectionAggregator.h"
-#include "mocca/testing/LoopbackPhysicalNetworkService.h"
-#include "mocca/testing/LoopbackPhysicalConnectionAcceptor.h"
-#include "mocca/net/TCPNetworkService.h"
 #include "mocca/net/Error.h"
 #include "mocca/net/MoccaNetworkService.h"
+#include "mocca/net/TCPNetworkService.h"
+#include "mocca/testing/LoopbackPhysicalConnectionAcceptor.h"
+#include "mocca/testing/LoopbackPhysicalNetworkService.h"
 
 #include "mocca/testing/NetworkTesting.h"
 
@@ -25,9 +25,7 @@ TYPED_TEST_CASE(ConnectionAggregatorTest, MyTypes);
 
 template <typename T> class ConnectionAggregatorTest : public ::testing::Test {
 protected:
-    ConnectionAggregatorTest() {
-        service.reset(new MoccaNetworkService(std::unique_ptr<IPhysicalNetworkService>(new T())));
-    }
+    ConnectionAggregatorTest() { service.reset(new MoccaNetworkService(std::unique_ptr<IPhysicalNetworkService>(new T()))); }
 
     virtual ~ConnectionAggregatorTest() {
         // You can do clean-up work that doesn't throw exceptions here.
@@ -56,8 +54,7 @@ TYPED_TEST(ConnectionAggregatorTest, EnqueueDequeue) {
     ByteArray recPacket2(data2.release().message);
     auto recStr1 = std::get<0>(mocca::parseFormattedByteArray<std::string>(recPacket1));
     auto recStr2 = std::get<0>(mocca::parseFormattedByteArray<std::string>(recPacket2));
-    ASSERT_TRUE(recStr1 == "Hello 1" && recStr2 == "Hello 2" ||
-                recStr1 == "Hello 2" && recStr2 == "Hello 1");
+    ASSERT_TRUE(recStr1 == "Hello 1" && recStr2 == "Hello 2" || recStr1 == "Hello 2" && recStr2 == "Hello 1");
 }
 
 TYPED_TEST(ConnectionAggregatorTest, SendReceiveParallel) {
@@ -67,7 +64,7 @@ TYPED_TEST(ConnectionAggregatorTest, SendReceiveParallel) {
     auto clientConnection1 = this->service->connect(createConnectionString<TypeParam>());
     auto clientConnection2 = this->service->connect(createConnectionString<TypeParam>());
 
-    const int numItems = 100;
+    const int numItems = 20;
     std::vector<std::string> data;
     for (int i = 0; i < numItems; i++) {
         data.push_back("item " + std::to_string(i));
@@ -81,10 +78,8 @@ TYPED_TEST(ConnectionAggregatorTest, SendReceiveParallel) {
             std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
         }
     };
-    auto clientFut1 =
-        async(std::launch::async, sendFunction, std::ref(*clientConnection1), std::ref(data));
-    auto clientFut2 =
-        async(std::launch::async, sendFunction, std::ref(*clientConnection2), std::ref(data));
+    auto clientFut1 = async(std::launch::async, sendFunction, std::ref(*clientConnection1), std::ref(data));
+    auto clientFut2 = async(std::launch::async, sendFunction, std::ref(*clientConnection2), std::ref(data));
 
     auto receiveFunction = [](ConnectionAggregator& aggregator, int numItems) {
         std::vector<std::string> result;
@@ -107,11 +102,10 @@ TYPED_TEST(ConnectionAggregatorTest, SendReceiveParallel) {
 
 TYPED_TEST(ConnectionAggregatorTest, DisconnectStrategyThrowException) {
     auto acceptor = this->service->bind(createBindingString<TypeParam>());
-    ConnectionAggregator target(std::move(acceptor),
-                                ConnectionAggregator::DisconnectStrategy::ThrowException);
+    ConnectionAggregator target(std::move(acceptor), ConnectionAggregator::DisconnectStrategy::ThrowException);
     {
         auto clientConnection = this->service->connect(createConnectionString<TypeParam>());
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     bool exceptionCaught = false;
@@ -121,18 +115,17 @@ TYPED_TEST(ConnectionAggregatorTest, DisconnectStrategyThrowException) {
         } catch (mocca::net::ConnectionClosedError) {
             exceptionCaught = true;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
     ASSERT_TRUE(exceptionCaught);
 }
 
 TYPED_TEST(ConnectionAggregatorTest, DisconnectStrategyRemoveConnection) {
     auto acceptor = this->service->bind(createBindingString<TypeParam>());
-    ConnectionAggregator target(std::move(acceptor),
-                                ConnectionAggregator::DisconnectStrategy::RemoveConnection);
+    ConnectionAggregator target(std::move(acceptor), ConnectionAggregator::DisconnectStrategy::RemoveConnection);
     {
         auto clientConnection = this->service->connect(createConnectionString<TypeParam>());
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     bool exceptionCaught = false;
@@ -142,7 +135,7 @@ TYPED_TEST(ConnectionAggregatorTest, DisconnectStrategyRemoveConnection) {
         } catch (mocca::net::ConnectionClosedError) {
             exceptionCaught = true;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
     ASSERT_FALSE(exceptionCaught);
 }

@@ -43,7 +43,7 @@ void LoopbackPhysicalConnection::send(ByteArray message, std::chrono::millisecon
     auto signal = inSignalQueue_->tryDequeue(std::chrono::milliseconds(0));
     if (!signal.isNull()) {
         if (signal == Signal::Disconnect) {
-            throw ConnectionClosedError("Connection to peer has been closed", __FILE__, __LINE__);
+            throw ConnectionClosedError("Connection to peer has been closed", identifier(), __FILE__, __LINE__);
         }
     }
     auto messageData = message.data();
@@ -58,7 +58,7 @@ ByteArray LoopbackPhysicalConnection::receive(uint32_t maxSize, std::chrono::mil
     auto signal = inSignalQueue_->tryDequeue(std::chrono::milliseconds(0));
     if (!signal.isNull()) {
         if (signal == Signal::Disconnect) {
-            throw ConnectionClosedError("Connection to peer has been closed", __FILE__, __LINE__);
+            throw ConnectionClosedError("Connection to peer has been closed", identifier(), __FILE__, __LINE__);
         }
     }
     ByteArray result;

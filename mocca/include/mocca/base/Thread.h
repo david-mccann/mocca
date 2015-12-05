@@ -6,30 +6,53 @@
 #include <vector>
 
 namespace mocca {
-struct Thread {
-    Thread();
-
+class AutoJoinThread {
+public:
     template <class F, class... Args>
-    Thread(F&& fun, Args&&... args)
-        : interrupted_(false)
-        , thread_(std::forward<F>(fun), std::forward<Args>(args)...) {
-        std::lock_guard<std::mutex> lock(allThreadsMx_);
-        allThreads_.push_back(this);
-    }
+    AutoJoinThread(F&& fun, Args&&... args)
+        : thread_(std::forward<F>(fun), std::forward<Args>(args)...) {}
+    ~AutoJoinThread() { thread_.join(); }
 
-    Thread(Thread&& other);
-    Thread& operator=(Thread&& other);
-    ~Thread();
+private:
+    std::thread thread_;
+};
 
+class Runnable {
+public:
+    virtual ~Runnable() {}
+
+    virtual void run() = 0;
+    void start();
+
+    virtual void interrupt();
     bool isInterrupted() const;
-    void interrupt();
-    static void interruptAll();
+    void join();
+
+    void setException(const std::exception_ptr& exception);
+    void rethrowException();
+
+    std::thread::id id() const;
 
 private:
     std::atomic<bool> interrupted_;
+    std::mutex exceptionMx_;
+    std::exception_ptr exception_;
     std::thread thread_;
+};
 
-    static std::mutex allThreadsMx_;
-    static std::vector<Thread*> allThreads_;
+class RunnableGroup {
+public:
+    ~RunnableGroup();
+
+    void addRunnable(std::unique_ptr<Runnable> thread);
+    void removeRunnable(const std::thread::id& threadID);
+
+    void interruptAll();
+    void joinAll();
+
+    void rethrowException();
+
+private:
+    std::vector<std::unique_ptr<Runnable>> threads_;
 };
 }

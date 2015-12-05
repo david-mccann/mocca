@@ -84,7 +84,7 @@ ByteArray WSConnection::receive(std::chrono::milliseconds timeout) const {
 #endif
 
     if (data[0] == 0x88) {
-        throw ConnectionClosedError("WebSocket connection closed", __FILE__, __LINE__);
+        throw ConnectionClosedError("WebSocket connection closed", identifier(), __FILE__, __LINE__);
     }
 
     // read the basic payload byte

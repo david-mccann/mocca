@@ -13,8 +13,11 @@ public:
 
 class ConnectionClosedError : public NetworkError {
 public:
-    ConnectionClosedError(const std::string& msg, const std::string& file, int line)
-        : NetworkError(msg, file, line) {}
+    ConnectionClosedError(const std::string& msg, const std::string& connectionID, const std::string& file, int line)
+        : NetworkError(msg, file, line), connectionID_(connectionID) {}
+    std::string connectionID() const { return connectionID_; }
+private:
+    std::string connectionID_;
 };
 
 class ConnectFailedError : public NetworkError {

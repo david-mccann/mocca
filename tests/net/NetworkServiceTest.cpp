@@ -166,37 +166,37 @@ TYPED_TEST(NetworkServiceTest, ReceiveTimeoutClient) {
     ASSERT_TRUE(recPacket.isEmpty());
 }
 
-//TYPED_TEST(NetworkServiceTest, SendReceiveParallel) {
-//    auto acceptor = this->target->bind(createBindingString<TypeParam>());
-//    auto clientConnection = this->target->connect(createConnectionString<TypeParam>());
-//    auto serverConnection = acceptor->getConnection();
-//    ASSERT_FALSE(serverConnection == nullptr);
-//    
-//    const int numItems = 200;
-//    std::vector<std::string> data;
-//    for (int i = 0; i < numItems; i++) {
-//        data.push_back("item " + std::to_string(i));
-//    }
-//
-//    mocca::Thread t(std::thread([&clientConnection, data] {
-//        for (auto item : data) {
-//            clientConnection->send(std::move(ByteArray() << item));
-//        }
-//    }));
-//
-//    std::vector<std::future<std::string>> futures;
-//    for (int i = 0; i < numItems; ++i) {
-//        futures.push_back(std::async(std::launch::async, [&serverConnection, i]() {
-//            auto recPacket = ByteArray(serverConnection->receive());
-//            return recPacket.get<std::string>();
-//        }));
-//    }
-//
-//    std::vector<std::string> result;
-//    for (int i = 0; i < numItems; i++) {
-//        result.push_back(futures[i].get());
-//    }
-//    for (auto item : data) {
-//        ASSERT_TRUE(std::find(begin(result), end(result), item) != end(result));
-//    }
-//}
+TYPED_TEST(NetworkServiceTest, SendReceiveParallel) {
+    auto acceptor = this->target->bind(createBindingString<TypeParam>());
+    auto clientConnection = this->target->connect(createConnectionString<TypeParam>());
+    auto serverConnection = acceptor->getConnection();
+    ASSERT_FALSE(serverConnection == nullptr);
+    
+    const int numItems = 200;
+    std::vector<std::string> data;
+    for (int i = 0; i < numItems; i++) {
+        data.push_back("item " + std::to_string(i));
+    }
+
+    mocca::AutoJoinThread a([&clientConnection, data] {
+        for (auto item : data) {
+            clientConnection->send(std::move(ByteArray() << item));
+        }
+    });
+
+    std::vector<std::future<std::string>> futures;
+    for (int i = 0; i < numItems; ++i) {
+        futures.push_back(std::async(std::launch::async, [&serverConnection, i]() {
+            auto recPacket = ByteArray(serverConnection->receive());
+            return recPacket.read(recPacket.size());
+        }));
+    }
+
+    std::vector<std::string> result;
+    for (int i = 0; i < numItems; i++) {
+        result.push_back(futures[i].get());
+    }
+    for (auto item : data) {
+        ASSERT_TRUE(std::find(begin(result), end(result), item) != end(result));
+    }
+}

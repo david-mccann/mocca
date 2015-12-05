@@ -42,7 +42,7 @@ void TCPConnection::send(ByteArray message, std::chrono::milliseconds timeout) c
         socket_->SendData((const int8_t*)message.data(), message.size(), static_cast<uint32_t>(timeout.count()));
     } catch (const IVDA::SocketConnectionException& err) {
         throw ConnectionClosedError("Connection to peer " + socket_->GetPeerAddress() + " lost during send operation (internal error: " +
-                                        err.what() + ")",
+                                        err.what() + ")", identifier(),
                                     __FILE__, __LINE__);
     } catch (const IVDA::SocketException& err) {
         std::string internalError(err.what());
@@ -58,7 +58,7 @@ ByteArray TCPConnection::receive(uint32_t maxSize, std::chrono::milliseconds tim
         return message;
     } catch (const IVDA::SocketConnectionException& err) {
         throw ConnectionClosedError("Connection to peer " + socket_->GetPeerAddress() + " lost during receive operation (internal error: " +
-                                        err.what() + ")",
+                                        err.what() + ")", identifier(),
                                     __FILE__, __LINE__);
     } catch (const IVDA::SocketException& err) {
         std::string internalErr(err.what());
