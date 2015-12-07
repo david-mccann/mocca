@@ -18,6 +18,7 @@ private:
 
     TCPConnectionAcceptor(int port);
 
+    int port_;
     IVDA::TCPServer server_;
 };
 }

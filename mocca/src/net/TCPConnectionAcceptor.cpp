@@ -1,10 +1,13 @@
 #include "mocca/net/TCPConnectionAcceptor.h"
+
 #include "mocca/net/Sockets.h"
+#include "mocca/log/LogManager.h"
 
 namespace mocca {
 namespace net {
 
 TCPConnectionAcceptor::TCPConnectionAcceptor(int port) 
+    : port_(port)
 {
     try {
         server_.SetReuseAddress(true);
@@ -29,6 +32,8 @@ std::unique_ptr<IPhysicalConnection> TCPConnectionAcceptor::getConnection(std::c
     }
     if (connectionSocket) {
         auto socketPtr = std::unique_ptr<IVDA::ConnectionSocket>(connectionSocket);
+        auto ip = connectionSocket->GetLocalAddress();
+        LDEBUG("Accepted TCP connection on port " << port_ << " from " << ip);
         return std::unique_ptr<TCPConnection>(new TCPConnection(move(socketPtr)));
     }
     return nullptr;
