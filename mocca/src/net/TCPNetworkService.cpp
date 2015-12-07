@@ -11,6 +11,7 @@
 #endif
 
 #include "mocca/base/ByteArray.h"
+#include "mocca/base/StringTools.h"
 #include "mocca/net/Error.h"
 #include "mocca/net/TCPConnection.h"
 #include "mocca/net/TCPConnectionAcceptor.h"
@@ -30,7 +31,7 @@ std::unique_ptr<IPhysicalConnection> TCPNetworkService::connect(const std::strin
         throw ConnectFailedError("Could not connect to " + networkAddress.toString() + " (internal error: " + err.what() + ")", __FILE__,
                                  __LINE__);
     } catch (const IVDA::SocketException& err) {
-        std::string internalError(err.what());
+        std::string internalError = mocca::joinString(err.what(), ", ", err.internalError());
         throw NetworkError("Network error in connect operation (internal error: " + internalError + ")", __FILE__, __LINE__);
     }
     return std::unique_ptr<TCPConnection>(new TCPConnection(std::move(socket)));

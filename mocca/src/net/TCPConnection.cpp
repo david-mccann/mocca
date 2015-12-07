@@ -1,5 +1,6 @@
 #include "mocca/net/TCPConnection.h"
 
+#include "mocca/base/StringTools.h"
 
 namespace mocca {
 namespace net {
@@ -42,10 +43,10 @@ void TCPConnection::send(ByteArray message, std::chrono::milliseconds timeout) c
         socket_->SendData((const int8_t*)message.data(), message.size(), static_cast<uint32_t>(timeout.count()));
     } catch (const IVDA::SocketConnectionException& err) {
         throw ConnectionClosedError("Connection to peer " + socket_->GetPeerAddress() + " lost during send operation (internal error: " +
-                                        err.what() + ")", identifier(),
-                                    __FILE__, __LINE__);
+                                        err.what() + ")",
+                                    identifier(), __FILE__, __LINE__);
     } catch (const IVDA::SocketException& err) {
-        std::string internalError(err.what());
+        std::string internalError = mocca::joinString(err.what(), ", ", err.internalError());
         throw NetworkError("Network error in send operation (internal error: " + internalError + ")", __FILE__, __LINE__);
     }
 }
@@ -58,11 +59,11 @@ ByteArray TCPConnection::receive(uint32_t maxSize, std::chrono::milliseconds tim
         return message;
     } catch (const IVDA::SocketConnectionException& err) {
         throw ConnectionClosedError("Connection to peer " + socket_->GetPeerAddress() + " lost during receive operation (internal error: " +
-                                        err.what() + ")", identifier(),
-                                    __FILE__, __LINE__);
+                                        err.what() + ")",
+                                    identifier(), __FILE__, __LINE__);
     } catch (const IVDA::SocketException& err) {
-        std::string internalErr(err.what());
-        throw NetworkError("Network error in receive operation (internal error: " + internalErr + ")", __FILE__, __LINE__);
+        std::string internalError = mocca::joinString(err.what(), ", ", err.internalError());
+        throw NetworkError("Network error in receive operation (internal error: " + internalError + ")", __FILE__, __LINE__);
     }
 }
 }
