@@ -107,6 +107,14 @@ TEST_F(ByteArrayTest, Move) {
     ASSERT_EQ(targetData, moved.data());
 }
 
+TEST_F(ByteArrayTest, Byte) {
+    ByteArray target;
+    target << (unsigned char)0xAB;
+    unsigned char result;
+    target >> result;
+    ASSERT_EQ(0xAB, result);
+}
+
 TEST_F(ByteArrayTest, Int) {
     {
         ByteArray target;

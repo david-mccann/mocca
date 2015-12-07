@@ -89,6 +89,22 @@ ByteArray ByteArray::createFromRaw(const void* raw, uint32_t size) {
     return std::move(byteArray);
 }
 
+ByteArray& ByteArray::operator<<(unsigned char val) {
+    append(&val, sizeof(unsigned char));
+    return *this;
+}
+
+ByteArray& ByteArray::operator>>(unsigned char& val) {
+#ifdef MOCCA_RUNTIME_CHECKS
+    if (readPos_ + sizeof(unsigned char) > size_) {
+        throw Error("Reading beyond end of packet", __FILE__, __LINE__);
+    }
+#endif
+    memcpy(&val, data_.get() + readPos_, sizeof(unsigned char));
+    readPos_ += sizeof(unsigned char);
+    return *this;
+}
+
 ByteArray& ByteArray::operator<<(int16_t val) {
     append(&val, sizeof(int16_t));
     return *this;
