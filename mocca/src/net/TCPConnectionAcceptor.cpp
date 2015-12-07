@@ -32,7 +32,7 @@ std::unique_ptr<IPhysicalConnection> TCPConnectionAcceptor::getConnection(std::c
     }
     if (connectionSocket) {
         auto socketPtr = std::unique_ptr<IVDA::ConnectionSocket>(connectionSocket);
-        auto ip = connectionSocket->GetLocalAddress();
+        auto ip = connectionSocket->GetPeerAddress();
         LDEBUG("Accepted TCP connection on port " << port_ << " from " << ip);
         return std::unique_ptr<TCPConnection>(new TCPConnection(move(socketPtr)));
     }
