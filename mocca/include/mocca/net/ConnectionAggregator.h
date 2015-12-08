@@ -27,7 +27,7 @@ public:
     enum class DisconnectStrategy { RemoveConnection, ThrowException };
 
     ConnectionAggregator(std::unique_ptr<mocca::net::IProtocolConnectionAcceptor> connectionAcceptor,
-                         DisconnectStrategy disconnectStrategy = DisconnectStrategy::ThrowException);
+                         DisconnectStrategy disconnectStrategy = DisconnectStrategy::RemoveConnection);
     ~ConnectionAggregator();
 
     mocca::Nullable<MessageEnvelope> receive(std::chrono::milliseconds timeout);
