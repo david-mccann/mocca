@@ -33,8 +33,9 @@ public:
     }
 
     friend void swap(Nullable& first, Nullable& second) {
-        std::swap(first.value_, second.value_);
-        std::swap(first.isNull_, second.isNull_);
+        using std::swap;
+        swap(first.value_, second.value_);
+        swap(first.isNull_, second.isNull_);
     }
 
     friend bool operator==(const Nullable<T>& lhs, const Nullable<T>& rhs) {
@@ -51,7 +52,7 @@ public:
         if (!isNull_) {
             T tmp(std::move(value_));
             isNull_ = true;
-            return tmp;
+            return std::move(tmp); // not necessary, but vs2013 complains
         }
         else {
             throw Error("Value of Nullable not set", __FILE__, __LINE__);
