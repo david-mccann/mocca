@@ -25,7 +25,7 @@ TYPED_TEST_CASE(ConnectionAggregatorTest, MyTypes);
 
 template <typename T> class ConnectionAggregatorTest : public ::testing::Test {
 protected:
-    ConnectionAggregatorTest() { service.reset(new MoccaNetworkService(std::unique_ptr<IPhysicalNetworkService>(new T()))); }
+    ConnectionAggregatorTest() { service.reset(new MoccaNetworkService<T>()); }
 
     virtual ~ConnectionAggregatorTest() {
         // You can do clean-up work that doesn't throw exceptions here.

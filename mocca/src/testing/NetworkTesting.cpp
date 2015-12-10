@@ -32,22 +32,22 @@ template <> std::string mocca::testing::createBindingString<LoopbackNetworkServi
 }
 
 template <> Endpoint mocca::testing::createConnectionEndpoint<TCPNetworkService>(int index) {
-    return Endpoint(MoccaNetworkService::protocolStatic(), TCPNetworkService::transportStatic(),
+    return Endpoint(MoccaNetworkService<TCPNetworkService>::protocolStatic(), TCPNetworkService::transportStatic(),
                     createConnectionString<TCPNetworkService>(index));
 }
 
 template <> Endpoint mocca::testing::createBindingEndpoint<TCPNetworkService>(int index) {
-    return Endpoint(MoccaNetworkService::protocolStatic(), TCPNetworkService::transportStatic(),
+    return Endpoint(MoccaNetworkService<TCPNetworkService>::protocolStatic(), TCPNetworkService::transportStatic(),
                     createBindingString<TCPNetworkService>(index));
 }
 
 template <> Endpoint mocca::testing::createConnectionEndpoint<LoopbackPhysicalNetworkService>(int index) {
-    return Endpoint(MoccaNetworkService::protocolStatic(), LoopbackPhysicalNetworkService::transportStatic(),
+    return Endpoint(MoccaNetworkService<TCPNetworkService>::protocolStatic(), LoopbackPhysicalNetworkService::transportStatic(),
                     createConnectionString<LoopbackPhysicalNetworkService>(index));
 }
 
 template <> Endpoint mocca::testing::createBindingEndpoint<LoopbackPhysicalNetworkService>(int index) {
-    return Endpoint(MoccaNetworkService::protocolStatic(), LoopbackPhysicalNetworkService::transportStatic(),
+    return Endpoint(MoccaNetworkService<TCPNetworkService>::protocolStatic(), LoopbackPhysicalNetworkService::transportStatic(),
                     createBindingString<LoopbackPhysicalNetworkService>(index));
 }
 

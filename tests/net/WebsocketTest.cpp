@@ -63,7 +63,7 @@ protected:
 };
 
 TEST_F(WebsocketTest, ReceiveSmallPayload) {
-    WSNetworkService wsService(std::unique_ptr<IPhysicalNetworkService>(new LoopbackPhysicalNetworkService()));
+    WSNetworkService<LoopbackPhysicalNetworkService> wsService;
     auto wsAcceptor = wsService.bind("mq");
     auto& lbService = wsService.physicalService();
     auto lbClientConnection = lbService.connect("mq");
@@ -84,7 +84,7 @@ TEST_F(WebsocketTest, ReceiveSmallPayload) {
 }
 
 TEST_F(WebsocketTest, ReceiveMediumPayload) {
-    WSNetworkService wsService(std::unique_ptr<IPhysicalNetworkService>(new LoopbackPhysicalNetworkService()));
+    WSNetworkService<LoopbackPhysicalNetworkService> wsService;
     auto wsAcceptor = wsService.bind("mq");
     auto& lbService = wsService.physicalService();
     auto lbClientConnection = lbService.connect("mq");
@@ -107,7 +107,7 @@ TEST_F(WebsocketTest, ReceiveMediumPayload) {
 }
 
 TEST_F(WebsocketTest, ReceiveBigPayload) {
-    WSNetworkService wsService(std::unique_ptr<IPhysicalNetworkService>(new LoopbackPhysicalNetworkService()));
+    WSNetworkService<LoopbackPhysicalNetworkService> wsService;
     auto wsAcceptor = wsService.bind("mq");
     auto& lbService = wsService.physicalService();
     auto lbClientConnection = lbService.connect("mq");
@@ -130,7 +130,7 @@ TEST_F(WebsocketTest, ReceiveBigPayload) {
 }
 
 TEST_F(WebsocketTest, SendSmallPayload) {
-    WSNetworkService wsService(std::unique_ptr<IPhysicalNetworkService>(new LoopbackPhysicalNetworkService()));
+    WSNetworkService<LoopbackPhysicalNetworkService> wsService;
     auto wsAcceptor = wsService.bind("mq");
     auto& lbService = wsService.physicalService();
     auto lbClientConnection = lbService.connect("mq");
@@ -153,7 +153,7 @@ TEST_F(WebsocketTest, SendSmallPayload) {
 }
 
 TEST_F(WebsocketTest, SendMediumPayload) {
-    WSNetworkService wsService(std::unique_ptr<IPhysicalNetworkService>(new LoopbackPhysicalNetworkService()));
+    WSNetworkService<LoopbackPhysicalNetworkService> wsService;
     auto wsAcceptor = wsService.bind("mq");
     auto& lbService = wsService.physicalService();
     auto lbClientConnection = lbService.connect("mq");
@@ -178,7 +178,7 @@ TEST_F(WebsocketTest, SendMediumPayload) {
 }
 
 TEST_F(WebsocketTest, SendBigPayload) {
-    WSNetworkService wsService(std::unique_ptr<IPhysicalNetworkService>(new LoopbackPhysicalNetworkService()));
+    WSNetworkService<LoopbackPhysicalNetworkService> wsService;
     auto wsAcceptor = wsService.bind("mq");
     auto& lbService = wsService.physicalService();
     auto lbClientConnection = lbService.connect("mq");
@@ -203,7 +203,7 @@ TEST_F(WebsocketTest, SendBigPayload) {
 }
 
 TEST_F(WebsocketTest, CloseConnection) {
-    WSNetworkService wsService(std::unique_ptr<IPhysicalNetworkService>(new LoopbackPhysicalNetworkService()));
+    WSNetworkService<LoopbackPhysicalNetworkService> wsService;
     auto wsAcceptor = wsService.bind("mq");
     auto& lbService = wsService.physicalService();
     auto lbClientConnection = lbService.connect("mq");

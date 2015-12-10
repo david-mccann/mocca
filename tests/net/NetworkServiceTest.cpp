@@ -30,7 +30,7 @@ class NetworkServiceTest : public ::testing::Test {
 protected:
     NetworkServiceTest() {
         // You can do set-up work for each test here.
-        target.reset(new MoccaNetworkService(std::unique_ptr<IPhysicalNetworkService>(new T())));
+        target.reset(new MoccaNetworkService<T>());
     }
 
     virtual ~NetworkServiceTest() {
