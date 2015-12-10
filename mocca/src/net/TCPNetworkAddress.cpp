@@ -13,8 +13,8 @@ TCPNetworkAddress::TCPNetworkAddress(const std::string& ip, int port) {
     port_ = port;
 }
 
-mocca::net::TCPNetworkAddress::TCPNetworkAddress(const std::string& connectionString) {
-    auto parts = mocca::splitString<std::string>(connectionString, ':');
+mocca::net::TCPNetworkAddress::TCPNetworkAddress(const std::string& address) {
+    auto parts = mocca::splitString<std::string>(address, ':');
     if (parts.size() != 2) {
         throw NetworkError("TCP connection string is malformed, must have the format 'ip:port'",
                            __FILE__, __LINE__);
@@ -53,7 +53,7 @@ std::string TCPNetworkAddress::ip() const { return ip_; }
 
 int TCPNetworkAddress::port() const { return port_; }
 
-std::string mocca::net::TCPNetworkAddress::connectionString() const {
+std::string mocca::net::TCPNetworkAddress::address() const {
     return ip_ + ":" + std::to_string(port_);
 }
 

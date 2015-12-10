@@ -11,14 +11,14 @@ class TCPNetworkAddress {
 
 public:
     TCPNetworkAddress(const std::string& ip, int port);
-	TCPNetworkAddress(const std::string& connectionString);
+	TCPNetworkAddress(const std::string& address);
 
     std::string toString() const;
 
     std::string ip() const;
     int port() const;
 
-	std::string connectionString() const;
+	std::string address() const;
 	std::string bindingString() const;
 
 	static int parsePort(const std::string& str);

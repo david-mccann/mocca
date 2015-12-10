@@ -39,9 +39,9 @@ TEST_F(TCPNetworkAddressTest, Ctor2) {
 	ASSERT_THROW(TCPNetworkAddress("localhost:-1"), NetworkError);
 }
 
-TEST_F(TCPNetworkAddressTest, ConnectionString) {
-	ASSERT_EQ("localhost:1234", TCPNetworkAddress("localhost", 1234).connectionString());
-	ASSERT_EQ("168.0.0.1:1234", TCPNetworkAddress("168.0.0.1", 1234).connectionString());
+TEST_F(TCPNetworkAddressTest, address) {
+	ASSERT_EQ("localhost:1234", TCPNetworkAddress("localhost", 1234).address());
+	ASSERT_EQ("168.0.0.1:1234", TCPNetworkAddress("168.0.0.1", 1234).address());
 }
 
 TEST_F(TCPNetworkAddressTest, BindingString) {

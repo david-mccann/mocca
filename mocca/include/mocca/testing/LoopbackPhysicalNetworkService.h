@@ -13,8 +13,7 @@ namespace net {
 
 class LoopbackPhysicalNetworkService {
 public:
-    static std::string transportStatic();
-    std::string transport() const;
+    static std::string protocol();
     std::unique_ptr<IPhysicalConnection> connect(const std::string& queueName);
     std::unique_ptr<IPhysicalConnectionAcceptor> bind(const std::string& queueName);
 

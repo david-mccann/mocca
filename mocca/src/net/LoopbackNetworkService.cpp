@@ -9,14 +9,6 @@
 namespace mocca {
 namespace net {
 
-std::string mocca::net::LoopbackNetworkService::transportStatic() {
-    return "loopback";
-}
-
-std::string mocca::net::LoopbackNetworkService::transport() const {
-    return transportStatic();
-}
-
 std::string mocca::net::LoopbackNetworkService::protocolStatic() {
     return "loopback";
 }

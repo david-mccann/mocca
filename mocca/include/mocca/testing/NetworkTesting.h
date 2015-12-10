@@ -20,14 +20,14 @@ namespace mocca {
 			}
 		};
 
-        template<typename T> std::string createConnectionString(int index = 0);
-        template<typename T> std::string createBindingString(int index = 0);
-        template<> std::string createConnectionString<net::TCPNetworkService>(int index);
-        template<> std::string createBindingString<net::TCPNetworkService>(int index);
-        template<> std::string createConnectionString<net::LoopbackPhysicalNetworkService>(int index);
-        template<> std::string createBindingString<net::LoopbackPhysicalNetworkService>(int index);
-        template<> std::string createConnectionString<net::LoopbackNetworkService>(int index);
-        template<> std::string createBindingString<net::LoopbackNetworkService>(int index);
+        template<typename T> std::string createAddress(int index = 0);
+        template<typename T> std::string createBindingAddress(int index = 0);
+        template<> std::string createAddress<net::TCPNetworkService>(int index);
+        template<> std::string createBindingAddress<net::TCPNetworkService>(int index);
+        template<> std::string createAddress<net::LoopbackPhysicalNetworkService>(int index);
+        template<> std::string createBindingAddress<net::LoopbackPhysicalNetworkService>(int index);
+        template<> std::string createAddress<net::LoopbackNetworkService>(int index);
+        template<> std::string createBindingAddress<net::LoopbackNetworkService>(int index);
 
         template<typename T> net::Endpoint createConnectionEndpoint(int index = 0);
         template<typename T> net::Endpoint createBindingEndpoint(int index = 0);

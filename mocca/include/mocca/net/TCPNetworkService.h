@@ -8,9 +8,8 @@ namespace net {
 
 class TCPNetworkService {
 public:
-    static std::string transportStatic();
-    std::string transport() const;
-    std::unique_ptr<IPhysicalConnection> connect(const std::string& connectionString);
+    static std::string protocol();
+    std::unique_ptr<IPhysicalConnection> connect(const std::string& address);
     std::unique_ptr<IPhysicalConnectionAcceptor> bind(const std::string& portString);
     std::string localIp() const;
     

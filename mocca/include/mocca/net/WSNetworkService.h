@@ -9,18 +9,14 @@ template <typename PhysicalServiceType>
 class WSNetworkService : public IProtocolNetworkService {
 public:
     static std::string protocolStatic() {
-        return "ws";
+        return "ws." + PhysicalServiceType::protocol();
     }
 
     std::string protocol() const override {
         return protocolStatic();
     }
 
-    std::string transport() const override {
-        return physicalNetworkService_.transport();
-    }
-
-    std::unique_ptr<IProtocolConnection> connect(const std::string& connectionString) override {
+    std::unique_ptr<IProtocolConnection> connect(const std::string& address) override {
         throw Error("WebSocket client connections not supported", __FILE__, __LINE__);
     }
     

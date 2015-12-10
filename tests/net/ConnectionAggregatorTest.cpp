@@ -35,10 +35,10 @@ protected:
 };
 
 TYPED_TEST(ConnectionAggregatorTest, EnqueueDequeue) {
-    auto acceptor = this->service->bind(createBindingString<TypeParam>());
+    auto acceptor = this->service->bind(createBindingAddress<TypeParam>());
     ConnectionAggregator target(std::move(acceptor));
-    auto clientConnection1 = this->service->connect(createConnectionString<TypeParam>());
-    auto clientConnection2 = this->service->connect(createConnectionString<TypeParam>());
+    auto clientConnection1 = this->service->connect(createAddress<TypeParam>());
+    auto clientConnection2 = this->service->connect(createAddress<TypeParam>());
 
     ByteArray packet1 = mocca::makeFormattedByteArray("Hello 1");
     ByteArray packet2 = mocca::makeFormattedByteArray("Hello 2");
@@ -59,10 +59,10 @@ TYPED_TEST(ConnectionAggregatorTest, EnqueueDequeue) {
 
 TYPED_TEST(ConnectionAggregatorTest, SendReceiveParallel) {
     TypeParam network;
-    auto acceptor = this->service->bind(createBindingString<TypeParam>());
+    auto acceptor = this->service->bind(createBindingAddress<TypeParam>());
     ConnectionAggregator target(std::move(acceptor));
-    auto clientConnection1 = this->service->connect(createConnectionString<TypeParam>());
-    auto clientConnection2 = this->service->connect(createConnectionString<TypeParam>());
+    auto clientConnection1 = this->service->connect(createAddress<TypeParam>());
+    auto clientConnection2 = this->service->connect(createAddress<TypeParam>());
 
     const int numItems = 20;
     std::vector<std::string> data;
@@ -101,10 +101,10 @@ TYPED_TEST(ConnectionAggregatorTest, SendReceiveParallel) {
 }
 
 TYPED_TEST(ConnectionAggregatorTest, DisconnectStrategyThrowException) {
-    auto acceptor = this->service->bind(createBindingString<TypeParam>());
+    auto acceptor = this->service->bind(createBindingAddress<TypeParam>());
     ConnectionAggregator target(std::move(acceptor), ConnectionAggregator::DisconnectStrategy::ThrowException);
     {
-        auto clientConnection = this->service->connect(createConnectionString<TypeParam>());
+        auto clientConnection = this->service->connect(createAddress<TypeParam>());
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
@@ -121,10 +121,10 @@ TYPED_TEST(ConnectionAggregatorTest, DisconnectStrategyThrowException) {
 }
 
 TYPED_TEST(ConnectionAggregatorTest, DisconnectStrategyRemoveConnection) {
-    auto acceptor = this->service->bind(createBindingString<TypeParam>());
+    auto acceptor = this->service->bind(createBindingAddress<TypeParam>());
     ConnectionAggregator target(std::move(acceptor), ConnectionAggregator::DisconnectStrategy::RemoveConnection);
     {
-        auto clientConnection = this->service->connect(createConnectionString<TypeParam>());
+        auto clientConnection = this->service->connect(createAddress<TypeParam>());
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 

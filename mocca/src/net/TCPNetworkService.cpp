@@ -21,8 +21,8 @@
 namespace mocca {
 namespace net {
 
-std::unique_ptr<IPhysicalConnection> TCPNetworkService::connect(const std::string& connectionString) {
-    TCPNetworkAddress networkAddress(connectionString);
+std::unique_ptr<IPhysicalConnection> TCPNetworkService::connect(const std::string& address) {
+    TCPNetworkAddress networkAddress(address);
     auto socket = std::unique_ptr<IVDA::TCPSocket>(new IVDA::TCPSocket());
     socket->SetNonBlocking(true);
     try {
@@ -37,12 +37,8 @@ std::unique_ptr<IPhysicalConnection> TCPNetworkService::connect(const std::strin
     return std::unique_ptr<TCPConnection>(new TCPConnection(std::move(socket)));
 }
 
-std::string mocca::net::TCPNetworkService::transportStatic() {
+std::string mocca::net::TCPNetworkService::protocol() {
     return "tcp";
-}
-
-std::string mocca::net::TCPNetworkService::transport() const {
-    return transportStatic();
 }
 
 std::unique_ptr<IPhysicalConnectionAcceptor> TCPNetworkService::bind(const std::string& portString) {

@@ -7,12 +7,8 @@
 namespace mocca {
 namespace net {
 
-std::string mocca::net::LoopbackPhysicalNetworkService::transportStatic() {
-    return "loopback_physical";
-}
-
-std::string mocca::net::LoopbackPhysicalNetworkService::transport() const {
-    return transportStatic();
+std::string mocca::net::LoopbackPhysicalNetworkService::protocol() {
+    return "loopback";
 }
 
 std::unique_ptr<IPhysicalConnection> LoopbackPhysicalNetworkService::connect(const std::string& queueName) {

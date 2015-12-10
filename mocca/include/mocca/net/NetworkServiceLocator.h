@@ -13,7 +13,7 @@ class IProtocolConnectionAcceptor;
 
 class NetworkServiceLocator {
 public:
-    static std::shared_ptr<IProtocolNetworkService> service(const std::string& protocol, const std::string& transport);
+    static std::shared_ptr<IProtocolNetworkService> service(const std::string& protocol);
     static void provideService(std::shared_ptr<IProtocolNetworkService> service);
     static void removeAll();
 
