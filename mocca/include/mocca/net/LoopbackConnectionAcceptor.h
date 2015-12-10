@@ -10,6 +10,7 @@ class LoopbackNetworkService;
 
 class LoopbackConnectionAcceptor : public IProtocolConnectionAcceptor {
     using LoopbackConnectionQueue = MessageQueue<std::unique_ptr<LoopbackConnection>>;
+
 public:
     LoopbackConnectionAcceptor(std::shared_ptr<LoopbackConnectionQueue> connectionQueue);
     virtual std::unique_ptr<IProtocolConnection> getConnection(std::chrono::milliseconds timeout) override;

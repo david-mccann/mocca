@@ -1,31 +1,31 @@
 #pragma once
 
-#include <string>
 #include <iostream>
+#include <string>
 
 namespace mocca {
 namespace net {
 
 class TCPNetworkAddress {
-	friend std::ostream& operator<<(std::ostream& os, const TCPNetworkAddress& obj);
+    friend std::ostream& operator<<(std::ostream& os, const TCPNetworkAddress& obj);
 
 public:
     TCPNetworkAddress(const std::string& ip, int port);
-	TCPNetworkAddress(const std::string& address);
+    TCPNetworkAddress(const std::string& address);
 
     std::string toString() const;
 
     std::string ip() const;
     int port() const;
 
-	std::string address() const;
-	std::string bindingString() const;
+    std::string address() const;
+    std::string bindingString() const;
 
-	static int parsePort(const std::string& str);
+    static int parsePort(const std::string& str);
 
 private:
-	static void checkIp(const std::string& ip);
-	static void checkPort(int port);
+    static void checkIp(const std::string& ip);
+    static void checkPort(int port);
 
 private:
     std::string ip_;

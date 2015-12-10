@@ -66,7 +66,8 @@ void mocca::RunnableGroup::rethrowException() {
 }
 
 void mocca::RunnableGroup::removeRunnable(const std::thread::id& threadID) {
-    auto it = std::find_if(begin(threads_), end(threads_), [&](const std::unique_ptr<Runnable>& thread) { return thread->id() == threadID; });
+    auto it =
+        std::find_if(begin(threads_), end(threads_), [&](const std::unique_ptr<Runnable>& thread) { return thread->id() == threadID; });
     (*it)->join();
     threads_.erase(it);
 }

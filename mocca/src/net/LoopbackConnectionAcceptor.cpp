@@ -1,15 +1,14 @@
 #include "mocca/base/ByteArray.h"
 #include "mocca/base/MessageQueue.h"
-#include "mocca/net/LoopbackConnectionAcceptor.h"
-#include "mocca/net/LoopbackConnection.h"
-#include "mocca/net/LoopbackNetworkService.h"
 #include "mocca/net/Error.h"
+#include "mocca/net/LoopbackConnection.h"
+#include "mocca/net/LoopbackConnectionAcceptor.h"
+#include "mocca/net/LoopbackNetworkService.h"
 
 namespace mocca {
 namespace net {
 
-LoopbackConnectionAcceptor::LoopbackConnectionAcceptor(
-    std::shared_ptr<LoopbackConnectionQueue> connectionQueue)
+LoopbackConnectionAcceptor::LoopbackConnectionAcceptor(std::shared_ptr<LoopbackConnectionQueue> connectionQueue)
     : connectionQueue_(connectionQueue) {}
 
 std::unique_ptr<IProtocolConnection> LoopbackConnectionAcceptor::getConnection(std::chrono::milliseconds timeout) {

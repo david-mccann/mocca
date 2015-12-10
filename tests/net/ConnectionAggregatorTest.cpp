@@ -46,8 +46,8 @@ TYPED_TEST(ConnectionAggregatorTest, EnqueueDequeue) {
     clientConnection1->send(std::move(packet1));
     clientConnection2->send(std::move(packet2));
 
-    auto data1 = target.receive(std::chrono::milliseconds(200));
-    auto data2 = target.receive(std::chrono::milliseconds(200));
+    auto data1 = target.receive(std::chrono::milliseconds(100));
+    auto data2 = target.receive(std::chrono::milliseconds(100));
     ASSERT_FALSE(data1.isNull());
     ASSERT_FALSE(data2.isNull());
     ByteArray recPacket1(data1.release().message);

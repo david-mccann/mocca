@@ -16,8 +16,7 @@ TCPNetworkAddress::TCPNetworkAddress(const std::string& ip, int port) {
 mocca::net::TCPNetworkAddress::TCPNetworkAddress(const std::string& address) {
     auto parts = mocca::splitString<std::string>(address, ':');
     if (parts.size() != 2) {
-        throw NetworkError("TCP connection string is malformed, must have the format 'ip:port'",
-                           __FILE__, __LINE__);
+        throw NetworkError("TCP connection string is malformed, must have the format 'ip:port'", __FILE__, __LINE__);
     }
     auto ip = parts.front();
     auto port = parsePort(parts.back());
@@ -35,8 +34,7 @@ void mocca::net::TCPNetworkAddress::checkIp(const std::string& ip) {
 
 void mocca::net::TCPNetworkAddress::checkPort(int port) {
     if (port < 1 || port > 65535) {
-        throw NetworkError("Port number " + std::to_string(port) + " is out of range", __FILE__,
-                           __LINE__);
+        throw NetworkError("Port number " + std::to_string(port) + " is out of range", __FILE__, __LINE__);
     }
 }
 
@@ -44,23 +42,27 @@ int mocca::net::TCPNetworkAddress::parsePort(const std::string& str) {
     try {
         return std::stoi(str);
     } catch (const std::exception& err) {
-        throw NetworkError("Error parsing port number '" + str + "': " + err.what(), __FILE__,
-                           __LINE__);
+        throw NetworkError("Error parsing port number '" + str + "': " + err.what(), __FILE__, __LINE__);
     }
 }
 
-std::string TCPNetworkAddress::ip() const { return ip_; }
+std::string TCPNetworkAddress::ip() const {
+    return ip_;
+}
 
-int TCPNetworkAddress::port() const { return port_; }
+int TCPNetworkAddress::port() const {
+    return port_;
+}
 
 std::string mocca::net::TCPNetworkAddress::address() const {
     return ip_ + ":" + std::to_string(port_);
 }
 
-std::string mocca::net::TCPNetworkAddress::bindingString() const { return std::to_string(port_); }
+std::string mocca::net::TCPNetworkAddress::bindingString() const {
+    return std::to_string(port_);
+}
 
-std::string mocca::net::TCPNetworkAddress::toString() const
-{
+std::string mocca::net::TCPNetworkAddress::toString() const {
     return ip_ + ":" + std::to_string(port_);
 }
 

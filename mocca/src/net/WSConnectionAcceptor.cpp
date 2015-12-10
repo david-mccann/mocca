@@ -1,18 +1,24 @@
 #include "mocca/net/WSConnectionAcceptor.h"
 
 #include "mocca/net/PhysicalConnection.h"
+#include "mocca/net/TCPConnectionAcceptor.h"
 #include "mocca/net/WSConnection.h"
 #include "mocca/net/WSHandshake.h"
+#include "mocca/testing/LoopbackPhysicalConnectionAcceptor.h"
 
 #include "mocca/log/LogManager.h"
 
 using namespace mocca;
 using namespace mocca::net;
 
-WSConnectionAcceptor::WSConnectionAcceptor(std::unique_ptr<IPhysicalConnectionAcceptor> physicalConnectionAcceptor)
+template <typename PhysicalConnectionAcceptorType>
+WSConnectionAcceptor<PhysicalConnectionAcceptorType>::WSConnectionAcceptor(
+    std::unique_ptr<PhysicalConnectionAcceptorType> physicalConnectionAcceptor)
     : physicalConnectionAcceptor_(std::move(physicalConnectionAcceptor)) {}
 
-std::unique_ptr<IProtocolConnection> WSConnectionAcceptor::getConnection(std::chrono::milliseconds timeout) {
+template <typename PhysicalConnectionAcceptorType>
+std::unique_ptr<IProtocolConnection>
+WSConnectionAcceptor<PhysicalConnectionAcceptorType>::getConnection(std::chrono::milliseconds timeout) {
     auto physicalConnection = physicalConnectionAcceptor_->getConnection(timeout);
     if (physicalConnection == nullptr) {
         return nullptr;
@@ -25,5 +31,10 @@ std::unique_ptr<IProtocolConnection> WSConnectionAcceptor::getConnection(std::ch
     ByteArray handshakeResponse = ByteArray::createFromRaw(responseStr.c_str(), responseStr.size());
     physicalConnection->send(std::move(handshakeResponse));
 
-    return std::unique_ptr<IProtocolConnection>(new WSConnection(std::move(physicalConnection), connectionInfo));
+    return std::unique_ptr<IProtocolConnection>(
+        new WSConnection<typename PhysicalConnectionAcceptorType::ConnectionType>(std::move(physicalConnection), connectionInfo));
 }
+
+
+template class WSConnectionAcceptor<TCPConnectionAcceptor>;
+template class WSConnectionAcceptor<LoopbackPhysicalConnectionAcceptor>;

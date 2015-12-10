@@ -2,11 +2,11 @@
 
 #include "mocca/base/Nullable.h"
 
+#include <algorithm>
 #include <condition_variable>
+#include <functional>
 #include <list>
 #include <mutex>
-#include <functional>
-#include <algorithm>
 
 namespace mocca {
 
@@ -47,8 +47,7 @@ public:
 
     /* Blocking dequeue operation with a predicate for filtering and a timeout. Like 'tryDequeue',
     * but only items satisfying the predicate will be fetched.  */
-    Nullable<T> tryDequeueFiltered(std::function<bool(const T&)> predicate,
-                                   std::chrono::milliseconds timeout) {
+    Nullable<T> tryDequeueFiltered(std::function<bool(const T&)> predicate, std::chrono::milliseconds timeout) {
         std::unique_lock<std::mutex> lock(mutex_);
         typename decltype(queue_)::iterator findIt;
         if (!condition_.wait_for(lock, timeout, [&] {

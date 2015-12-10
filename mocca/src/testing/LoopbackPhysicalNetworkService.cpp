@@ -11,7 +11,7 @@ std::string mocca::net::LoopbackPhysicalNetworkService::protocol() {
     return "loopback";
 }
 
-std::unique_ptr<IPhysicalConnection> LoopbackPhysicalNetworkService::connect(const std::string& queueName) {
+std::unique_ptr<LoopbackPhysicalConnection> LoopbackPhysicalNetworkService::connect(const std::string& queueName) {
     if (!spawnedConnections_.count(queueName)) {
         throw NetworkError("No connection acceptor bound to queue " + queueName, __FILE__, __LINE__);
     }
@@ -24,18 +24,18 @@ std::unique_ptr<IPhysicalConnection> LoopbackPhysicalNetworkService::connect(con
 
     auto serverConnection = std::unique_ptr<LoopbackPhysicalConnection>(
         new LoopbackPhysicalConnection(messageQueue1, messageQueue2, signalQueue1, signalQueue2));
-    auto clientConnection =
-        std::unique_ptr<IPhysicalConnection>(new LoopbackPhysicalConnection(messageQueue2, messageQueue1, signalQueue2, signalQueue1));
+    auto clientConnection = std::unique_ptr<LoopbackPhysicalConnection>(
+        new LoopbackPhysicalConnection(messageQueue2, messageQueue1, signalQueue2, signalQueue1));
 
     spawnedConnections_[queueName]->enqueue(std::move(serverConnection));
 
     return clientConnection;
 }
 
-std::unique_ptr<IPhysicalConnectionAcceptor> LoopbackPhysicalNetworkService::bind(const std::string& queueName) {
+std::unique_ptr<LoopbackPhysicalConnectionAcceptor> LoopbackPhysicalNetworkService::bind(const std::string& queueName) {
     auto queue = std::make_shared<LoopbackConnectionQueue>();
     spawnedConnections_[queueName] = queue;
-    return std::unique_ptr<IPhysicalConnectionAcceptor>(new LoopbackPhysicalConnectionAcceptor(queue));
+    return std::unique_ptr<LoopbackPhysicalConnectionAcceptor>(new LoopbackPhysicalConnectionAcceptor(queue));
 }
 }
 }

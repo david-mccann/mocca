@@ -2,16 +2,17 @@
 
 #include <deque>
 
-#include "mocca/net/IPhysicalConnectionAcceptor.h"
 #include "mocca/net/TCPConnection.h"
 
 namespace mocca {
 namespace net {
 
-class TCPConnectionAcceptor : public IPhysicalConnectionAcceptor {
+class TCPConnectionAcceptor {
 public:
+    using ConnectionType = TCPConnection;
+
     TCPConnectionAcceptor(const TCPConnectionAcceptor& other) = delete;
-    std::unique_ptr<IPhysicalConnection> getConnection(std::chrono::milliseconds timeout) override;
+    std::unique_ptr<TCPConnection> getConnection(std::chrono::milliseconds timeout);
 
 private:
     friend class TCPNetworkService;

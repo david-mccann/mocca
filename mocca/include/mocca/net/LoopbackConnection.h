@@ -16,10 +16,8 @@ public:
     using LoopbackMessageQueue = MessageQueue<ByteArray>;
     using LoopbackSignalQueue = MessageQueue<Signal>;
 
-    LoopbackConnection(std::shared_ptr<LoopbackMessageQueue> sendQueue,
-                       std::shared_ptr<LoopbackMessageQueue> receiveQueue,
-                       std::shared_ptr<LoopbackSignalQueue> outSignalQueue,
-                       std::shared_ptr<LoopbackSignalQueue> inSignalQueue);
+    LoopbackConnection(std::shared_ptr<LoopbackMessageQueue> sendQueue, std::shared_ptr<LoopbackMessageQueue> receiveQueue,
+                       std::shared_ptr<LoopbackSignalQueue> outSignalQueue, std::shared_ptr<LoopbackSignalQueue> inSignalQueue);
     ~LoopbackConnection();
 
     std::string identifier() const override;

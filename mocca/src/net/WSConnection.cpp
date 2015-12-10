@@ -3,6 +3,8 @@
 #include "mocca/base/Endian.h"
 #include "mocca/net/Error.h"
 #include "mocca/net/PhysicalConnection.h"
+#include "mocca/net/TCPConnection.h"
+#include "mocca/testing/LoopbackPhysicalConnection.h"
 
 #include <limits>
 #include <mutex>
@@ -32,15 +34,18 @@ using namespace mocca::net;
 +---------------------------------------------------------------+
 */
 
-WSConnection::WSConnection(std::unique_ptr<IPhysicalConnection> physicalConnection, const WSConnectionInfo& connectionInfo)
+
+template <typename PhysicalConnectionType>
+WSConnection<PhysicalConnectionType>::WSConnection(std::unique_ptr<PhysicalConnectionType> physicalConnection,
+                                                   const WSConnectionInfo& connectionInfo)
     : physicalConnection_(std::move(physicalConnection))
     , connectionInfo_(connectionInfo) {}
 
-std::string mocca::net::WSConnection::identifier() const {
+template <typename PhysicalConnectionType> std::string WSConnection<PhysicalConnectionType>::identifier() const {
     return physicalConnection_->identifier();
 }
 
-void WSConnection::send(ByteArray message) const {
+template <typename PhysicalConnectionType> void WSConnection<PhysicalConnectionType>::send(ByteArray message) const {
     auto payloadSize = message.size();
     ByteArray sendBuffer(payloadSize + 10); // header size is at most 10 bytes
 
@@ -70,8 +75,9 @@ void WSConnection::send(ByteArray message) const {
     physicalConnection_->send(std::move(sendBuffer));
 }
 
-ByteArray WSConnection::receive(std::chrono::milliseconds timeout) const {
-    std::lock_guard<IPhysicalConnection> lock(*physicalConnection_);
+template <typename PhysicalConnectionType>
+ByteArray WSConnection<PhysicalConnectionType>::receive(std::chrono::milliseconds timeout) const {
+    std::lock_guard<PhysicalConnectionType> lock(*physicalConnection_);
 
     // read the flags byte
     auto data = receiveExactly(*physicalConnection_, 1, timeout);
@@ -129,6 +135,10 @@ ByteArray WSConnection::receive(std::chrono::milliseconds timeout) const {
     return payload;
 }
 
-WSConnectionInfo mocca::net::WSConnection::connectionInfo() const {
+template <typename PhysicalConnectionType> WSConnectionInfo WSConnection<PhysicalConnectionType>::connectionInfo() const {
     return connectionInfo_;
 }
+
+
+template class WSConnection<TCPConnection>;
+template class WSConnection<LoopbackPhysicalConnection>;

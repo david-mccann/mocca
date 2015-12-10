@@ -1,6 +1,5 @@
 #pragma once
 
-#include "mocca/net/IPhysicalConnection.h"
 #include "mocca/net/IProtocolConnection.h"
 
 #include <unordered_map>
@@ -15,9 +14,9 @@ struct WSConnectionInfo {
     std::unordered_map<std::string, std::string> header;
 };
 
-class WSConnection : public IProtocolConnection {
+template <typename PhysicalConnectionType> class WSConnection : public IProtocolConnection {
 public:
-    WSConnection(std::unique_ptr<IPhysicalConnection> physicalConnection, const WSConnectionInfo& connectionInfo);
+    WSConnection(std::unique_ptr<PhysicalConnectionType> physicalConnection, const WSConnectionInfo& connectionInfo);
 
     std::string identifier() const override;
     void send(ByteArray message) const override;
@@ -26,7 +25,7 @@ public:
     WSConnectionInfo connectionInfo() const;
 
 private:
-    std::unique_ptr<IPhysicalConnection> physicalConnection_;
+    std::unique_ptr<PhysicalConnectionType> physicalConnection_;
     WSConnectionInfo connectionInfo_;
 };
 }

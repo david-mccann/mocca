@@ -1,7 +1,7 @@
 #include "mocca/testing/NetworkTesting.h"
 
-#include "mocca/testing/LoopbackPhysicalConnectionAcceptor.h"
 #include "mocca/net/MoccaNetworkService.h"
+#include "mocca/testing/LoopbackPhysicalConnectionAcceptor.h"
 
 #include <chrono>
 

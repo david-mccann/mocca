@@ -1,18 +1,16 @@
 #pragma once
 
 #include "mocca/net/IProtocolConnectionAcceptor.h"
-#include "mocca/net/IPhysicalConnectionAcceptor.h"
-
 
 namespace mocca {
 namespace net {
-class MoccaConnectionAcceptor : public IProtocolConnectionAcceptor {
+template <typename PhysicalConnectionAcceptorType> class MoccaConnectionAcceptor : public IProtocolConnectionAcceptor {
 public:
-    MoccaConnectionAcceptor(std::unique_ptr<IPhysicalConnectionAcceptor> physicalConnectionAcceptor);
+    MoccaConnectionAcceptor(std::unique_ptr<PhysicalConnectionAcceptorType> physicalConnectionAcceptor);
     std::unique_ptr<IProtocolConnection> getConnection(std::chrono::milliseconds timeout) override;
 
 private:
-    std::unique_ptr<IPhysicalConnectionAcceptor> physicalConnectionAcceptor_;
+    std::unique_ptr<PhysicalConnectionAcceptorType> physicalConnectionAcceptor_;
 };
 }
 }

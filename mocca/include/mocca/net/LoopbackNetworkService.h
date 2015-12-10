@@ -6,7 +6,7 @@
 #include <map>
 
 namespace mocca {
-template<typename T> class MessageQueue;
+template <typename T> class MessageQueue;
 namespace net {
 
 class LoopbackNetworkService : public IProtocolNetworkService {

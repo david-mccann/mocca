@@ -24,6 +24,5 @@ private:
 
 bool operator==(const Path& lhs, const Path& rhs);
 Path operator+(const Path& lhs, const std::string& rhs);
-
 }
 }

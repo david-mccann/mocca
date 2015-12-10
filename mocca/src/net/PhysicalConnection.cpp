@@ -1,11 +1,15 @@
 #include "mocca/net/PhysicalConnection.h"
 
+#include "mocca/net/TCPConnection.h"
+#include "mocca/testing/LoopbackPhysicalConnection.h"
+
 #include <algorithm>
 
 using namespace mocca;
 using namespace mocca::net;
 
-ByteArray mocca::net::receiveUntil(IPhysicalConnection& connection, const std::string& delim, std::chrono::milliseconds timeout,
+template <typename PhysicalConnectionType>
+ByteArray mocca::net::receiveUntil(PhysicalConnectionType& connection, const std::string& delim, std::chrono::milliseconds timeout,
                                    uint32_t chunkSize) {
     ByteArray result;
     bool cont = true;
@@ -27,7 +31,8 @@ ByteArray mocca::net::receiveUntil(IPhysicalConnection& connection, const std::s
     return result;
 }
 
-ByteArray mocca::net::receiveExactly(IPhysicalConnection& connection, uint32_t size, std::chrono::milliseconds timeout) {
+template <typename PhysicalConnectionType>
+ByteArray mocca::net::receiveExactly(PhysicalConnectionType& connection, uint32_t size, std::chrono::milliseconds timeout) {
     ByteArray result(size);
     while (result.size() < size) {
         auto chunk = connection.receive(size, timeout);
@@ -38,3 +43,12 @@ ByteArray mocca::net::receiveExactly(IPhysicalConnection& connection, uint32_t s
     }
     return result;
 }
+
+template ByteArray mocca::net::receiveUntil<TCPConnection>(TCPConnection& connection, const std::string& delim,
+                                                           std::chrono::milliseconds timeout, uint32_t chunkSize);
+template ByteArray mocca::net::receiveUntil<LoopbackPhysicalConnection>(LoopbackPhysicalConnection& connection, const std::string& delim,
+                                                                        std::chrono::milliseconds timeout, uint32_t chunkSize);
+
+template ByteArray mocca::net::receiveExactly<TCPConnection>(TCPConnection& connection, uint32_t size, std::chrono::milliseconds timeout);
+template ByteArray mocca::net::receiveExactly<LoopbackPhysicalConnection>(LoopbackPhysicalConnection& connection, uint32_t size,
+                                                                          std::chrono::milliseconds timeout);

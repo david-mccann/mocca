@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
 #include "mocca/base/Error.h"
@@ -27,8 +27,7 @@ template <typename T> std::vector<T> splitString(const std::string& str, char de
 template <typename T> std::string formatString(const std::string& str, const T& value) {
     auto pos = str.find("%%");
     if (pos == std::string::npos) {
-        throw Error("Number of placeholders does not match number of arguments", __FILE__,
-                          __LINE__);
+        throw Error("Number of placeholders does not match number of arguments", __FILE__, __LINE__);
     }
 
     std::ostringstream oss;
@@ -38,8 +37,7 @@ template <typename T> std::string formatString(const std::string& str, const T& 
     std::string result = str;
     return result.replace(pos, 2, valueStr);
 }
-template <typename T, typename... Args>
-std::string formatString(const std::string& str, const T& value, const Args&... args) {
+template <typename T, typename... Args> std::string formatString(const std::string& str, const T& value, const Args&... args) {
     return formatString(formatString(str, value), args...);
 }
 
@@ -58,8 +56,7 @@ template <typename T> std::string joinString(const T& value) {
     oss << value;
     return oss.str();
 }
-template <typename T, typename... Args>
-std::string joinString(const T& value, const Args&... args) {
+template <typename T, typename... Args> std::string joinString(const T& value, const Args&... args) {
     return joinString(value) + joinString(args...);
 }
 }

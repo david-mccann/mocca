@@ -1,7 +1,7 @@
 #pragma once
 
-#include "mocca/net/IProtocolNetworkService.h"
 #include "mocca/net/Endpoint.h"
+#include "mocca/net/IProtocolNetworkService.h"
 
 #include <vector>
 

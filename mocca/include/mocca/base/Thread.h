@@ -1,10 +1,10 @@
 #pragma once
 
 #include <atomic>
+#include <memory>
 #include <mutex>
 #include <thread>
 #include <vector>
-#include <memory>
 
 namespace mocca {
 class AutoJoinThread {

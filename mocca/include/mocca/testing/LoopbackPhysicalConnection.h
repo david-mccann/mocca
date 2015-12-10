@@ -1,7 +1,5 @@
 #pragma once
 
-#include "mocca/net/IPhysicalConnection.h"
-
 #include <mutex>
 
 namespace mocca {
@@ -11,7 +9,7 @@ class ByteArray;
 
 namespace net {
 
-class LoopbackPhysicalConnection : public IPhysicalConnection {
+class LoopbackPhysicalConnection {
 public:
     enum class Signal { Disconnect };
 
@@ -19,14 +17,14 @@ public:
     using LoopbackSignalQueue = MessageQueue<Signal>;
 
     LoopbackPhysicalConnection(std::shared_ptr<LoopbackMessageQueue> sendQueue, std::shared_ptr<LoopbackMessageQueue> receiveQueue,
-                           std::shared_ptr<LoopbackSignalQueue> outSignalQueue, std::shared_ptr<LoopbackSignalQueue> inSignalQueue);
+                               std::shared_ptr<LoopbackSignalQueue> outSignalQueue, std::shared_ptr<LoopbackSignalQueue> inSignalQueue);
     ~LoopbackPhysicalConnection();
 
-    std::string identifier() const override;
-    void lock() override;
-    void unlock() override;
-    void send(ByteArray message, std::chrono::milliseconds timeout) const override;
-    ByteArray receive(uint32_t maxSize, std::chrono::milliseconds timeout) const override;
+    std::string identifier() const;
+    void lock();
+    void unlock();
+    void send(ByteArray message, std::chrono::milliseconds timeout = std::chrono::milliseconds(10)) const;
+    ByteArray receive(uint32_t maxSize, std::chrono::milliseconds timeout = std::chrono::milliseconds(10)) const;
 
 private:
     static std::string createIdentifier();

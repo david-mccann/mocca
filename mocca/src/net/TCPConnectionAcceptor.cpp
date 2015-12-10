@@ -20,7 +20,7 @@ TCPConnectionAcceptor::TCPConnectionAcceptor(int port)
     }
 }
 
-std::unique_ptr<IPhysicalConnection> TCPConnectionAcceptor::getConnection(std::chrono::milliseconds timeout) {
+std::unique_ptr<TCPConnection> TCPConnectionAcceptor::getConnection(std::chrono::milliseconds timeout) {
     IVDA::TCPSocket* connectionSocket = nullptr;
     try {
         server_.AcceptNewConnection((IVDA::ConnectionSocket**)&connectionSocket, static_cast<uint32_t>(timeout.count()));

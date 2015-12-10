@@ -1,16 +1,16 @@
 #include "mocca/base/ByteArray.h"
 #include "mocca/base/MessageQueue.h"
 #include "mocca/net/Error.h"
-#include "mocca/testing/LoopbackPhysicalConnection.h"
 #include "mocca/net/LoopbackNetworkService.h"
+#include "mocca/testing/LoopbackPhysicalConnection.h"
 
 namespace mocca {
 namespace net {
 
 LoopbackPhysicalConnection::LoopbackPhysicalConnection(std::shared_ptr<LoopbackMessageQueue> sendQueue,
-                                               std::shared_ptr<LoopbackMessageQueue> receiveQueue,
-                                               std::shared_ptr<LoopbackSignalQueue> outSignalQueue,
-                                               std::shared_ptr<LoopbackSignalQueue> inSignalQueue)
+                                                       std::shared_ptr<LoopbackMessageQueue> receiveQueue,
+                                                       std::shared_ptr<LoopbackSignalQueue> outSignalQueue,
+                                                       std::shared_ptr<LoopbackSignalQueue> inSignalQueue)
     : identifier_(createIdentifier())
     , sendQueue_(sendQueue)
     , receiveQueue_(receiveQueue)

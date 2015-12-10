@@ -251,8 +251,7 @@ void ByteArray::resetReadPos() {
     readPos_ = 0;
 }
 
-std::string readAt(const ByteArray & byteArray, uint32_t index, uint32_t size)
-{
+std::string readAt(const ByteArray& byteArray, uint32_t index, uint32_t size) {
 #ifdef MOCCA_RUNTIME_CHECKS
     if (index + size > byteArray.size()) {
         throw Error("Index out of bounds", __FILE__, __LINE__);
@@ -260,5 +259,4 @@ std::string readAt(const ByteArray & byteArray, uint32_t index, uint32_t size)
 #endif
     return std::string((char*)(byteArray.data() + index), size);
 }
-
 }

@@ -1,19 +1,22 @@
 #include "mocca/net/MoccaConnection.h"
 #include "mocca/net/PhysicalConnection.h"
+#include "mocca/net/TCPConnection.h"
+#include "mocca/testing/LoopbackPhysicalConnection.h"
 
 #include <mutex>
 
 using namespace mocca;
 using namespace mocca::net;
 
-mocca::net::MoccaConnection::MoccaConnection(std::unique_ptr<IPhysicalConnection> physicalConnection)
+template <typename PhysicalConnectionType>
+MoccaConnection<PhysicalConnectionType>::MoccaConnection(std::unique_ptr<PhysicalConnectionType> physicalConnection)
     : physicalConnection_(std::move(physicalConnection)) {}
 
-std::string MoccaConnection::identifier() const {
+template <typename PhysicalConnectionType> std::string MoccaConnection<PhysicalConnectionType>::identifier() const {
     return physicalConnection_->identifier();
 }
 
-void MoccaConnection::send(ByteArray message) const {
+template <typename PhysicalConnectionType> void MoccaConnection<PhysicalConnectionType>::send(ByteArray message) const {
     // fixme: performance loss; implement prepend method for ByteArray
     ByteArray newMessage(message.size() + sizeof(uint32_t));
     newMessage << message.size();
@@ -21,8 +24,9 @@ void MoccaConnection::send(ByteArray message) const {
     physicalConnection_->send(std::move(newMessage));
 }
 
-ByteArray MoccaConnection::receive(std::chrono::milliseconds timeout) const {
-    std::lock_guard<IPhysicalConnection> lock(*physicalConnection_);
+template <typename PhysicalConnectionType>
+ByteArray MoccaConnection<PhysicalConnectionType>::receive(std::chrono::milliseconds timeout) const {
+    std::lock_guard<PhysicalConnectionType> lock(*physicalConnection_);
     auto sizeData = receiveExactly(*physicalConnection_, sizeof(uint32_t), timeout);
     if (sizeData.isEmpty()) {
         return ByteArray();
@@ -31,3 +35,6 @@ ByteArray MoccaConnection::receive(std::chrono::milliseconds timeout) const {
     auto data = receiveExactly(*physicalConnection_, size, timeout);
     return data;
 }
+
+template class MoccaConnection<TCPConnection>;
+template class MoccaConnection<LoopbackPhysicalConnection>;
