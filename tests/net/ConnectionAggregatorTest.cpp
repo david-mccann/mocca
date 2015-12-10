@@ -58,7 +58,6 @@ TYPED_TEST(ConnectionAggregatorTest, EnqueueDequeue) {
 }
 
 TYPED_TEST(ConnectionAggregatorTest, SendReceiveParallel) {
-    TypeParam network;
     auto acceptor = this->service->bind(createBindingAddress<TypeParam>());
     ConnectionAggregator target(std::move(acceptor));
     auto clientConnection1 = this->service->connect(createAddress<TypeParam>());
