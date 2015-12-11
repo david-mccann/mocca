@@ -5,9 +5,9 @@
 namespace mocca {
 namespace net {
 
-template <typename FramingProtocolType, typename StreamType> class StreamFramingConnection : public IMessageConnection {
+template <typename ProtocolType, typename StreamType> class FramingConnection : public IMessageConnection {
 public:
-    StreamFramingConnection(std::unique_ptr<StreamType> stream) : stream_(std::move(stream)) {}
+    FramingConnection(std::unique_ptr<StreamType> stream) : stream_(std::move(stream)) {}
 
     std::string identifier() const override;
     void send(ByteArray message, std::chrono::milliseconds timeout) const override;

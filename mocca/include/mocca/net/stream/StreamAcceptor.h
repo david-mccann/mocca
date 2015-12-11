@@ -5,7 +5,7 @@
 namespace mocca {
 namespace net {
 
-template <typename Derived, typename StreamType> class StreamAcceptorBase {
+template <typename Derived, typename StreamType> class StreamAcceptor {
 public:
     using Stream_Type = StreamType;
     std::unique_ptr<StreamType> accept(std::chrono::milliseconds timeout) {

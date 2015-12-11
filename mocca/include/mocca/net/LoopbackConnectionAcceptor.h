@@ -13,7 +13,7 @@
 //
 //public:
 //    LoopbackConnectionAcceptor(std::shared_ptr<LoopbackConnectionQueue> connectionQueue);
-//    virtual std::unique_ptr<IProtocolConnection> getConnection(std::chrono::milliseconds timeout) override;
+//    virtual std::unique_ptr<IProtocolConnection> accept(std::chrono::milliseconds timeout) override;
 //
 //private:
 //    std::shared_ptr<LoopbackConnectionQueue> connectionQueue_;

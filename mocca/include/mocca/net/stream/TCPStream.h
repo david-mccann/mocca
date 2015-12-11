@@ -1,20 +1,19 @@
 #pragma once
 
 #include "mocca/base/ByteArray.h"
-#include "mocca/net/stream/StreamBase.h"
+#include "mocca/net/stream/Stream.h"
 #include "mocca/net/stream/Sockets.h"
 #include "mocca/net/stream/TCPNetworkAddress.h"
 
 namespace mocca {
 namespace net {
 
-class TCPConnection : public StreamBase<TCPConnection> {
-    friend class StreamBase<TCPConnection>;
-    friend class TCPConnectionAcceptor;
+class TCPStream : public Stream<TCPStream> {
+    friend class Stream<TCPStream>;
 
 public:
-    TCPConnection(const TCPConnection& other) = delete;
-    ~TCPConnection();
+    TCPStream(std::unique_ptr<IVDA::ConnectionSocket> socket);
+    ~TCPStream();
 
 private:
     std::string identifierImpl() const;
@@ -24,8 +23,6 @@ private:
     static std::string createIdentifier();
 
 private:
-    TCPConnection(std::unique_ptr<IVDA::ConnectionSocket> socket);
-
     std::unique_ptr<IVDA::ConnectionSocket> socket_;
     std::string identifier_;
 };

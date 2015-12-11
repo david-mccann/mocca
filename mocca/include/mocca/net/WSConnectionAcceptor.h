@@ -8,7 +8,7 @@
 //template <typename PhysicalConnectionAcceptorType> class WSConnectionAcceptor : public IProtocolConnectionAcceptor {
 //public:
 //    WSConnectionAcceptor(std::unique_ptr<PhysicalConnectionAcceptorType> physicalConnectionAcceptor);
-//    std::unique_ptr<IProtocolConnection> getConnection(std::chrono::milliseconds timeout) override;
+//    std::unique_ptr<IProtocolConnection> accept(std::chrono::milliseconds timeout) override;
 //
 //private:
 //    std::unique_ptr<PhysicalConnectionAcceptorType> physicalConnectionAcceptor_;

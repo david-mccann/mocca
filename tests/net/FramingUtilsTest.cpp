@@ -2,26 +2,28 @@
 
 #include "mocca/base/ByteArray.h"
 #include "mocca/base/MessageQueue.h"
-#include "mocca/net/stream/MessageQueueStream.h"
 #include "mocca/net/framing/FramingUtils.h"
+#include "mocca/net/stream/MessageQueueStream.h"
 
 using namespace mocca;
 using namespace mocca::net;
 
 class FramingUtilsTest : public ::testing::Test {
 protected:
-    FramingUtilsTest() {
-    }
+    FramingUtilsTest() {}
 
     virtual ~FramingUtilsTest() {
         // You can do clean-up work that doesn't throw exceptions here.
     }
 
     std::unique_ptr<MessageQueueStream> createFilledStream(char from, char to) {
-        std::unique_ptr<MessageQueueStream> stream(new MessageQueueStream());
+        auto receiveQueue = std::make_shared<MessageQueueStream::LoopbackMessageQueue>();
         for (unsigned char c = from; c <= to; ++c) {
-            stream->write(std::move(ByteArray() << c));
+            receiveQueue->enqueue(c);
         }
+        std::unique_ptr<MessageQueueStream> stream(new MessageQueueStream(
+            std::make_shared<MessageQueueStream::LoopbackMessageQueue>(), receiveQueue,
+            std::make_shared<MessageQueueStream::LoopbackSignalQueue>(), std::make_shared<MessageQueueStream::LoopbackSignalQueue>()));
         return stream;
     }
 };
@@ -46,7 +48,7 @@ TEST_F(FramingUtilsTest, ReceiveExactly_InsufficientData) {
 }
 
 TEST_F(FramingUtilsTest, ReceiveExactly_NoData) {
-    std::unique_ptr<MessageQueueStream> stream(new MessageQueueStream());
+    auto stream = createFilledStream('a', 'a' - 1);
     auto result = readExactly(*stream, 1, std::chrono::milliseconds(1));
     ASSERT_EQ(0, result.size());
 }

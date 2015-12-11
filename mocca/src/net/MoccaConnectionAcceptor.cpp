@@ -1,6 +1,6 @@
 //#include "mocca/net/MoccaConnection.h"
 //#include "mocca/net/MoccaConnectionAcceptor.h"
-//#include "mocca/net/stream/TCPConnectionAcceptor.h"
+//#include "mocca/net/stream/TCPStreamAcceptor.h"
 //#include "mocca/testing/LoopbackPhysicalConnectionAcceptor.h"
 //
 //using namespace mocca::net;
@@ -12,8 +12,8 @@
 //
 //template <typename PhysicalConnectionAcceptorType>
 //std::unique_ptr<IProtocolConnection>
-//MoccaConnectionAcceptor<PhysicalConnectionAcceptorType>::getConnection(std::chrono::milliseconds timeout) {
-//    auto physicalConnection = physicalConnectionAcceptor_->getConnection(timeout);
+//MoccaConnectionAcceptor<PhysicalConnectionAcceptorType>::accept(std::chrono::milliseconds timeout) {
+//    auto physicalConnection = physicalConnectionAcceptor_->accept(timeout);
 //    if (physicalConnection != nullptr) {
 //        using ConnectionType = typename PhysicalConnectionAcceptorType::ConnectionType;
 //        return std::unique_ptr<IProtocolConnection>(new MoccaConnection<ConnectionType>(std::move(physicalConnection)));

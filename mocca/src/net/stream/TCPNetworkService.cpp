@@ -13,15 +13,15 @@
 //#include "mocca/base/ByteArray.h"
 //#include "mocca/base/StringTools.h"
 //#include "mocca/net/Error.h"
-//#include "mocca/net/stream/TCPConnection.h"
-//#include "mocca/net/stream/TCPConnectionAcceptor.h"
+//#include "mocca/net/stream/TCPStream.h"
+//#include "mocca/net/stream/TCPStreamAcceptor.h"
 //#include "mocca/net/stream/TCPNetworkAddress.h"
 //#include "mocca/net/stream/TCPNetworkService.h"
 //
 //namespace mocca {
 //namespace net {
 //
-//std::unique_ptr<TCPConnection> TCPNetworkService::connect(const std::string& address) {
+//std::unique_ptr<TCPStream> TCPNetworkService::connect(const std::string& address) {
 //    TCPNetworkAddress networkAddress(address);
 //    auto socket = std::unique_ptr<IVDA::TCPSocket>(new IVDA::TCPSocket());
 //    socket->SetNonBlocking(true);
@@ -34,16 +34,16 @@
 //        std::string internalError = mocca::joinString(err.what(), ", ", err.internalError());
 //        throw NetworkError("Network error in connect operation (internal error: " + internalError + ")", __FILE__, __LINE__);
 //    }
-//    return std::unique_ptr<TCPConnection>(new TCPConnection(std::move(socket)));
+//    return std::unique_ptr<TCPStream>(new TCPStream(std::move(socket)));
 //}
 //
 //std::string mocca::net::TCPNetworkService::protocol() {
 //    return "tcp";
 //}
 //
-//std::unique_ptr<TCPConnectionAcceptor> TCPNetworkService::bind(const std::string& portString) {
+//std::unique_ptr<TCPStreamAcceptor> TCPNetworkService::bind(const std::string& portString) {
 //    int port = TCPNetworkAddress::parsePort(portString);
-//    return std::unique_ptr<TCPConnectionAcceptor>(new TCPConnectionAcceptor(port));
+//    return std::unique_ptr<TCPStreamAcceptor>(new TCPStreamAcceptor(port));
 //}
 //
 //#ifdef WIN32

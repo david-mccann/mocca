@@ -3,7 +3,7 @@
 //#include "mocca/base/Endian.h"
 //#include "mocca/net/Error.h"
 //#include "mocca/net/PhysicalConnection.h"
-//#include "mocca/net/stream/TCPConnection.h"
+//#include "mocca/net/stream/TCPStream.h"
 //#include "mocca/testing/LoopbackPhysicalConnection.h"
 //
 //#include <limits>

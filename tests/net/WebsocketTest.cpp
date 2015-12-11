@@ -68,7 +68,7 @@
 //    auto& lbService = wsService.physicalService();
 //    auto lbClientConnection = lbService.connect("mq");
 //    lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
-//    auto wsServerConnection = wsAcceptor->getConnection();
+//    auto wsServerConnection = wsAcceptor->accept();
 //
 //    unsigned char payloadSize = 125;
 //    ByteArray data(payloadSize + 6); // 6 bytes header
@@ -89,7 +89,7 @@
 //    auto& lbService = wsService.physicalService();
 //    auto lbClientConnection = lbService.connect("mq");
 //    lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
-//    auto wsServerConnection = wsAcceptor->getConnection();
+//    auto wsServerConnection = wsAcceptor->accept();
 //
 //    uint16_t payloadSize = 40000;
 //    uint16_t payloadSizeBE = swap_uint16(payloadSize);
@@ -112,7 +112,7 @@
 //    auto& lbService = wsService.physicalService();
 //    auto lbClientConnection = lbService.connect("mq");
 //    lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
-//    auto wsServerConnection = wsAcceptor->getConnection();
+//    auto wsServerConnection = wsAcceptor->accept();
 //
 //    uint64_t payloadSize = 70000;
 //    uint64_t payloadSizeBE = swap_uint64(payloadSize);
@@ -135,7 +135,7 @@
 //    auto& lbService = wsService.physicalService();
 //    auto lbClientConnection = lbService.connect("mq");
 //    lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
-//    auto wsServerConnection = wsAcceptor->getConnection();
+//    auto wsServerConnection = wsAcceptor->accept();
 //    readUntil(*lbClientConnection, "\r\n\r\n"); // remove hanshake response from client buffer
 //
 //    unsigned char payloadSize = 125;
@@ -158,7 +158,7 @@
 //    auto& lbService = wsService.physicalService();
 //    auto lbClientConnection = lbService.connect("mq");
 //    lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
-//    auto wsServerConnection = wsAcceptor->getConnection();
+//    auto wsServerConnection = wsAcceptor->accept();
 //    readUntil(*lbClientConnection, "\r\n\r\n"); // remove hanshake response from client buffer
 //
 //    uint16_t payloadSize = 40000;
@@ -183,7 +183,7 @@
 //    auto& lbService = wsService.physicalService();
 //    auto lbClientConnection = lbService.connect("mq");
 //    lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
-//    auto wsServerConnection = wsAcceptor->getConnection();
+//    auto wsServerConnection = wsAcceptor->accept();
 //    readUntil(*lbClientConnection, "\r\n\r\n"); // remove hanshake response from client buffer
 //
 //    uint64_t payloadSize = 70000;
@@ -208,7 +208,7 @@
 //    auto& lbService = wsService.physicalService();
 //    auto lbClientConnection = lbService.connect("mq");
 //    lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
-//    auto wsServerConnection = wsAcceptor->getConnection();
+//    auto wsServerConnection = wsAcceptor->accept();
 //    const unsigned char closeData[] = {0x88};
 //    lbClientConnection->send(ByteArray::createFromRaw(&closeData, 1));
 //    ASSERT_THROW(wsServerConnection->receive(), ConnectionClosedError);

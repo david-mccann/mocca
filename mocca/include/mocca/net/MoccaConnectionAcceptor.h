@@ -7,7 +7,7 @@
 //template <typename PhysicalConnectionAcceptorType> class MoccaConnectionAcceptor : public IProtocolConnectionAcceptor {
 //public:
 //    MoccaConnectionAcceptor(std::unique_ptr<PhysicalConnectionAcceptorType> physicalConnectionAcceptor);
-//    std::unique_ptr<IProtocolConnection> getConnection(std::chrono::milliseconds timeout) override;
+//    std::unique_ptr<IProtocolConnection> accept(std::chrono::milliseconds timeout) override;
 //
 //private:
 //    std::unique_ptr<PhysicalConnectionAcceptorType> physicalConnectionAcceptor_;

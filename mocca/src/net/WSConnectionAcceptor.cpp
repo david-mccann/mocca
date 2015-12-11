@@ -1,7 +1,7 @@
 //#include "mocca/net/WSConnectionAcceptor.h"
 //
 //#include "mocca/net/PhysicalConnection.h"
-//#include "mocca/net/stream/TCPConnectionAcceptor.h"
+//#include "mocca/net/stream/TCPStreamAcceptor.h"
 //#include "mocca/net/WSConnection.h"
 //#include "mocca/net/WSHandshake.h"
 //#include "mocca/testing/LoopbackPhysicalConnectionAcceptor.h"
@@ -18,8 +18,8 @@
 //
 //template <typename PhysicalConnectionAcceptorType>
 //std::unique_ptr<IProtocolConnection>
-//WSConnectionAcceptor<PhysicalConnectionAcceptorType>::getConnection(std::chrono::milliseconds timeout) {
-//    auto physicalConnection = physicalConnectionAcceptor_->getConnection(timeout);
+//WSConnectionAcceptor<PhysicalConnectionAcceptorType>::accept(std::chrono::milliseconds timeout) {
+//    auto physicalConnection = physicalConnectionAcceptor_->accept(timeout);
 //    if (physicalConnection == nullptr) {
 //        return nullptr;
 //    }

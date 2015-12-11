@@ -1,6 +1,6 @@
 #include "mocca/net/framing/SizePrefixedProtocol.h"
 
-#include "mocca/net/stream/TCPConnection.h"
+#include "mocca/net/stream/TCPStream.h"
 #include "mocca/net/stream/MessageQueueStream.h"
 
 using namespace mocca;
@@ -33,5 +33,5 @@ void SizePrefixedProtocol<StreamType>::performHandshakeImpl(StreamType & stream,
     // nothing to do
 }
 
-template class SizePrefixedProtocol<TCPConnection>;
+template class SizePrefixedProtocol<TCPStream>;
 template class SizePrefixedProtocol<MessageQueueStream>;

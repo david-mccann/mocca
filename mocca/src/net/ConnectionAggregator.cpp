@@ -44,7 +44,7 @@
 //void ConnectionAggregator::run() {
 //    try {
 //        while (!isInterrupted()) {
-//            auto connection = connectionAcceptor_->getConnection(std::chrono::milliseconds(100));
+//            auto connection = connectionAcceptor_->accept(std::chrono::milliseconds(100));
 //            if (connection != nullptr) {
 //                auto sendRunnable = std::unique_ptr<SendThread>(new SendThread(*connection, sendQueue_));
 //                auto receiveRunnable = std::unique_ptr<ReceiveThread>(new ReceiveThread(*connection, receiveQueue_));

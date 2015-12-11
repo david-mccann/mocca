@@ -1,7 +1,7 @@
 #include "mocca/net/framing/FramingUtils.h"
 
 #include "mocca/net/stream/MessageQueueStream.h"
-#include "mocca/net/stream/TCPConnection.h"
+#include "mocca/net/stream/TCPStream.h"
 
 #include <algorithm>
 
@@ -42,11 +42,11 @@ template <typename StreamType> ByteArray mocca::net::readExactly(StreamType& str
     return result;
 }
 
-template ByteArray mocca::net::readUntil<TCPConnection>(TCPConnection& stream, const std::string& delim, std::chrono::milliseconds timeout,
+template ByteArray mocca::net::readUntil<TCPStream>(TCPStream& stream, const std::string& delim, std::chrono::milliseconds timeout,
                                                         uint32_t chunkSize);
 template ByteArray mocca::net::readUntil<MessageQueueStream>(MessageQueueStream& stream, const std::string& delim,
                                                              std::chrono::milliseconds timeout, uint32_t chunkSize);
 
-template ByteArray mocca::net::readExactly<TCPConnection>(TCPConnection& stream, uint32_t size, std::chrono::milliseconds timeout);
+template ByteArray mocca::net::readExactly<TCPStream>(TCPStream& stream, uint32_t size, std::chrono::milliseconds timeout);
 template ByteArray mocca::net::readExactly<MessageQueueStream>(MessageQueueStream& stream, uint32_t size,
                                                                std::chrono::milliseconds timeout);
