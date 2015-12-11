@@ -14,11 +14,11 @@ public:
         return static_cast<const Derived*>(this)->identifierImpl();
     }
 
-    ByteArray receive(uint32_t maxSize, std::chrono::milliseconds timeout = std::chrono::milliseconds(100)) { // fixme: rename to read
+    ByteArray read(uint32_t maxSize, std::chrono::milliseconds timeout = std::chrono::milliseconds(100)) {
         return static_cast<Derived*>(this)->readImpl(maxSize, timeout);
     }
 
-    void send(ByteArray data, std::chrono::milliseconds timeout = std::chrono::milliseconds(100)) { // fixme: rename to write
+    void write(ByteArray data, std::chrono::milliseconds timeout = std::chrono::milliseconds(100)) {
         static_cast<Derived*>(this)->writeImpl(std::move(data), timeout);
     }
 
