@@ -1,0 +1,21 @@
+#pragma once
+
+#include <chrono>
+#include <string>
+
+#include "mocca/base/ByteArray.h"
+
+namespace mocca {
+
+namespace net {
+
+class IMessageConnection {
+public:
+    virtual ~IMessageConnection() {}
+
+    virtual std::string identifier() const = 0;
+    virtual void send(ByteArray message, std::chrono::milliseconds timeout) const = 0;
+    virtual ByteArray receive(std::chrono::milliseconds timeout = std::chrono::milliseconds(100)) const = 0;
+};
+}
+}

@@ -3,6 +3,7 @@
 #include "mocca/base/ByteArray.h"
 
 #include <memory>
+#include <chrono>
 
 namespace mocca {
 namespace net {
@@ -12,9 +13,12 @@ public:
     FramingProtocolBase(std::unique_ptr<IOStreamType> ioStream)
         : ioStream_(std::move(ioStream)) {}
 
-    ByteArray readFrameFromStream() { return static_cast<Derived*>(this)->readFrameFromStreamImpl(); }
-
-    void writeFrameToStream(ByteArray frame) { static_cast<Derived*>(this)->writeFrameToStreamImpl(std::move(frame)); }
+    ByteArray readFrameFromStream(std::chrono::milliseconds timeout) const {
+        return static_cast<const Derived*>(this)->readFrameFromStreamImpl(timeout);
+    }
+    void writeFrameToStream(ByteArray frame, std::chrono::milliseconds timeout) const {
+        static_cast<const Derived*>(this)->writeFrameToStreamImpl(std::move(frame), timeout);
+    }
 
 protected:
     std::unique_ptr<IOStreamType> ioStream_;
