@@ -8,20 +8,19 @@
 namespace mocca {
 namespace net {
 
-template <typename Derived, typename IOStreamType> class FramingProtocolBase {
+template <typename Derived, typename StreamType> class FramingProtocolBase {
 public:
-    FramingProtocolBase(std::unique_ptr<IOStreamType> ioStream)
-        : ioStream_(std::move(ioStream)) {}
-
-    ByteArray readFrameFromStream(std::chrono::milliseconds timeout) const {
-        return static_cast<const Derived*>(this)->readFrameFromStreamImpl(timeout);
-    }
-    void writeFrameToStream(ByteArray frame, std::chrono::milliseconds timeout) const {
-        static_cast<const Derived*>(this)->writeFrameToStreamImpl(std::move(frame), timeout);
+    static ByteArray readFrameFromStream(StreamType& stream, std::chrono::milliseconds timeout) {
+        return Derived::readFrameFromStreamImpl(stream, timeout);
     }
 
-protected:
-    std::unique_ptr<IOStreamType> ioStream_;
+    static void writeFrameToStream(StreamType& stream, ByteArray frame, std::chrono::milliseconds timeout) {
+        Derived::writeFrameToStreamImpl(stream, std::move(frame), timeout);
+    }
+
+    static void performHandshake(StreamType& stream, std::chrono::milliseconds timeout) {
+        Derived::performHandshakeImpl(stream, timeout);
+    }
 };
 }
 }

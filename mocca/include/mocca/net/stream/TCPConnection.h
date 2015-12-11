@@ -1,16 +1,15 @@
 #pragma once
 
 #include "mocca/base/ByteArray.h"
-#include "mocca/net/stream/IOStreamBase.h"
+#include "mocca/net/stream/StreamBase.h"
 #include "mocca/net/stream/Sockets.h"
 #include "mocca/net/stream/TCPNetworkAddress.h"
 
 namespace mocca {
 namespace net {
 
-class TCPConnection : public IOStreamBase<TCPConnection> {
-    friend class IOStreamBase<TCPConnection>;
-    friend class TCPNetworkService;
+class TCPConnection : public StreamBase<TCPConnection> {
+    friend class StreamBase<TCPConnection>;
     friend class TCPConnectionAcceptor;
 
 public:

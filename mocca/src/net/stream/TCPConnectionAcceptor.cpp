@@ -7,12 +7,13 @@
 namespace mocca {
 namespace net {
 
-TCPConnectionAcceptor::TCPConnectionAcceptor(int port)
-    : port_(port) {
+TCPConnectionAcceptor::TCPConnectionAcceptor(const std::string& port)
+    : port_(std::stoi(port)) {
+
     try {
         server_.SetReuseAddress(true);
         server_.SetNonBlocking(true);
-        server_.Bind(IVDA::NetworkAddress(IVDA::NetworkAddress::Any, port));
+        server_.Bind(IVDA::NetworkAddress(IVDA::NetworkAddress::Any, port_));
         server_.Listen(3); // ???
     } catch (const IVDA::SocketException& err) {
         std::string internalError = mocca::joinString(err.what(), ", ", err.internalError());
@@ -20,7 +21,7 @@ TCPConnectionAcceptor::TCPConnectionAcceptor(int port)
     }
 }
 
-std::unique_ptr<TCPConnection> TCPConnectionAcceptor::getConnection(std::chrono::milliseconds timeout) {
+std::unique_ptr<TCPConnection> TCPConnectionAcceptor::acceptImpl(std::chrono::milliseconds timeout) {
     IVDA::TCPSocket* connectionSocket = nullptr;
     try {
         server_.AcceptNewConnection((IVDA::ConnectionSocket**)&connectionSocket, static_cast<uint32_t>(timeout.count()));

@@ -1,12 +1,12 @@
 #pragma once
 
 #include "mocca/base/MessageQueue.h"
-#include "mocca/net/stream/IOStreamBase.h"
+#include "mocca/net/stream/StreamBase.h"
 
 namespace mocca {
 namespace net {
-class MessageQueueStream : public IOStreamBase<MessageQueueStream> {
-friend class IOStreamBase<MessageQueueStream>;
+class MessageQueueStream : public StreamBase<MessageQueueStream> {
+friend class StreamBase<MessageQueueStream>;
 private:
     ByteArray readImpl(uint32_t maxSize, std::chrono::milliseconds timeout);
     void writeImpl(ByteArray data, std::chrono::milliseconds timeout);

@@ -3,22 +3,20 @@
 #include <deque>
 
 #include "mocca/net/stream/TCPConnection.h"
+#include "mocca/net/stream/StreamAcceptorBase.h"
 
 namespace mocca {
 namespace net {
 
-class TCPConnectionAcceptor {
+class TCPConnectionAcceptor : public StreamAcceptorBase<TCPConnectionAcceptor, TCPConnection> {
 public:
-    using ConnectionType = TCPConnection;
-
-    TCPConnectionAcceptor(const TCPConnectionAcceptor& other) = delete;
-    std::unique_ptr<TCPConnection> getConnection(std::chrono::milliseconds timeout);
+    friend class StreamAcceptorBase<TCPConnectionAcceptor, TCPConnection>;
+    TCPConnectionAcceptor(const std::string& port);
 
 private:
-    friend class TCPNetworkService;
+    std::unique_ptr<TCPConnection> acceptImpl(std::chrono::milliseconds timeout);
 
-    TCPConnectionAcceptor(int port);
-
+private:
     int port_;
     IVDA::TCPServer server_;
 };

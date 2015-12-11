@@ -6,14 +6,14 @@
 namespace mocca {
 namespace net {
 
-template <typename IOStreamType> class SizePrefixedProtocol : public FramingProtocolBase<SizePrefixedProtocol<IOStreamType>, IOStreamType> {
+template <typename StreamType> class SizePrefixedProtocol : public FramingProtocolBase<SizePrefixedProtocol<StreamType>, StreamType> {
 public:
-    friend class FramingProtocolBase<SizePrefixedProtocol<IOStreamType>, IOStreamType>;
-    using FramingProtocolBase::FramingProtocolBase; // inherit constructor
+    friend class FramingProtocolBase<SizePrefixedProtocol<StreamType>, StreamType>;
 
 private:
-    ByteArray readFrameFromStreamImpl(std::chrono::milliseconds timeout) const;
-    void writeFrameToStreamImpl(ByteArray frame, std::chrono::milliseconds timeout) const;
+    static ByteArray readFrameFromStreamImpl(StreamType& stream, std::chrono::milliseconds timeout);
+    static void writeFrameToStreamImpl(StreamType& stream, ByteArray frame, std::chrono::milliseconds timeout);
+    static void performHandshakeImpl(StreamType& stream, std::chrono::milliseconds timeout);
 };
 }
 }

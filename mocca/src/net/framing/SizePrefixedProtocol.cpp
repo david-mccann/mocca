@@ -6,25 +6,31 @@
 using namespace mocca;
 using namespace mocca::net;
 
-template <typename IOStreamType>
-ByteArray SizePrefixedProtocol<IOStreamType>::readFrameFromStreamImpl(std::chrono::milliseconds timeout) const {
-    std::lock_guard<IOStreamType> lock(*ioStream_);
-    auto sizeData = readExactly(*ioStream_, sizeof(uint32_t), timeout);
+template <typename StreamType>
+ByteArray SizePrefixedProtocol<StreamType>::readFrameFromStreamImpl(StreamType& stream, std::chrono::milliseconds timeout) {
+    std::lock_guard<StreamType> lock(stream);
+    auto sizeData = readExactly(stream, sizeof(uint32_t), timeout);
     if (sizeData.isEmpty()) {
         return ByteArray();
     }
     auto frameSize = sizeData.read<uint32_t>();
-    auto frame = readExactly(*ioStream_, frameSize, timeout);
+    auto frame = readExactly(stream, frameSize, timeout);
     return frame;
 }
 
-template <typename IOStreamType>
-void SizePrefixedProtocol<IOStreamType>::writeFrameToStreamImpl(ByteArray frame, std::chrono::milliseconds timeout) const {
+template <typename StreamType>
+void SizePrefixedProtocol<StreamType>::writeFrameToStreamImpl(StreamType& stream, ByteArray frame, std::chrono::milliseconds timeout) {
     // fixme: performance loss; implement prepend method for ByteArray
     ByteArray newFrame(frame.size() + sizeof(uint32_t));
     newFrame << frame.size();
     newFrame.append(frame);
-    ioStream_->write(std::move(newFrame));
+    stream.write(std::move(newFrame));
+}
+
+template<typename StreamType>
+void SizePrefixedProtocol<StreamType>::performHandshakeImpl(StreamType & stream, std::chrono::milliseconds timeout)
+{
+    // nothing to do
 }
 
 template class SizePrefixedProtocol<TCPConnection>;

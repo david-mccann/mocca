@@ -1,44 +1,41 @@
-//#include "gtest/gtest.h"
-//
-//#include "mocca/base/Error.h"
-//#include "mocca/base/Thread.h"
-//#include "mocca/base/ByteArray.h"
-//#include "mocca/testing/LoopbackPhysicalNetworkService.h"
-//#include "mocca/testing/LoopbackPhysicalConnectionAcceptor.h"
-//#include "mocca/net/stream/TCPNetworkService.h"
-//#include "mocca/net/MoccaNetworkService.h"
-//#include "mocca/net/MoccaConnection.h"
-//
-//#include "mocca/testing/NetworkTesting.h"
-//
-//#include <future>
-//#include <algorithm>
-//
-//using namespace mocca;
-//using namespace mocca::net;
-//using namespace mocca::testing;
-//
-//#ifdef MOCCA_TEST_TCP
-//typedef ::testing::Types<LoopbackPhysicalNetworkService, TCPNetworkService> MyTypes;
-//#else
-//typedef ::testing::Types<LoopbackPhysicalNetworkService> MyTypes;
-//#endif
-//TYPED_TEST_CASE(NetworkServiceTest, MyTypes);
-//
-//template<typename T>
-//class NetworkServiceTest : public ::testing::Test {
-//protected:
-//    NetworkServiceTest() {
-//        // You can do set-up work for each test here.
-//        target.reset(new MoccaNetworkService<T>());
-//    }
-//
-//    virtual ~NetworkServiceTest() {
-//        // You can do clean-up work that doesn't throw exceptions here.
-//    }
-//
-//    std::unique_ptr<IProtocolNetworkService> target;
-//};
+#include "gtest/gtest.h"
+
+#include "mocca/base/Error.h"
+#include "mocca/base/Thread.h"
+#include "mocca/base/ByteArray.h"
+#include "mocca/net/message/IMessageConnection.h"
+#include "mocca/net/framing/SizePrefixedProtocol.h"
+#include "mocca/net/message/StreamFramingConnection.h"
+#include "mocca/net/stream/MessageQueueStream.h"
+
+#include <future>
+#include <algorithm>
+
+using namespace mocca;
+using namespace mocca::net;
+
+#ifdef MOCCA_TEST_TCP
+typedef ::testing::Types<LoopbackPhysicalNetworkService, TCPNetworkService> MyTypes;
+#else
+typedef ::testing::Types<SizePrefixedProtocol<MessageQueueStream>> MyTypes;
+#endif
+TYPED_TEST_CASE(NetworkServiceTest, MyTypes);
+
+template<typename T>
+class NetworkServiceTest : public ::testing::Test {
+protected:
+    NetworkServiceTest() {
+        // You can do set-up work for each test here.
+        using StreamType = T::StreamType;
+        target.reset(new StreamFramingConnection<T>(std::unique_ptr<typename StreamType>(new StreamType())));
+    }
+
+    virtual ~NetworkServiceTest() {
+        // You can do clean-up work that doesn't throw exceptions here.
+    }
+
+    std::unique_ptr<IMessageConnection> target;
+};
 //
 //TYPED_TEST(NetworkServiceTest, Identifier)
 //{
@@ -65,7 +62,7 @@
 //        ASSERT_NE(serverConnection1->identifier(), serverConnection2->identifier());
 //    }
 //}
-//
+
 //TYPED_TEST(NetworkServiceTest, AcceptorConnections) {
 //    {
 //        // cannot connect to an unbound port

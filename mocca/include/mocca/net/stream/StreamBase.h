@@ -8,7 +8,7 @@ namespace mocca {
 namespace net {
 
 template <typename Derived>
-class IOStreamBase {
+class StreamBase {
 public:
     std::string identifier() const {
         return static_cast<const Derived*>(this)->identifierImpl();

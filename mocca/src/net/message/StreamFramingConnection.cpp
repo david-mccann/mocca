@@ -7,23 +7,23 @@
 using namespace mocca;
 using namespace mocca::net;
 
-template<typename FramingProtocolType>
-inline std::string StreamFramingConnection<FramingProtocolType>::identifier() const
+template <typename FramingProtocolType, typename StreamType>
+inline std::string StreamFramingConnection<FramingProtocolType, StreamType>::identifier() const
 {
     return std::string(); // fixme: todo
 }
 
-template<typename FramingProtocolType>
-void StreamFramingConnection<FramingProtocolType>::send(ByteArray message, std::chrono::milliseconds timeout) const
+template <typename FramingProtocolType, typename StreamType>
+void StreamFramingConnection<FramingProtocolType, StreamType>::send(ByteArray message, std::chrono::milliseconds timeout) const
 {
-    framingProtocol_.writeFrameToStream(std::move(message), timeout);
+    FramingProtocolType::writeFrameToStream(*stream_, std::move(message), timeout);
 }
 
-template<typename FramingProtocolType>
-ByteArray StreamFramingConnection<FramingProtocolType>::receive(std::chrono::milliseconds timeout) const
+template <typename FramingProtocolType, typename StreamType>
+ByteArray StreamFramingConnection<FramingProtocolType, StreamType>::receive(std::chrono::milliseconds timeout) const
 {
-    return framingProtocol_.readFrameFromStream(timeout);
+    return FramingProtocolType::readFrameFromStream(*stream_, timeout);
 }
 
-template class StreamFramingConnection<SizePrefixedProtocol<TCPConnection>>;
-template class StreamFramingConnection<SizePrefixedProtocol<MessageQueueStream>>;
+template class StreamFramingConnection<SizePrefixedProtocol<TCPConnection>, TCPConnection>;
+template class StreamFramingConnection<SizePrefixedProtocol<MessageQueueStream>, MessageQueueStream>;

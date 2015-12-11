@@ -8,8 +8,8 @@
 using namespace mocca;
 using namespace mocca::net;
 
-template <typename IOStreamType>
-ByteArray mocca::net::readUntil(IOStreamType& stream, const std::string& delim, std::chrono::milliseconds timeout, uint32_t chunkSize) {
+template <typename StreamType>
+ByteArray mocca::net::readUntil(StreamType& stream, const std::string& delim, std::chrono::milliseconds timeout, uint32_t chunkSize) {
     ByteArray result;
     bool cont = true;
     while (cont) {
@@ -30,7 +30,7 @@ ByteArray mocca::net::readUntil(IOStreamType& stream, const std::string& delim, 
     return result;
 }
 
-template <typename IOStreamType> ByteArray mocca::net::readExactly(IOStreamType& stream, uint32_t size, std::chrono::milliseconds timeout) {
+template <typename StreamType> ByteArray mocca::net::readExactly(StreamType& stream, uint32_t size, std::chrono::milliseconds timeout) {
     ByteArray result(size);
     while (result.size() < size) {
         auto chunk = stream.read(size, timeout);
