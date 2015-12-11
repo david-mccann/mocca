@@ -1,4 +1,4 @@
-#include "mocca/net/TCPNetworkAddress.h"
+#include "mocca/net/stream/TCPNetworkAddress.h"
 #include "mocca/net/Error.h"
 
 #include "mocca/base/StringTools.h"

@@ -1,4 +1,4 @@
-#include "mocca/net/TCPConnection.h"
+#include "mocca/net/stream/TCPConnection.h"
 
 #include "mocca/base/StringTools.h"
 
@@ -20,7 +20,7 @@ TCPConnection::~TCPConnection() {
     }
 }
 
-std::string TCPConnection::identifier() const {
+std::string TCPConnection::identifierImpl() const {
     return identifier_;
 }
 
@@ -30,15 +30,7 @@ std::string TCPConnection::createIdentifier() {
     return "tcp_" + std::to_string(count);
 }
 
-void TCPConnection::lock() {
-    mutex_.lock();
-}
-
-void mocca::net::TCPConnection::unlock() {
-    mutex_.unlock();
-}
-
-void TCPConnection::send(ByteArray message, std::chrono::milliseconds timeout) const {
+void TCPConnection::writeImpl(ByteArray message, std::chrono::milliseconds timeout) {
     try {
         socket_->SendData((const int8_t*)message.data(), message.size(), static_cast<uint32_t>(timeout.count()));
     } catch (const IVDA::SocketConnectionException& err) {
@@ -51,7 +43,7 @@ void TCPConnection::send(ByteArray message, std::chrono::milliseconds timeout) c
     }
 }
 
-ByteArray TCPConnection::receive(uint32_t maxSize, std::chrono::milliseconds timeout) const {
+ByteArray TCPConnection::readImpl(uint32_t maxSize, std::chrono::milliseconds timeout) {
     try {
         ByteArray message(maxSize);
         auto bytesRead = socket_->ReceiveData((int8_t*)message.data(), maxSize, static_cast<uint32_t>(timeout.count()));

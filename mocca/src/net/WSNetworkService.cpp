@@ -1,7 +1,7 @@
 #include "mocca/net/WSNetworkService.h"
 
 #include "mocca/net/WSConnectionAcceptor.h"
-#include "mocca/net/TCPNetworkService.h"
+#include "mocca/net/stream/TCPNetworkService.h"
 #include "mocca/testing/LoopbackPhysicalNetworkService.h"
 
 using namespace mocca::net;

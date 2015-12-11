@@ -4,7 +4,7 @@
 #include "mocca/net/LoopbackConnection.h"
 #include "mocca/net/LoopbackConnectionAcceptor.h"
 #include "mocca/net/LoopbackNetworkService.h"
-#include "mocca/net/TCPNetworkAddress.h"
+#include "mocca/net/stream/TCPNetworkAddress.h"
 
 namespace mocca {
 namespace net {

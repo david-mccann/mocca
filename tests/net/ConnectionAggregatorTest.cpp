@@ -6,7 +6,7 @@
 #include "mocca/net/ConnectionAggregator.h"
 #include "mocca/net/Error.h"
 #include "mocca/net/MoccaNetworkService.h"
-#include "mocca/net/TCPNetworkService.h"
+#include "mocca/net/stream/TCPNetworkService.h"
 #include "mocca/testing/LoopbackPhysicalConnectionAcceptor.h"
 #include "mocca/testing/LoopbackPhysicalNetworkService.h"
 

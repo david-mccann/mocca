@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "mocca/net/Error.h"
-#include "mocca/net/stddefines.h"
+#include "mocca/net/stream/stddefines.h"
 
 #ifdef DETECTED_OS_WINDOWS
 // include Sockets.h and other files that include it before anything else that might include windows.h to make sure windwos.h is not included before winsock2.h

@@ -5,7 +5,7 @@
 #include "mocca/base/ByteArray.h"
 #include "mocca/testing/LoopbackPhysicalNetworkService.h"
 #include "mocca/testing/LoopbackPhysicalConnectionAcceptor.h"
-#include "mocca/net/TCPNetworkService.h"
+#include "mocca/net/stream/TCPNetworkService.h"
 #include "mocca/net/MoccaNetworkService.h"
 #include "mocca/net/MoccaConnection.h"
 

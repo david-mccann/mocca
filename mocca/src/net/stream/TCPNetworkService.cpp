@@ -13,10 +13,10 @@
 #include "mocca/base/ByteArray.h"
 #include "mocca/base/StringTools.h"
 #include "mocca/net/Error.h"
-#include "mocca/net/TCPConnection.h"
-#include "mocca/net/TCPConnectionAcceptor.h"
-#include "mocca/net/TCPNetworkAddress.h"
-#include "mocca/net/TCPNetworkService.h"
+#include "mocca/net/stream/TCPConnection.h"
+#include "mocca/net/stream/TCPConnectionAcceptor.h"
+#include "mocca/net/stream/TCPNetworkAddress.h"
+#include "mocca/net/stream/TCPNetworkService.h"
 
 namespace mocca {
 namespace net {

@@ -2,7 +2,7 @@
 
 #include <deque>
 
-#include "mocca/net/TCPConnection.h"
+#include "mocca/net/stream/TCPConnection.h"
 
 namespace mocca {
 namespace net {

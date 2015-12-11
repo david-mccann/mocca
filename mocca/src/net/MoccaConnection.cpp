@@ -1,6 +1,6 @@
 #include "mocca/net/MoccaConnection.h"
 #include "mocca/net/PhysicalConnection.h"
-#include "mocca/net/TCPConnection.h"
+#include "mocca/net/stream/TCPConnection.h"
 #include "mocca/testing/LoopbackPhysicalConnection.h"
 
 #include <mutex>

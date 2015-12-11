@@ -1,8 +1,8 @@
 #pragma once
 
 #include "mocca/net/PhysicalConnection.h"
-#include "mocca/net/TCPConnection.h"
-#include "mocca/net/TCPConnectionAcceptor.h"
+#include "mocca/net/stream/TCPConnection.h"
+#include "mocca/net/stream/TCPConnectionAcceptor.h"
 
 namespace mocca {
 namespace net {

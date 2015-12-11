@@ -1,8 +1,8 @@
-#include "mocca/net/TCPConnectionAcceptor.h"
+#include "mocca/net/stream/TCPConnectionAcceptor.h"
 
 #include "mocca/base/StringTools.h"
 #include "mocca/log/LogManager.h"
-#include "mocca/net/Sockets.h"
+#include "mocca/net/stream/Sockets.h"
 
 namespace mocca {
 namespace net {

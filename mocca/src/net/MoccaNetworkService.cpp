@@ -1,16 +1,12 @@
 #include "mocca/net/MoccaNetworkService.h"
 
-#include "mocca/net/TCPNetworkService.h"
+#include "mocca/net/stream/TCPNetworkService.h"
 #include "mocca/testing/LoopbackPhysicalNetworkService.h"
 
 using namespace mocca::net;
 
-template <typename PhysicalServiceType> std::string MoccaNetworkService<PhysicalServiceType>::protocolStatic() {
-    return "mocca." + PhysicalServiceType::protocol();
-}
-
 template <typename PhysicalServiceType> std::string MoccaNetworkService<PhysicalServiceType>::protocol() const {
-    return protocolStatic();
+    return "mocca." + PhysicalServiceType::protocol();
 }
 
 template <typename PhysicalServiceType>

@@ -1,7 +1,7 @@
 #include "mocca/net/WSConnectionAcceptor.h"
 
 #include "mocca/net/PhysicalConnection.h"
-#include "mocca/net/TCPConnectionAcceptor.h"
+#include "mocca/net/stream/TCPConnectionAcceptor.h"
 #include "mocca/net/WSConnection.h"
 #include "mocca/net/WSHandshake.h"
 #include "mocca/testing/LoopbackPhysicalConnectionAcceptor.h"

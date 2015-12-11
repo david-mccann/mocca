@@ -1,6 +1,6 @@
 #include "mocca/net/MoccaConnection.h"
 #include "mocca/net/MoccaConnectionAcceptor.h"
-#include "mocca/net/TCPConnectionAcceptor.h"
+#include "mocca/net/stream/TCPConnectionAcceptor.h"
 #include "mocca/testing/LoopbackPhysicalConnectionAcceptor.h"
 
 using namespace mocca::net;

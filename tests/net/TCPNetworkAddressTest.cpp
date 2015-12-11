@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "mocca/net/TCPNetworkAddress.h"
+#include "mocca/net/stream/TCPNetworkAddress.h"
 #include "mocca/net/Error.h"
 
 using namespace mocca::net;
