@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mocca/net/message/IMessageConnection.h"
+#include "mocca/net/IMessageConnection.h"
 
 namespace mocca {
 namespace net {
