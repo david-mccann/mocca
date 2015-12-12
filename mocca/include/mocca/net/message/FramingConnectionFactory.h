@@ -16,6 +16,8 @@ public:
     std::unique_ptr<IMessageConnection> connect(const std::string& address) override;
     std::unique_ptr<IMessageConnectionAcceptor> bind(const std::string& address) override;
 
+    IStreamConnectionFactory& streamConnectionFactory();
+
 private:
     std::unique_ptr<IStreamConnectionFactory> streamConnectionFactory_;
     std::unique_ptr<FramingStrategy> framingStrategy_;

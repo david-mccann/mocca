@@ -3,6 +3,7 @@
 #include "mocca/base/StringTools.h"
 #include "mocca/net/Error.h"
 #include "mocca/net/framing/SizePrefixedProtocol.h"
+#include "mocca/net/framing/WebSocketProtocol.h"
 #include "mocca/net/message/FramingConnectionFactory.h"
 #include "mocca/net/stream/QueueConnectionFactory.h"
 #include "mocca/net/stream/TCPConnectionFactory.h"
@@ -42,6 +43,14 @@ void NetworkServiceLocator::provideAll() {
     // queue.prefixed
     provideService(std::make_shared<FramingConnectionFactory>(std::unique_ptr<IStreamConnectionFactory>(new QueueConnectionFactory()),
                                                               std::unique_ptr<FramingStrategy>(new SizePrefixedProtocol())));
+
+    // tcp.ws
+    provideService(std::make_shared<FramingConnectionFactory>(std::unique_ptr<IStreamConnectionFactory>(new TCPConnectionFactory()),
+                                                              std::unique_ptr<FramingStrategy>(new WebSocketProtocol())));
+
+    // queue.ws
+    provideService(std::make_shared<FramingConnectionFactory>(std::unique_ptr<IStreamConnectionFactory>(new QueueConnectionFactory()),
+                                                              std::unique_ptr<FramingStrategy>(new WebSocketProtocol())));
 }
 
 std::unique_ptr<IMessageConnectionAcceptor> mocca::net::NetworkServiceLocator::bind(const Endpoint& endpoint) {
