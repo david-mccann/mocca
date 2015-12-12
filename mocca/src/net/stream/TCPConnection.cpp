@@ -1,15 +1,15 @@
-#include "mocca/net/stream/TCPStream.h"
+#include "mocca/net/stream/TCPConnection.h"
 
 #include "mocca/base/StringTools.h"
 
 namespace mocca {
 namespace net {
 
-TCPStream::TCPStream(std::unique_ptr<IVDA::ConnectionSocket> socket)
+TCPConnection::TCPConnection(std::unique_ptr<IVDA::ConnectionSocket> socket)
     : socket_(move(socket))
     , identifier_(createIdentifier()) {}
 
-TCPStream::~TCPStream() {
+TCPConnection::~TCPConnection() {
     if (socket_ != nullptr) {
         try {
             socket_->Disconnect();
@@ -20,17 +20,17 @@ TCPStream::~TCPStream() {
     }
 }
 
-std::string TCPStream::identifierImpl() const {
+std::string TCPConnection::identifier() const {
     return identifier_;
 }
 
-std::string TCPStream::createIdentifier() {
+std::string TCPConnection::createIdentifier() {
     static unsigned int count = 0;
     ++count;
     return "tcp_" + std::to_string(count);
 }
 
-void TCPStream::writeImpl(ByteArray message, std::chrono::milliseconds timeout) {
+void TCPConnection::send(ByteArray message, std::chrono::milliseconds timeout) const {
     try {
         socket_->SendData((const int8_t*)message.data(), message.size(), static_cast<uint32_t>(timeout.count()));
     } catch (const IVDA::SocketConnectionException& err) {
@@ -43,7 +43,7 @@ void TCPStream::writeImpl(ByteArray message, std::chrono::milliseconds timeout) 
     }
 }
 
-ByteArray TCPStream::readImpl(uint32_t maxSize, std::chrono::milliseconds timeout) {
+ByteArray TCPConnection::receive(uint32_t maxSize, std::chrono::milliseconds timeout) const {
     try {
         ByteArray message(maxSize);
         auto bytesRead = socket_->ReceiveData((int8_t*)message.data(), maxSize, static_cast<uint32_t>(timeout.count()));

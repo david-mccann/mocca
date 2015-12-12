@@ -1,19 +1,21 @@
-#include "mocca/net/message/FramingObjectFactory.h"
+#include "mocca/net/message/FramingConnectionFactory.h"
+
+#include "mocca/net/message/FramingConnection.h"
+#include "mocca/net/message/FramingConnectionAcceptor.h"
 
 using namespace mocca::net;
 
-template <typename ProtocolType, typename StreamObjectFactoryType>
-inline std::unique_ptr<IMessageConnection> FramingObjectFactory<ProtocolType, StreamObjectFactoryType>::connect(const std::string& args) {
+FramingObjectFactory::FramingObjectFactory(std::unique_ptr<IStreamConnectionFactory> streamConnectionFactory,
+                                           std::unique_ptr<FramingStrategy> framingStrategy)
+    : streamConnectionFactory_(std::move(streamConnectionFactory))
+    , framingStrategy_(std::move(framingStrategy)) {}
+
+std::unique_ptr<IMessageConnection> FramingObjectFactory::connect(const std::string& address) {
     return std::unique_ptr<IMessageConnection>(
-        new FramingConnection<ProtocolType, typename StreamObjectFactoryType::Stream_Type>(streamObjectFactory_.createStream(args)));
+        new FramingConnection(streamConnectionFactory_->connect(address), framingStrategy_->clone()));
 }
 
-template <typename ProtocolType, typename StreamObjectFactoryType>
-std::unique_ptr<IMessageConnectionAcceptor> FramingObjectFactory<ProtocolType, StreamObjectFactoryType>::bind(const std::string& args) {
+std::unique_ptr<IMessageConnectionAcceptor> FramingObjectFactory::bind(const std::string& address) {
     return std::unique_ptr<IMessageConnectionAcceptor>(
-        new FramingConnectionAcceptor<ProtocolType, typename StreamObjectFactoryType::Acceptor_Type>(
-            streamObjectFactory_.createAcceptor(args)));
+        new FramingConnectionAcceptor(streamConnectionFactory_->bind(address), framingStrategy_->clone()));
 }
-
-template Prefixed_TCP_Factory;
-template Prefixed_MessageQueue_Factory;

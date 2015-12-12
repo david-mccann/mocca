@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mocca/base/ByteArray.h"
+#include "mocca/net/IStreamConnection.h"
 
 #include <algorithm>
 #include <chrono>
@@ -8,11 +8,9 @@
 namespace mocca {
 namespace net {
 
-template <typename StreamType>
-ByteArray readUntil(StreamType& stream, const std::string& delim, std::chrono::milliseconds timeout = std::chrono::milliseconds(100),
+ByteArray readUntil(IStreamConnection& stream, const std::string& delim, std::chrono::milliseconds timeout = std::chrono::milliseconds(100),
                     uint32_t chunkSize = 512);
 
-template <typename StreamType>
-ByteArray readExactly(StreamType& stream, uint32_t size, std::chrono::milliseconds timeout = std::chrono::milliseconds(100));
+ByteArray readExactly(IStreamConnection& stream, uint32_t size, std::chrono::milliseconds timeout = std::chrono::milliseconds(100));
 }
 }

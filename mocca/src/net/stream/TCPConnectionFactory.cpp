@@ -1,12 +1,14 @@
-#include "mocca/net/stream/TCPObjectFactory.h"
+#include "mocca/net/stream/TCPConnectionFactory.h"
 
 #include "mocca/base/StringTools.h"
+#include "mocca/net/stream/TCPConnection.h"
+#include "mocca/net/stream/TCPConnectionAcceptor.h"
 #include "mocca/net/stream/TCPNetworkAddress.h"
 
 using namespace mocca::net;
 
-std::unique_ptr<TCPStream> TCPObjectFactory::createStreamImpl(const std::string& args) {
-    TCPNetworkAddress networkAddress(args);
+std::unique_ptr<IStreamConnection> TCPConnectionFactory::connect(const std::string& address) {
+    TCPNetworkAddress networkAddress(address);
     auto socket = std::unique_ptr<IVDA::TCPSocket>(new IVDA::TCPSocket());
     socket->SetNonBlocking(true);
     try {
@@ -18,10 +20,10 @@ std::unique_ptr<TCPStream> TCPObjectFactory::createStreamImpl(const std::string&
         std::string internalError = mocca::joinString(err.what(), ", ", err.internalError());
         throw NetworkError("Network error in connect operation (internal error: " + internalError + ")", __FILE__, __LINE__);
     }
-    return std::unique_ptr<TCPStream>(new TCPStream(std::move(socket)));
+    return std::unique_ptr<IStreamConnection>(new TCPConnection(std::move(socket)));
 }
 
-std::unique_ptr<TCPStreamAcceptor> TCPObjectFactory::createAcceptorImpl(const std::string& args) {
-    int port = TCPNetworkAddress::parsePort(args);
-    return std::unique_ptr<TCPStreamAcceptor>(new TCPStreamAcceptor(port));
+std::unique_ptr<IStreamConnectionAcceptor> TCPConnectionFactory::bind(const std::string& address) {
+    int port = TCPNetworkAddress::parsePort(address);
+    return std::unique_ptr<IStreamConnectionAcceptor>(new TCPConnectionAcceptor(port));
 }

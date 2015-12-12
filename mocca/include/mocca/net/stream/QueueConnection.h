@@ -1,27 +1,26 @@
 #pragma once
 
 #include "mocca/base/MessageQueue.h"
-#include "mocca/net/stream/Stream.h"
+#include "mocca/net/IStreamConnection.h"
 
 namespace mocca {
 namespace net {
-class MessageQueueStream : public Stream<MessageQueueStream> {
-    friend class Stream<MessageQueueStream>;
+class QueueConnection : public IStreamConnection {
 public:
     enum class Signal { Disconnect };
-
     using LoopbackMessageQueue = MessageQueue<unsigned char>;
     using LoopbackSignalQueue = MessageQueue<Signal>;
 
-    MessageQueueStream(std::shared_ptr<LoopbackMessageQueue> sendQueue, std::shared_ptr<LoopbackMessageQueue> receiveQueue,
-                       std::shared_ptr<LoopbackSignalQueue> outSignalQueue, std::shared_ptr<LoopbackSignalQueue> inSignalQueue);
-    ~MessageQueueStream();
+    QueueConnection(std::shared_ptr<LoopbackMessageQueue> sendQueue, std::shared_ptr<LoopbackMessageQueue> receiveQueue,
+                    std::shared_ptr<LoopbackSignalQueue> outSignalQueue, std::shared_ptr<LoopbackSignalQueue> inSignalQueue);
+    ~QueueConnection();
+
+    std::string identifier() const override;
+    void send(ByteArray message, std::chrono::milliseconds timeout) const override;
+    ByteArray receive(uint32_t maxSize, std::chrono::milliseconds timeout) const override;
 
 private:
     static std::string createIdentifier();
-    std::string identifierImpl() const;
-    void writeImpl(ByteArray message, std::chrono::milliseconds timeout) const;
-    ByteArray readImpl(uint32_t maxSize, std::chrono::milliseconds timeout) const;
 
 private:
     std::string identifier_;

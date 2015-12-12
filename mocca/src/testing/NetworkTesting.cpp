@@ -1,26 +1,26 @@
-#include "mocca/testing/NetworkTesting.h"
-
-
-#include <chrono>
-
-using namespace mocca::net;
-
-template <> std::string mocca::testing::createAddress<TCPObjectFactory>(int index) {
-    return "localhost:" + std::to_string(5678 + index);
-}
-
-template <> std::string mocca::testing::createBindingAddress<TCPObjectFactory>(int index) {
-    return std::to_string(5678 + index);
-}
-
-template <> std::string mocca::testing::createAddress<MessageQueueObjectFactory>(int index) {
-    return "messageQueue" + std::to_string(index);
-}
-
-template <> std::string mocca::testing::createBindingAddress<MessageQueueObjectFactory>(int index) {
-    return "messageQueue" + std::to_string(index);
-}
-
+//#include "mocca/testing/NetworkTesting.h"
+//
+//
+//#include <chrono>
+//
+//using namespace mocca::net;
+//
+//template <> std::string mocca::testing::createAddress<TCPObjectFactory>(int index) {
+//    return "localhost:" + std::to_string(5678 + index);
+//}
+//
+//template <> std::string mocca::testing::createBindingAddress<TCPObjectFactory>(int index) {
+//    return std::to_string(5678 + index);
+//}
+//
+//template <> std::string mocca::testing::createAddress<MessageQueueObjectFactory>(int index) {
+//    return "messageQueue" + std::to_string(index);
+//}
+//
+//template <> std::string mocca::testing::createBindingAddress<MessageQueueObjectFactory>(int index) {
+//    return "messageQueue" + std::to_string(index);
+//}
+//
 //template <> std::string mocca::testing::createAddress<LoopbackNetworkService>(int index) {
 //    return "messageQueue" + std::to_string(index);
 //}

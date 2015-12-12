@@ -1,34 +1,33 @@
-#include "mocca/net/stream/MessageQueueStream.h"
+#include "mocca/net/stream/QueueConnection.h"
 
 #include "mocca/net/Error.h"
 
 using namespace mocca;
 using namespace mocca::net;
 
-MessageQueueStream::MessageQueueStream(std::shared_ptr<LoopbackMessageQueue> sendQueue, std::shared_ptr<LoopbackMessageQueue> receiveQueue,
-                                       std::shared_ptr<LoopbackSignalQueue> outSignalQueue,
-                                       std::shared_ptr<LoopbackSignalQueue> inSignalQueue)
+QueueConnection::QueueConnection(std::shared_ptr<LoopbackMessageQueue> sendQueue, std::shared_ptr<LoopbackMessageQueue> receiveQueue,
+                                 std::shared_ptr<LoopbackSignalQueue> outSignalQueue, std::shared_ptr<LoopbackSignalQueue> inSignalQueue)
     : identifier_(createIdentifier())
     , sendQueue_(sendQueue)
     , receiveQueue_(receiveQueue)
     , outSignalQueue_(outSignalQueue)
     , inSignalQueue_(inSignalQueue) {}
 
-MessageQueueStream::~MessageQueueStream() {
+QueueConnection::~QueueConnection() {
     outSignalQueue_->enqueue(Signal::Disconnect);
 }
 
-std::string MessageQueueStream::createIdentifier() {
+std::string QueueConnection::createIdentifier() {
     static unsigned int count = 0;
     ++count;
-    return "loopback_" + std::to_string(count);
+    return "queue_" + std::to_string(count);
 }
 
-std::string MessageQueueStream::identifierImpl() const {
+std::string QueueConnection::identifier() const {
     return identifier_;
 }
 
-void MessageQueueStream::writeImpl(ByteArray message, std::chrono::milliseconds timeout) const {
+void QueueConnection::send(ByteArray message, std::chrono::milliseconds timeout) const {
     auto signal = inSignalQueue_->tryDequeue(std::chrono::milliseconds(0));
     if (!signal.isNull()) {
         if (signal == Signal::Disconnect) {
@@ -43,7 +42,7 @@ void MessageQueueStream::writeImpl(ByteArray message, std::chrono::milliseconds 
     }
 }
 
-ByteArray MessageQueueStream::readImpl(uint32_t maxSize, std::chrono::milliseconds timeout) const {
+ByteArray QueueConnection::receive(uint32_t maxSize, std::chrono::milliseconds timeout) const {
     auto signal = inSignalQueue_->tryDequeue(std::chrono::milliseconds(0));
     if (!signal.isNull()) {
         if (signal == Signal::Disconnect) {

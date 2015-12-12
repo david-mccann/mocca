@@ -1,9 +1,7 @@
 #include "gtest/gtest.h"
 
-#include "mocca/base/ByteArray.h"
-#include "mocca/base/MessageQueue.h"
 #include "mocca/net/framing/FramingUtils.h"
-#include "mocca/net/stream/MessageQueueStream.h"
+#include "mocca/net/stream/QueueConnection.h"
 
 using namespace mocca;
 using namespace mocca::net;
@@ -16,14 +14,14 @@ protected:
         // You can do clean-up work that doesn't throw exceptions here.
     }
 
-    std::unique_ptr<MessageQueueStream> createFilledStream(char from, char to) {
-        auto receiveQueue = std::make_shared<MessageQueueStream::LoopbackMessageQueue>();
+    std::unique_ptr<QueueConnection> createFilledStream(char from, char to) {
+        auto receiveQueue = std::make_shared<QueueConnection::LoopbackMessageQueue>();
         for (unsigned char c = from; c <= to; ++c) {
             receiveQueue->enqueue(c);
         }
-        std::unique_ptr<MessageQueueStream> stream(new MessageQueueStream(
-            std::make_shared<MessageQueueStream::LoopbackMessageQueue>(), receiveQueue,
-            std::make_shared<MessageQueueStream::LoopbackSignalQueue>(), std::make_shared<MessageQueueStream::LoopbackSignalQueue>()));
+        std::unique_ptr<QueueConnection> stream(new QueueConnection(
+            std::make_shared<QueueConnection::LoopbackMessageQueue>(), receiveQueue,
+            std::make_shared<QueueConnection::LoopbackSignalQueue>(), std::make_shared<QueueConnection::LoopbackSignalQueue>()));
         return stream;
     }
 };

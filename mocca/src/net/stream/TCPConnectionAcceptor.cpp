@@ -1,4 +1,4 @@
-#include "mocca/net/stream/TCPStreamAcceptor.h"
+#include "mocca/net/stream/TCPConnectionAcceptor.h"
 
 #include "mocca/base/StringTools.h"
 #include "mocca/log/LogManager.h"
@@ -7,7 +7,7 @@
 namespace mocca {
 namespace net {
 
-TCPStreamAcceptor::TCPStreamAcceptor(int port)
+TCPConnectionAcceptor::TCPConnectionAcceptor(int port)
     : port_(port) {
 
     try {
@@ -21,7 +21,7 @@ TCPStreamAcceptor::TCPStreamAcceptor(int port)
     }
 }
 
-std::unique_ptr<TCPStream> TCPStreamAcceptor::acceptImpl(std::chrono::milliseconds timeout) {
+std::unique_ptr<IStreamConnection> TCPConnectionAcceptor::accept(std::chrono::milliseconds timeout) {
     IVDA::TCPSocket* connectionSocket = nullptr;
     try {
         server_.AcceptNewConnection((IVDA::ConnectionSocket**)&connectionSocket, static_cast<uint32_t>(timeout.count()));
@@ -33,7 +33,7 @@ std::unique_ptr<TCPStream> TCPStreamAcceptor::acceptImpl(std::chrono::millisecon
         auto socketPtr = std::unique_ptr<IVDA::ConnectionSocket>(connectionSocket);
         auto ip = connectionSocket->GetPeerAddress();
         LDEBUG("Accepted TCP connection on port " << port_ << " from " << ip);
-        return std::unique_ptr<TCPStream>(new TCPStream(move(socketPtr)));
+        return std::unique_ptr<IStreamConnection>(new TCPConnection(std::move(socketPtr)));
     }
     return nullptr;
 }

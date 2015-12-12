@@ -1,24 +1,19 @@
 #include "mocca/net/message/FramingConnectionAcceptor.h"
 
-#include "mocca/net/framing/SizePrefixedProtocol.h"
 #include "mocca/net/message/FramingConnection.h"
-#include "mocca/net/stream/TCPStreamAcceptor.h"
-#include "mocca/net/stream/MessageQueueStreamAcceptor.h"
 
 using namespace mocca::net;
 
-template <typename ProtocolType, typename StreamAcceptorType>
-std::unique_ptr<IMessageConnection>
-FramingConnectionAcceptor<ProtocolType, StreamAcceptorType>::accept(std::chrono::milliseconds timeout) {
+FramingConnectionAcceptor::FramingConnectionAcceptor(std::unique_ptr<IStreamConnectionAcceptor> streamAcceptor,
+                                                     std::unique_ptr<FramingStrategy> framingStrategy)
+    : streamAcceptor_(std::move(streamAcceptor))
+    , framingStrategy_(std::move(framingStrategy)) {}
+
+std::unique_ptr<IMessageConnection> FramingConnectionAcceptor::accept(std::chrono::milliseconds timeout) {
     auto stream = streamAcceptor_->accept(timeout);
     if (stream != nullptr) {
-        ProtocolType::performHandshake(*stream, timeout);
-        return std::unique_ptr<IMessageConnection>(
-            new FramingConnection<ProtocolType, typename StreamAcceptorType::Stream_Type>(std::move(stream)));
+        framingStrategy_->performHandshake(*stream, timeout);
+        return std::unique_ptr<IMessageConnection>(new FramingConnection(std::move(stream), framingStrategy_->clone()));
     }
     return nullptr;
 }
-
-
-template class FramingConnectionAcceptor<SizePrefixedProtocol<TCPStream>, TCPStreamAcceptor>;
-template class FramingConnectionAcceptor<SizePrefixedProtocol<MessageQueueStream>, MessageQueueStreamAcceptor>;

@@ -1,20 +1,22 @@
 #pragma once
 
 #include "mocca/net/IMessageConnection.h"
+#include "mocca/net/framing/FramingStrategy.h"
 
 namespace mocca {
 namespace net {
 
-template <typename ProtocolType, typename StreamType> class FramingConnection : public IMessageConnection {
+class FramingConnection : public IMessageConnection {
 public:
-    FramingConnection(std::unique_ptr<StreamType> stream) : stream_(std::move(stream)) {}
+    FramingConnection(std::unique_ptr<IStreamConnection> stream, std::unique_ptr<FramingStrategy> framingStrategy);
 
     std::string identifier() const override;
     void send(ByteArray message, std::chrono::milliseconds timeout) const override;
     ByteArray receive(std::chrono::milliseconds timeout) const override;
 
 private:
-    std::unique_ptr<StreamType> stream_;
+    std::unique_ptr<IStreamConnection> stream_;
+    std::unique_ptr<FramingStrategy> framingStrategy_;
 };
 }
 }
