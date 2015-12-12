@@ -5,6 +5,14 @@
 using namespace mocca;
 using namespace mocca::net;
 
+std::string mocca::net::SizePrefixedProtocol::protocol() const {
+    return "prefixed";
+}
+
+std::unique_ptr<FramingStrategy> mocca::net::SizePrefixedProtocol::clone() const {
+    return std::unique_ptr<FramingStrategy>(new SizePrefixedProtocol(*this));
+}
+
 ByteArray SizePrefixedProtocol::readFrameFromStream(IStreamConnection& connection, std::chrono::milliseconds timeout) {
     std::lock_guard<IStreamConnection> lock(connection);
     auto sizeData = readExactly(connection, sizeof(uint32_t), timeout);

@@ -10,8 +10,9 @@ namespace mocca {
 namespace net {
 class QueueConnectionFactory : public IStreamConnectionFactory {
 public:
-    std::unique_ptr<IStreamConnection> connect(const std::string& queueName);
-    std::unique_ptr<IStreamConnectionAcceptor> bind(const std::string& queueName);
+    std::string protocol() const override;
+    std::unique_ptr<IStreamConnection> connect(const std::string& queueName) override;
+    std::unique_ptr<IStreamConnectionAcceptor> bind(const std::string& queueName) override;
 
 private:
     std::map<std::string, std::shared_ptr<typename QueueConnectionAcceptor::LoopbackConnectionQueue>> spawnedConnections_;

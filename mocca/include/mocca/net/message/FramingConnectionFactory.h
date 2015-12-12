@@ -7,13 +7,14 @@
 namespace mocca {
 namespace net {
 
-class FramingObjectFactory : public IMessageConnectionFactory {
+class FramingConnectionFactory : public IMessageConnectionFactory {
 public:
-    FramingObjectFactory(std::unique_ptr<IStreamConnectionFactory> streamConnectionFactory,
+    FramingConnectionFactory(std::unique_ptr<IStreamConnectionFactory> streamConnectionFactory,
                          std::unique_ptr<FramingStrategy> framingStrategy);
 
-    std::unique_ptr<IMessageConnection> connect(const std::string& address);
-    std::unique_ptr<IMessageConnectionAcceptor> bind(const std::string& address);
+    std::string protocol() const override;
+    std::unique_ptr<IMessageConnection> connect(const std::string& address) override;
+    std::unique_ptr<IMessageConnectionAcceptor> bind(const std::string& address) override;
 
 private:
     std::unique_ptr<IStreamConnectionFactory> streamConnectionFactory_;

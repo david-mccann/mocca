@@ -1,34 +1,30 @@
-//#include "mocca/testing/NetworkTesting.h"
-//
-//
-//#include <chrono>
-//
-//using namespace mocca::net;
-//
-//template <> std::string mocca::testing::createAddress<TCPObjectFactory>(int index) {
-//    return "localhost:" + std::to_string(5678 + index);
-//}
-//
-//template <> std::string mocca::testing::createBindingAddress<TCPObjectFactory>(int index) {
-//    return std::to_string(5678 + index);
-//}
-//
-//template <> std::string mocca::testing::createAddress<MessageQueueObjectFactory>(int index) {
-//    return "messageQueue" + std::to_string(index);
-//}
-//
-//template <> std::string mocca::testing::createBindingAddress<MessageQueueObjectFactory>(int index) {
-//    return "messageQueue" + std::to_string(index);
-//}
-//
-//template <> std::string mocca::testing::createAddress<LoopbackNetworkService>(int index) {
-//    return "messageQueue" + std::to_string(index);
-//}
-//
-//template <> std::string mocca::testing::createBindingAddress<LoopbackNetworkService>(int index) {
-//    return "messageQueue" + std::to_string(index);
-//}
-//
+#include "mocca/testing/NetworkTesting.h"
+
+#include "mocca/base/Error.h"
+
+std::string mocca::testing::createAddress(const std::string & protocol, int index)
+{
+    if (protocol.find("tcp") != std::string::npos) {
+        return "localhost:" + std::to_string(5678 + index);
+    }
+    else if (protocol.find("queue") != std::string::npos) {
+        return "queue_" + std::to_string(index);
+    }
+    throw Error("Invalid protocol " + protocol, __FILE__, __LINE__);
+}
+
+std::string mocca::testing::createBindingAddress(const std::string & protocol, int index)
+{
+    if (protocol.find("tcp") != std::string::npos) {
+        return std::to_string(5678 + index);
+    }
+    else if (protocol.find("queue") != std::string::npos) {
+        return "queue_" + std::to_string(index);
+    }
+    throw Error("Invalid protocol " + protocol, __FILE__, __LINE__);
+}
+
+
 //template <> Endpoint mocca::testing::createConnectionEndpoint<TCPNetworkService>(int index) {
 //    return Endpoint(MoccaNetworkService<TCPNetworkService>::protocolStatic(), createAddress<TCPNetworkService>(index));
 //}

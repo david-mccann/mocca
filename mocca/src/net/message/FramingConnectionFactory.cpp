@@ -5,17 +5,22 @@
 
 using namespace mocca::net;
 
-FramingObjectFactory::FramingObjectFactory(std::unique_ptr<IStreamConnectionFactory> streamConnectionFactory,
+FramingConnectionFactory::FramingConnectionFactory(std::unique_ptr<IStreamConnectionFactory> streamConnectionFactory,
                                            std::unique_ptr<FramingStrategy> framingStrategy)
     : streamConnectionFactory_(std::move(streamConnectionFactory))
     , framingStrategy_(std::move(framingStrategy)) {}
 
-std::unique_ptr<IMessageConnection> FramingObjectFactory::connect(const std::string& address) {
+std::string mocca::net::FramingConnectionFactory::protocol() const
+{
+    return streamConnectionFactory_->protocol() + "." + framingStrategy_->protocol();
+}
+
+std::unique_ptr<IMessageConnection> FramingConnectionFactory::connect(const std::string& address) {
     return std::unique_ptr<IMessageConnection>(
         new FramingConnection(streamConnectionFactory_->connect(address), framingStrategy_->clone()));
 }
 
-std::unique_ptr<IMessageConnectionAcceptor> FramingObjectFactory::bind(const std::string& address) {
+std::unique_ptr<IMessageConnectionAcceptor> FramingConnectionFactory::bind(const std::string& address) {
     return std::unique_ptr<IMessageConnectionAcceptor>(
         new FramingConnectionAcceptor(streamConnectionFactory_->bind(address), framingStrategy_->clone()));
 }

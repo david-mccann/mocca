@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 
 namespace mocca {
 namespace testing {
@@ -9,14 +10,8 @@ public:
     ~TempProvideNetworkService() { net::NetworkServiceLocator::removeAll(); }
 };
 
-//template <typename T> std::string createAddress(int index = 0);
-//template <typename T> std::string createBindingAddress(int index = 0);
-//template <> std::string createAddress<net::TCPObjectFactory>(int index);
-//template <> std::string createBindingAddress<net::TCPObjectFactory>(int index);
-//template <> std::string createAddress<net::MessageQueueObjectFactory>(int index);
-//template <> std::string createBindingAddress<net::MessageQueueObjectFactory>(int index);
-//template <> std::string createAddress<net::LoopbackNetworkService>(int index);
-//template <> std::string createBindingAddress<net::LoopbackNetworkService>(int index);
+std::string createAddress(const std::string& protocol, int index = 0);
+std::string createBindingAddress(const std::string& protocol, int index = 0);
 
 //template <typename T> net::Endpoint createConnectionEndpoint(int index = 0);
 //template <typename T> net::Endpoint createBindingEndpoint(int index = 0);

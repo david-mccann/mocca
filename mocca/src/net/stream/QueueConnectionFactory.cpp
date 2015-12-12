@@ -7,6 +7,10 @@
 
 using namespace mocca::net;
 
+std::string mocca::net::QueueConnectionFactory::protocol() const {
+    return "queue";
+}
+
 std::unique_ptr<IStreamConnection> QueueConnectionFactory::connect(const std::string& queueName) {
     if (!spawnedConnections_.count(queueName)) {
         throw NetworkError("No connection acceptor bound to queue " + queueName, __FILE__, __LINE__);
