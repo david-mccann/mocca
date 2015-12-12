@@ -15,13 +15,13 @@ protected:
     }
 
     std::unique_ptr<QueueConnection> createFilledStream(char from, char to) {
-        auto receiveQueue = std::make_shared<QueueConnection::LoopbackMessageQueue>();
+        auto receiveQueue = std::make_shared<QueueConnection::MQ>();
         for (unsigned char c = from; c <= to; ++c) {
             receiveQueue->enqueue(c);
         }
         std::unique_ptr<QueueConnection> stream(new QueueConnection(
-            std::make_shared<QueueConnection::LoopbackMessageQueue>(), receiveQueue,
-            std::make_shared<QueueConnection::LoopbackSignalQueue>(), std::make_shared<QueueConnection::LoopbackSignalQueue>()));
+            std::make_shared<QueueConnection::MQ>(), receiveQueue,
+            std::make_shared<QueueConnection::SQ>(), std::make_shared<QueueConnection::SQ>()));
         return stream;
     }
 };

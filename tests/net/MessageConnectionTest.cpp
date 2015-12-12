@@ -31,7 +31,7 @@ protected:
 
 INSTANTIATE_TEST_CASE_P(InstantiationName,
     NetworkServiceTest,
-    ::testing::Values("tcp.prefixed", "queue.prefixed"));
+    ::testing::Values("tcp.prefixed", "queue.prefixed", "loopback"));
 
 TEST_P(NetworkServiceTest, Identifier)
 {

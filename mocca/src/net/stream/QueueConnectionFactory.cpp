@@ -7,7 +7,7 @@
 
 using namespace mocca::net;
 
-std::string mocca::net::QueueConnectionFactory::protocol() const {
+std::string QueueConnectionFactory::protocol() const {
     return "queue";
 }
 
@@ -16,11 +16,11 @@ std::unique_ptr<IStreamConnection> QueueConnectionFactory::connect(const std::st
         throw NetworkError("No connection acceptor bound to queue " + queueName, __FILE__, __LINE__);
     }
 
-    auto messageQueue1 = std::make_shared<QueueConnection::LoopbackMessageQueue>();
-    auto messageQueue2 = std::make_shared<QueueConnection::LoopbackMessageQueue>();
+    auto messageQueue1 = std::make_shared<QueueConnection::MQ>();
+    auto messageQueue2 = std::make_shared<QueueConnection::MQ>();
 
-    auto signalQueue1 = std::make_shared<QueueConnection::LoopbackSignalQueue>();
-    auto signalQueue2 = std::make_shared<QueueConnection::LoopbackSignalQueue>();
+    auto signalQueue1 = std::make_shared<QueueConnection::SQ>();
+    auto signalQueue2 = std::make_shared<QueueConnection::SQ>();
 
     auto serverConnection = std::unique_ptr<QueueConnection>(new QueueConnection(messageQueue1, messageQueue2, signalQueue1, signalQueue2));
     auto clientConnection =

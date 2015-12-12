@@ -7,6 +7,7 @@
 #include "mocca/net/message/FramingConnectionFactory.h"
 #include "mocca/net/stream/QueueConnectionFactory.h"
 #include "mocca/net/stream/TCPConnectionFactory.h"
+#include "mocca/net/message/LoopbackConnectionFactory.h"
 
 using namespace mocca::net;
 
@@ -51,6 +52,9 @@ void NetworkServiceLocator::provideAll() {
     // queue.ws
     provideService(std::make_shared<FramingConnectionFactory>(std::unique_ptr<IStreamConnectionFactory>(new QueueConnectionFactory()),
                                                               std::unique_ptr<FramingStrategy>(new WebSocketProtocol())));
+
+    // loopback
+    provideService(std::make_shared<LoopbackConnectionFactory>());
 }
 
 std::unique_ptr<IMessageConnectionAcceptor> mocca::net::NetworkServiceLocator::bind(const Endpoint& endpoint) {

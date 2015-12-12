@@ -2,11 +2,12 @@
 
 #include "mocca/net/Error.h"
 
+
 using namespace mocca;
 using namespace mocca::net;
 
-QueueConnection::QueueConnection(std::shared_ptr<LoopbackMessageQueue> sendQueue, std::shared_ptr<LoopbackMessageQueue> receiveQueue,
-                                 std::shared_ptr<LoopbackSignalQueue> outSignalQueue, std::shared_ptr<LoopbackSignalQueue> inSignalQueue)
+QueueConnection::QueueConnection(std::shared_ptr<MQ> sendQueue, std::shared_ptr<MQ> receiveQueue, std::shared_ptr<SQ> outSignalQueue,
+                                 std::shared_ptr<SQ> inSignalQueue)
     : identifier_(createIdentifier())
     , sendQueue_(sendQueue)
     , receiveQueue_(receiveQueue)
