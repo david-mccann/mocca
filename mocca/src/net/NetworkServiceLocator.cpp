@@ -5,9 +5,9 @@
 #include "mocca/net/framing/SizePrefixedProtocol.h"
 #include "mocca/net/framing/WebSocketProtocol.h"
 #include "mocca/net/message/FramingConnectionFactory.h"
+#include "mocca/net/message/LoopbackConnectionFactory.h"
 #include "mocca/net/stream/QueueConnectionFactory.h"
 #include "mocca/net/stream/TCPConnectionFactory.h"
-#include "mocca/net/message/LoopbackConnectionFactory.h"
 
 using namespace mocca::net;
 
@@ -57,12 +57,37 @@ void NetworkServiceLocator::provideAll() {
     provideService(std::make_shared<LoopbackConnectionFactory>());
 }
 
-std::unique_ptr<IMessageConnectionAcceptor> mocca::net::NetworkServiceLocator::bind(const Endpoint& endpoint) {
+std::unique_ptr<IMessageConnectionAcceptor> NetworkServiceLocator::bind(const Endpoint& endpoint) {
     auto serv = service(endpoint.protocol());
     return serv->bind(endpoint.address());
 }
 
-std::unique_ptr<IMessageConnection> mocca::net::NetworkServiceLocator::connect(const Endpoint& endpoint) {
+std::unique_ptr<IMessageConnection> NetworkServiceLocator::connect(const Endpoint& endpoint) {
     auto serv = service(endpoint.protocol());
     return serv->connect(endpoint.address());
+}
+
+const std::string& NetworkServiceLocator::loopback() {
+    static std::string str = "loopback";
+    return str;
+}
+
+const std::string& NetworkServiceLocator::tcpPrefixed() {
+    static std::string str = "tcp.prefixed";
+    return str;
+}
+
+const std::string& NetworkServiceLocator::tcpWebSocket() {
+    static std::string str = "tcp.ws";
+    return str;
+}
+
+const std::string& NetworkServiceLocator::queuePrefixed() {
+    static std::string str = "queue.prefixed";
+    return str;
+}
+
+const std::string& NetworkServiceLocator::queueWebSocket() {
+    static std::string str = "queue.ws";
+    return str;
 }

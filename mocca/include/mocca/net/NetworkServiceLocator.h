@@ -14,6 +14,12 @@ public:
     static void removeAll();
     static void provideAll();
 
+    static const std::string& loopback();
+    static const std::string& tcpPrefixed();
+    static const std::string& tcpWebSocket();
+    static const std::string& queuePrefixed();
+    static const std::string& queueWebSocket();
+
     static std::unique_ptr<IMessageConnectionAcceptor> bind(const Endpoint& endpoint);
     static std::unique_ptr<IMessageConnection> connect(const Endpoint& endpoint);
 
