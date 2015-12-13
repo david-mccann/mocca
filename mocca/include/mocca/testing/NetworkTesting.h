@@ -7,12 +7,6 @@
 
 namespace mocca {
 namespace testing {
-template <typename T> class TempProvideNetworkService {
-public:
-    TempProvideNetworkService() { net::NetworkServiceLocator::provideService(std::make_shared<T>()); }
-    ~TempProvideNetworkService() { net::NetworkServiceLocator::removeAll(); }
-};
-
 std::string createAddress(const std::string& protocol, int index = 0);
 std::string createBindingAddress(const std::string& protocol, int index = 0);
 
