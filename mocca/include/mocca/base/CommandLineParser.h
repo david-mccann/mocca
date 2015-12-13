@@ -33,7 +33,7 @@ public:
     void parse(int argc, const char** argv);
 
 private:
-    void printUsage(const std::string&) const;
+    void printHelp(const std::string&) const;
 
 private:
     std::vector<Option> options_;

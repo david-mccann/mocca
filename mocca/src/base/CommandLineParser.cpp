@@ -11,9 +11,9 @@ using namespace mocca;
 
 CommandLineParser::CommandLineParser() {
     Option usage;
-    usage.key = "--usage";
-    usage.help = "prints usage";
-    usage.callback = std::bind(&CommandLineParser::printUsage, this, std::placeholders::_1);
+    usage.key = "--help";
+    usage.help = "prints help";
+    usage.callback = std::bind(&CommandLineParser::printHelp, this, std::placeholders::_1);
     options_.push_back(usage);
 }
 
@@ -21,7 +21,7 @@ void CommandLineParser::addOption(const Option& option) {
     options_.push_back(option);
 }
 
-void mocca::CommandLineParser::printUsage(const std::string&) const {
+void mocca::CommandLineParser::printHelp(const std::string&) const {
     std::stringstream stream;
     for (const auto& opt : options_) {
         stream << opt.key << ": " << opt.help << std::endl;
@@ -42,7 +42,8 @@ void CommandLineParser::parse(int argc, const char** argv) {
         auto separatorIndex = arg.find_first_of("=");
         auto argKey = arg.substr(0, separatorIndex);
         if (findMemberEqual(options_, &Option::key, argKey) == end(options_)) {
-            throw ParserError(formatString("Unknown option '%%'", argKey), __FILE__, __LINE__);
+            std::cout << "Unknown option '" << argKey << "'" << std::endl;
+            printHelp(std::string());
         }
         std::string argValue;
         if (separatorIndex != std::string::npos) {
