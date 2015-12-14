@@ -29,7 +29,7 @@ std::string QueueConnection::identifier() const {
 }
 
 void QueueConnection::send(ByteArray message, std::chrono::milliseconds timeout) const {
-    auto signal = inSignalQueue_->tryDequeue(std::chrono::milliseconds(0));
+    auto signal = inSignalQueue_->dequeueNoWait();
     if (!signal.isNull()) {
         if (signal == Signal::Disconnect) {
             throw ConnectionClosedError("Connection to peer has been closed", identifier_, __FILE__, __LINE__);
@@ -44,7 +44,7 @@ void QueueConnection::send(ByteArray message, std::chrono::milliseconds timeout)
 }
 
 ByteArray QueueConnection::receive(uint32_t maxSize, std::chrono::milliseconds timeout) const {
-    auto signal = inSignalQueue_->tryDequeue(std::chrono::milliseconds(0));
+    auto signal = inSignalQueue_->dequeueNoWait();
     if (!signal.isNull()) {
         if (signal == Signal::Disconnect) {
             throw ConnectionClosedError("Connection to peer has been closed", identifier_, __FILE__, __LINE__);

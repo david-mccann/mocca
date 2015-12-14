@@ -28,7 +28,7 @@ std::string LoopbackConnection::identifier() const {
 }
 
 void LoopbackConnection::send(ByteArray message, std::chrono::milliseconds timeout) const {
-    auto signal = inSignalQueue_->tryDequeue(std::chrono::milliseconds(0));
+    auto signal = inSignalQueue_->dequeueNoWait();
     if (!signal.isNull()) {
         if (signal == Signal::Disconnect) {
             throw ConnectionClosedError("Connection to peer has been closed", identifier_, __FILE__, __LINE__);
@@ -39,7 +39,7 @@ void LoopbackConnection::send(ByteArray message, std::chrono::milliseconds timeo
 }
 
 ByteArray LoopbackConnection::receive(std::chrono::milliseconds timeout) const {
-    auto signal = inSignalQueue_->tryDequeue(std::chrono::milliseconds(0));
+    auto signal = inSignalQueue_->dequeueNoWait();
     if (!signal.isNull()) {
         if (signal == Signal::Disconnect) {
             throw ConnectionClosedError("Connection to peer has been closed", identifier_, __FILE__, __LINE__);

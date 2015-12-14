@@ -61,6 +61,16 @@ public:
         return val;
     }
 
+    Nullable<T> dequeueNoWait() {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (!queue_.empty()) {
+            T val(std::move(queue_.front()));
+            queue_.pop_front();
+            return val;
+        }
+        return Nullable<T>();
+    }
+
     bool isEmpty() const {
         std::lock_guard<std::mutex> lock(mutex_);
         return queue_.empty();
