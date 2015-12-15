@@ -34,8 +34,9 @@ protected:
 INSTANTIATE_TEST_CASE_P(InstantiationName, ConnectionAggregatorTest, ::testing::Values("tcp.prefixed", "queue.prefixed"));
 
 TEST_P(ConnectionAggregatorTest, EnqueueDequeue) {
-    auto acceptor = this->target->bind(createBindingAddress(GetParam()));
-    ConnectionAggregator target(std::move(acceptor));
+    std::vector<std::unique_ptr<IMessageConnectionAcceptor>> acceptors;
+    acceptors.emplace_back(this->target->bind(createBindingAddress(GetParam())));
+    ConnectionAggregator target(std::move(acceptors));
     auto clientConnection1 = this->target->connect(createAddress(GetParam()));
     auto clientConnection2 = this->target->connect(createAddress(GetParam()));
 
@@ -56,9 +57,37 @@ TEST_P(ConnectionAggregatorTest, EnqueueDequeue) {
     ASSERT_TRUE(recStr1 == "Hello 1" && recStr2 == "Hello 2" || recStr1 == "Hello 2" && recStr2 == "Hello 1");
 }
 
+TEST_P(ConnectionAggregatorTest, MultipleAcceptors) {
+    std::vector<std::unique_ptr<IMessageConnectionAcceptor>> acceptors;
+    acceptors.emplace_back(this->target->bind(createBindingAddress(GetParam())));
+    acceptors.emplace_back(this->target->bind(createBindingAddress(GetParam(), 1)));
+    ConnectionAggregator target(std::move(acceptors));
+
+    auto clientConnection1 = this->target->connect(createAddress(GetParam()));
+    auto clientConnection2 = this->target->connect(createAddress(GetParam(), 1));
+
+    ByteArray packet1 = mocca::makeFormattedByteArray("Hello 1");
+    ByteArray packet2 = mocca::makeFormattedByteArray("Hello 2");
+
+    clientConnection1->send(std::move(packet1));
+    clientConnection2->send(std::move(packet2));
+
+    auto data1 = target.receive(std::chrono::milliseconds(100));
+    auto data2 = target.receive(std::chrono::milliseconds(100));
+    ASSERT_FALSE(data1.isNull());
+    ASSERT_FALSE(data2.isNull());
+    ByteArray recPacket1(data1.release().message);
+    ByteArray recPacket2(data2.release().message);
+    auto recStr1 = std::get<0>(mocca::parseFormattedByteArray<std::string>(recPacket1));
+    auto recStr2 = std::get<0>(mocca::parseFormattedByteArray<std::string>(recPacket2));
+    ASSERT_TRUE(recStr1 == "Hello 1" && recStr2 == "Hello 2" || recStr1 == "Hello 2" && recStr2 == "Hello 1");
+}
+
 TEST_P(ConnectionAggregatorTest, SendReceiveParallel) {
-    auto acceptor = this->target->bind(createBindingAddress(GetParam()));
-    ConnectionAggregator target(std::move(acceptor));
+    std::vector<std::unique_ptr<IMessageConnectionAcceptor>> acceptors;
+    acceptors.emplace_back(this->target->bind(createBindingAddress(GetParam())));
+    ConnectionAggregator target(std::move(acceptors));
+
     auto clientConnection1 = this->target->connect(createAddress(GetParam()));
     auto clientConnection2 = this->target->connect(createAddress(GetParam()));
 
@@ -99,8 +128,9 @@ TEST_P(ConnectionAggregatorTest, SendReceiveParallel) {
 }
 
 TEST_P(ConnectionAggregatorTest, DisconnectStrategyThrowException) {
-    auto acceptor = this->target->bind(createBindingAddress(GetParam()));
-    ConnectionAggregator target(std::move(acceptor), ConnectionAggregator::DisconnectStrategy::ThrowException);
+    std::vector<std::unique_ptr<IMessageConnectionAcceptor>> acceptors;
+    acceptors.emplace_back(this->target->bind(createBindingAddress(GetParam())));
+    ConnectionAggregator target(std::move(acceptors), ConnectionAggregator::DisconnectStrategy::ThrowException);
     {
         auto clientConnection = this->target->connect(createAddress(GetParam()));
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -119,8 +149,9 @@ TEST_P(ConnectionAggregatorTest, DisconnectStrategyThrowException) {
 }
 
 TEST_P(ConnectionAggregatorTest, DisconnectStrategyRemoveConnection) {
-    auto acceptor = this->target->bind(createBindingAddress(GetParam()));
-    ConnectionAggregator target(std::move(acceptor), ConnectionAggregator::DisconnectStrategy::RemoveConnection);
+    std::vector<std::unique_ptr<IMessageConnectionAcceptor>> acceptors;
+    acceptors.emplace_back(this->target->bind(createBindingAddress(GetParam())));
+    ConnectionAggregator target(std::move(acceptors));
     {
         auto clientConnection = this->target->connect(createAddress(GetParam()));
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
