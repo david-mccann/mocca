@@ -32,7 +32,8 @@ protected:
     std::shared_ptr<IMessageConnectionFactory> target;
 };
 
-INSTANTIATE_TEST_CASE_P(InstantiationName, ConnectionAggregatorTest, ::testing::Values("tcp.prefixed", "queue.prefixed"));
+INSTANTIATE_TEST_CASE_P(InstantiationName, ConnectionAggregatorTest,
+                        ::testing::Values(NetworkServiceLocator::queuePrefixed().c_str(), NetworkServiceLocator::loopback().c_str()));
 
 TEST_P(ConnectionAggregatorTest, EnqueueDequeue) {
     ConnectionAggregator target(mocca::makeUniquePtrVec<IMessageConnectionAcceptor>(this->target->bind(createBindingAddress(GetParam()))));
