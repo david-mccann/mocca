@@ -6,6 +6,7 @@
 #include <cassert>
 #include <iterator>
 #include <vector>
+#include <memory>
 
 namespace mocca {
 
@@ -109,5 +110,17 @@ typename std::vector<T>::iterator findMemberEqual(std::vector<T>& vec, U (T::*Me
         }
     }
     return end(vec);
+}
+
+template <typename T, typename... Args>
+std::unique_ptr<T> makeUnique(Args&&... args) {
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
+template <typename T, typename... Args>
+std::vector<std::unique_ptr<T>> makeUniquePtrVec(Args&&... args) {
+    std::unique_ptr<T> tmp[] = { std::move(args)... };
+    return std::vector<std::unique_ptr<T>>{ std::make_move_iterator(std::begin(tmp)), std::make_move_iterator(std::end(tmp)) };
+
 }
 }

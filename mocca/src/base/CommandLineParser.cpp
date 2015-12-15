@@ -13,7 +13,10 @@ CommandLineParser::CommandLineParser() {
     Option usage;
     usage.key = "--help";
     usage.help = "prints help";
-    usage.callback = std::bind(&CommandLineParser::printHelp, this, std::placeholders::_1);
+    usage.callback = [&](const std::string&) {
+        printHelp();
+        std::exit(0);
+    };
     options_.push_back(usage);
 }
 
@@ -21,7 +24,7 @@ void CommandLineParser::addOption(const Option& option) {
     options_.push_back(option);
 }
 
-void mocca::CommandLineParser::printHelp(const std::string&) const {
+void CommandLineParser::printHelp() const {
     std::stringstream stream;
     for (const auto& opt : options_) {
         stream << opt.key << ": " << opt.help << std::endl;
@@ -33,7 +36,6 @@ void mocca::CommandLineParser::printHelp(const std::string&) const {
         stream << std::endl;
     }
     std::cout << stream.str();
-    std::exit(0);
 }
 
 void CommandLineParser::parse(int argc, const char** argv) {
@@ -42,8 +44,8 @@ void CommandLineParser::parse(int argc, const char** argv) {
         auto separatorIndex = arg.find_first_of("=");
         auto argKey = arg.substr(0, separatorIndex);
         if (findMemberEqual(options_, &Option::key, argKey) == end(options_)) {
-            std::cout << "Unknown option '" << argKey << "'" << std::endl;
-            printHelp(std::string());
+            printHelp();
+            throw ParserError("Unknown option: " + argKey, __FILE__, __LINE__);
         }
         std::string argValue;
         if (separatorIndex != std::string::npos) {

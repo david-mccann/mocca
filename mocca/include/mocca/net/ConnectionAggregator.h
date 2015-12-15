@@ -25,7 +25,7 @@ class ConnectionAggregator : public Runnable {
 public:
     enum class DisconnectStrategy { RemoveConnection, ThrowException };
 
-    ConnectionAggregator(std::unique_ptr<mocca::net::IMessageConnectionAcceptor> connectionAcceptor,
+    ConnectionAggregator(std::vector<std::unique_ptr<mocca::net::IMessageConnectionAcceptor>> connectionAcceptor,
                          DisconnectStrategy disconnectStrategy = DisconnectStrategy::RemoveConnection);
     ~ConnectionAggregator();
 
@@ -76,7 +76,7 @@ private:
     };
 
 private:
-    std::unique_ptr<mocca::net::IMessageConnectionAcceptor> connectionAcceptor_;
+    std::vector<std::unique_ptr<mocca::net::IMessageConnectionAcceptor>> connectionAcceptors_;
     DisconnectStrategy disconnectStrategy_;
     EnvelopeQueue sendQueue_;
     EnvelopeQueue receiveQueue_;
