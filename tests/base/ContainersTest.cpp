@@ -118,3 +118,17 @@ TEST_F(ContainersTest, CollectMembers) {
     ASSERT_EQ("first", res[0]);
     ASSERT_EQ("second", res[1]);
 }
+
+TEST_F(ContainersTest, MakeUnique) {
+    auto x = makeUnique<std::string>("Hello World");
+    ASSERT_EQ(*x, "Hello World");
+    auto y = makeUnique<std::string>(5, 'z');
+    ASSERT_EQ(*y, "zzzzz");
+}
+
+TEST_F(ContainersTest, MakeUniquePtrVec) {
+    auto x = makeUniquePtrVec<std::string>(makeUnique<std::string>("Hello"), makeUnique<std::string>("World"));
+    ASSERT_EQ(2, x.size());
+    ASSERT_EQ("Hello", *x[0]);
+    ASSERT_EQ("World", *x[1]);
+}

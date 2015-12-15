@@ -1,44 +1,44 @@
-#include <future>
-
 #include "gtest/gtest.h"
 
 #include "mocca/base/ByteArray.h"
+#include "mocca/base/Containers.h"
+#include "mocca/base/Error.h"
+#include "mocca/base/Thread.h"
 #include "mocca/net/ConnectionAggregator.h"
 #include "mocca/net/Error.h"
-#include "mocca/net/MoccaNetworkService.h"
-#include "mocca/net/TCPNetworkService.h"
-#include "mocca/testing/LoopbackPhysicalConnectionAcceptor.h"
-#include "mocca/testing/LoopbackPhysicalNetworkService.h"
-
+#include "mocca/net/NetworkServiceLocator.h"
 #include "mocca/testing/NetworkTesting.h"
+
+#include <algorithm>
+#include <future>
 
 using namespace mocca;
 using namespace mocca::net;
 using namespace mocca::testing;
 
-#ifdef MOCCA_TEST_TCP
-typedef ::testing::Types<LoopbackPhysicalNetworkService, TCPNetworkService> MyTypes;
-#else
-typedef ::testing::Types<LoopbackPhysicalNetworkService> MyTypes;
-#endif
-TYPED_TEST_CASE(ConnectionAggregatorTest, MyTypes);
-
-template <typename T> class ConnectionAggregatorTest : public ::testing::Test {
+class ConnectionAggregatorTest : public ::testing::TestWithParam<const char*> {
 protected:
-    ConnectionAggregatorTest() { service.reset(new MoccaNetworkService(std::unique_ptr<IPhysicalNetworkService>(new T()))); }
+    ConnectionAggregatorTest() {
+        // You can do set-up work for each test here.
+        NetworkServiceLocator::provideAll();
+        target = NetworkServiceLocator::service(GetParam());
+    }
 
     virtual ~ConnectionAggregatorTest() {
+        NetworkServiceLocator::removeAll();
         // You can do clean-up work that doesn't throw exceptions here.
     }
 
-    std::unique_ptr<IProtocolNetworkService> service;
+    std::shared_ptr<IMessageConnectionFactory> target;
 };
 
-TYPED_TEST(ConnectionAggregatorTest, EnqueueDequeue) {
-    auto acceptor = this->service->bind(createBindingString<TypeParam>());
-    ConnectionAggregator target(std::move(acceptor));
-    auto clientConnection1 = this->service->connect(createConnectionString<TypeParam>());
-    auto clientConnection2 = this->service->connect(createConnectionString<TypeParam>());
+INSTANTIATE_TEST_CASE_P(InstantiationName, ConnectionAggregatorTest, ::testing::Values("tcp.prefixed", "queue.prefixed"));
+
+TEST_P(ConnectionAggregatorTest, EnqueueDequeue) {
+    ConnectionAggregator target(mocca::makeUniquePtrVec<IMessageConnectionAcceptor>(this->target->bind(createBindingAddress(GetParam()))));
+
+    auto clientConnection1 = this->target->connect(createAddress(GetParam()));
+    auto clientConnection2 = this->target->connect(createAddress(GetParam()));
 
     ByteArray packet1 = mocca::makeFormattedByteArray("Hello 1");
     ByteArray packet2 = mocca::makeFormattedByteArray("Hello 2");
@@ -46,8 +46,8 @@ TYPED_TEST(ConnectionAggregatorTest, EnqueueDequeue) {
     clientConnection1->send(std::move(packet1));
     clientConnection2->send(std::move(packet2));
 
-    auto data1 = target.receive(std::chrono::milliseconds(200));
-    auto data2 = target.receive(std::chrono::milliseconds(200));
+    auto data1 = target.receive(std::chrono::milliseconds(100));
+    auto data2 = target.receive(std::chrono::milliseconds(100));
     ASSERT_FALSE(data1.isNull());
     ASSERT_FALSE(data2.isNull());
     ByteArray recPacket1(data1.release().message);
@@ -57,12 +57,35 @@ TYPED_TEST(ConnectionAggregatorTest, EnqueueDequeue) {
     ASSERT_TRUE(recStr1 == "Hello 1" && recStr2 == "Hello 2" || recStr1 == "Hello 2" && recStr2 == "Hello 1");
 }
 
-TYPED_TEST(ConnectionAggregatorTest, SendReceiveParallel) {
-    TypeParam network;
-    auto acceptor = this->service->bind(createBindingString<TypeParam>());
-    ConnectionAggregator target(std::move(acceptor));
-    auto clientConnection1 = this->service->connect(createConnectionString<TypeParam>());
-    auto clientConnection2 = this->service->connect(createConnectionString<TypeParam>());
+TEST_P(ConnectionAggregatorTest, MultipleAcceptors) {
+    ConnectionAggregator target(mocca::makeUniquePtrVec<IMessageConnectionAcceptor>(
+        this->target->bind(createBindingAddress(GetParam())), this->target->bind(createBindingAddress(GetParam(), 1))));
+
+    auto clientConnection1 = this->target->connect(createAddress(GetParam()));
+    auto clientConnection2 = this->target->connect(createAddress(GetParam(), 1));
+
+    ByteArray packet1 = mocca::makeFormattedByteArray("Hello 1");
+    ByteArray packet2 = mocca::makeFormattedByteArray("Hello 2");
+
+    clientConnection1->send(std::move(packet1));
+    clientConnection2->send(std::move(packet2));
+
+    auto data1 = target.receive(std::chrono::milliseconds(100));
+    auto data2 = target.receive(std::chrono::milliseconds(100));
+    ASSERT_FALSE(data1.isNull());
+    ASSERT_FALSE(data2.isNull());
+    ByteArray recPacket1(data1.release().message);
+    ByteArray recPacket2(data2.release().message);
+    auto recStr1 = std::get<0>(mocca::parseFormattedByteArray<std::string>(recPacket1));
+    auto recStr2 = std::get<0>(mocca::parseFormattedByteArray<std::string>(recPacket2));
+    ASSERT_TRUE(recStr1 == "Hello 1" && recStr2 == "Hello 2" || recStr1 == "Hello 2" && recStr2 == "Hello 1");
+}
+
+TEST_P(ConnectionAggregatorTest, SendReceiveParallel) {
+    ConnectionAggregator target(mocca::makeUniquePtrVec<IMessageConnectionAcceptor>(this->target->bind(createBindingAddress(GetParam()))));
+
+    auto clientConnection1 = this->target->connect(createAddress(GetParam()));
+    auto clientConnection2 = this->target->connect(createAddress(GetParam()));
 
     const int numItems = 20;
     std::vector<std::string> data;
@@ -70,7 +93,7 @@ TYPED_TEST(ConnectionAggregatorTest, SendReceiveParallel) {
         data.push_back("item " + std::to_string(i));
     }
 
-    auto sendFunction = [](IProtocolConnection& connection, const std::vector<std::string>& data) {
+    auto sendFunction = [](IMessageConnection& connection, const std::vector<std::string>& data) {
         for (auto item : data) {
             connection.send(mocca::makeFormattedByteArray(item));
             static int sleepTime = 0;
@@ -100,11 +123,11 @@ TYPED_TEST(ConnectionAggregatorTest, SendReceiveParallel) {
     }
 }
 
-TYPED_TEST(ConnectionAggregatorTest, DisconnectStrategyThrowException) {
-    auto acceptor = this->service->bind(createBindingString<TypeParam>());
-    ConnectionAggregator target(std::move(acceptor), ConnectionAggregator::DisconnectStrategy::ThrowException);
+TEST_P(ConnectionAggregatorTest, DisconnectStrategyThrowException) {
+    ConnectionAggregator target(mocca::makeUniquePtrVec<IMessageConnectionAcceptor>(this->target->bind(createBindingAddress(GetParam()))),
+                                ConnectionAggregator::DisconnectStrategy::ThrowException);
     {
-        auto clientConnection = this->service->connect(createConnectionString<TypeParam>());
+        auto clientConnection = this->target->connect(createAddress(GetParam()));
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
@@ -120,11 +143,10 @@ TYPED_TEST(ConnectionAggregatorTest, DisconnectStrategyThrowException) {
     ASSERT_TRUE(exceptionCaught);
 }
 
-TYPED_TEST(ConnectionAggregatorTest, DisconnectStrategyRemoveConnection) {
-    auto acceptor = this->service->bind(createBindingString<TypeParam>());
-    ConnectionAggregator target(std::move(acceptor), ConnectionAggregator::DisconnectStrategy::RemoveConnection);
+TEST_P(ConnectionAggregatorTest, DisconnectStrategyRemoveConnection) {
+    ConnectionAggregator target(mocca::makeUniquePtrVec<IMessageConnectionAcceptor>(this->target->bind(createBindingAddress(GetParam()))));
     {
-        auto clientConnection = this->service->connect(createConnectionString<TypeParam>());
+        auto clientConnection = this->target->connect(createAddress(GetParam()));
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 

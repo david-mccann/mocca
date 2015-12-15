@@ -2,10 +2,11 @@
 
 #include "Error.h"
 
-#include <vector>
-#include <cassert>
 #include <algorithm>
+#include <cassert>
 #include <iterator>
+#include <vector>
+#include <memory>
 
 namespace mocca {
 
@@ -36,8 +37,7 @@ public:
     V getByFirst(const U& first) const {
         auto it = std::find(begin(first_), end(first_), first);
         if (it == end(first_)) {
-            throw Error("Map does not contain the specified entry in the first column", __FILE__,
-                        __LINE__);
+            throw Error("Map does not contain the specified entry in the first column", __FILE__, __LINE__);
         }
         auto index = std::distance(begin(first_), it);
         return second_[index];
@@ -46,8 +46,7 @@ public:
     U getBySecond(const V& second) const {
         auto it = std::find(begin(second_), end(second_), second);
         if (it == end(second_)) {
-            throw Error("Map does not contain the specified entry in the second column", __FILE__,
-                        __LINE__);
+            throw Error("Map does not contain the specified entry in the second column", __FILE__, __LINE__);
         }
         auto index = std::distance(begin(second_), it);
         return first_[index];
@@ -66,8 +65,7 @@ private:
 };
 
 template <typename Iter> using IterValueType = typename std::iterator_traits<Iter>::value_type;
-template <typename Iter, typename U>
-std::vector<U> collectMembers(Iter it, Iter itEnd, const U IterValueType<Iter>::*Mem) {
+template <typename Iter, typename U> std::vector<U> collectMembers(Iter it, Iter itEnd, const U IterValueType<Iter>::*Mem) {
     std::vector<U> result;
     for (; it != itEnd; ++it) {
         result.push_back(*it.*Mem);
@@ -85,8 +83,7 @@ typename std::vector<T>::const_iterator findMemberEqual(const std::vector<T>& ve
     return end(vec);
 }
 
-template <typename T, typename U>
-typename std::vector<T>::iterator findMemberEqual(std::vector<T>& vec, const U T::*Mem, const U& val) {
+template <typename T, typename U> typename std::vector<T>::iterator findMemberEqual(std::vector<T>& vec, const U T::*Mem, const U& val) {
     for (typename std::vector<T>::iterator it = begin(vec); it != end(vec); ++it) {
         if (*it.*Mem == val) {
             return it;
@@ -96,7 +93,7 @@ typename std::vector<T>::iterator findMemberEqual(std::vector<T>& vec, const U T
 }
 
 template <typename T, typename U>
-typename std::vector<T>::const_iterator findMemberEqual(const std::vector<T>& vec, U(T::*MemFn)() const, const U& val) {
+typename std::vector<T>::const_iterator findMemberEqual(const std::vector<T>& vec, U (T::*MemFn)() const, const U& val) {
     for (typename std::vector<T>::const_iterator it = begin(vec); it != end(vec); ++it) {
         if ((*it.*MemFn)() == val) {
             return it;
@@ -106,7 +103,7 @@ typename std::vector<T>::const_iterator findMemberEqual(const std::vector<T>& ve
 }
 
 template <typename T, typename U>
-typename std::vector<T>::iterator findMemberEqual(std::vector<T>& vec, U(T::*MemFn)() const, const U& val) {
+typename std::vector<T>::iterator findMemberEqual(std::vector<T>& vec, U (T::*MemFn)() const, const U& val) {
     for (typename std::vector<T>::iterator it = begin(vec); it != end(vec); ++it) {
         if ((*it.*MemFn)() == val) {
             return it;
@@ -115,4 +112,15 @@ typename std::vector<T>::iterator findMemberEqual(std::vector<T>& vec, U(T::*Mem
     return end(vec);
 }
 
+template <typename T, typename... Args>
+std::unique_ptr<T> makeUnique(Args&&... args) {
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
+template <typename T, typename... Args>
+std::vector<std::unique_ptr<T>> makeUniquePtrVec(Args&&... args) {
+    std::unique_ptr<T> tmp[] = { std::move(args)... };
+    return std::vector<std::unique_ptr<T>>{ std::make_move_iterator(std::begin(tmp)), std::make_move_iterator(std::end(tmp)) };
+
+}
 }

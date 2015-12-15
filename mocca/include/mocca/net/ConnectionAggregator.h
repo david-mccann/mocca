@@ -3,8 +3,7 @@
 #include "mocca/base/MessageQueue.h"
 #include "mocca/base/Nullable.h"
 #include "mocca/base/Thread.h"
-#include "mocca/net/IProtocolConnection.h"
-#include "mocca/net/IProtocolConnectionAcceptor.h"
+#include "mocca/net/IMessageConnectionAcceptor.h"
 
 #include <vector>
 
@@ -26,7 +25,7 @@ class ConnectionAggregator : public Runnable {
 public:
     enum class DisconnectStrategy { RemoveConnection, ThrowException };
 
-    ConnectionAggregator(std::unique_ptr<mocca::net::IProtocolConnectionAcceptor> connectionAcceptor,
+    ConnectionAggregator(std::vector<std::unique_ptr<mocca::net::IMessageConnectionAcceptor>> connectionAcceptor,
                          DisconnectStrategy disconnectStrategy = DisconnectStrategy::RemoveConnection);
     ~ConnectionAggregator();
 
@@ -41,43 +40,43 @@ private:
 private:
     class ReceiveThread : public Runnable {
     public:
-        ReceiveThread(IProtocolConnection& connection, EnvelopeQueue& receiveQueue);
+        ReceiveThread(IMessageConnection& connection, EnvelopeQueue& receiveQueue);
         ~ReceiveThread();
 
     private:
         void run() override;
 
     private:
-        IProtocolConnection& connection_;
+        IMessageConnection& connection_;
         EnvelopeQueue& receiveQueue_;
     };
 
     class SendThread : public Runnable {
     public:
-        SendThread(IProtocolConnection& connection, EnvelopeQueue& sendQueue);
+        SendThread(IMessageConnection& connection, EnvelopeQueue& sendQueue);
         ~SendThread();
 
     private:
         void run() override;
 
     private:
-        IProtocolConnection& connection_;
+        IMessageConnection& connection_;
         EnvelopeQueue& sendQueue_;
     };
 
     struct ThreadedConnection {
         // ctor only needed because of stupid vs2013
-        ThreadedConnection(std::unique_ptr<IProtocolConnection> connection, std::thread::id receiveThreadID, std::thread::id sendThreadID)
+        ThreadedConnection(std::unique_ptr<IMessageConnection> connection, std::thread::id receiveThreadID, std::thread::id sendThreadID)
             : connection(std::move(connection))
             , receiveThreadID(receiveThreadID)
             , sendThreadID(sendThreadID) {}
-        std::unique_ptr<IProtocolConnection> connection;
+        std::unique_ptr<IMessageConnection> connection;
         std::thread::id receiveThreadID;
         std::thread::id sendThreadID;
     };
 
 private:
-    std::unique_ptr<mocca::net::IProtocolConnectionAcceptor> connectionAcceptor_;
+    std::vector<std::unique_ptr<mocca::net::IMessageConnectionAcceptor>> connectionAcceptors_;
     DisconnectStrategy disconnectStrategy_;
     EnvelopeQueue sendQueue_;
     EnvelopeQueue receiveQueue_;

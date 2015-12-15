@@ -15,9 +15,9 @@ MessageEnvelope::MessageEnvelope(MessageEnvelope&& other)
     , senderID(std::move(other.senderID)) {}
 
 
-ConnectionAggregator::ConnectionAggregator(std::unique_ptr<mocca::net::IProtocolConnectionAcceptor> connectionAcceptor,
+ConnectionAggregator::ConnectionAggregator(std::vector<std::unique_ptr<IMessageConnectionAcceptor>> connectionAcceptors,
                                            DisconnectStrategy disconnectStrategy)
-    : connectionAcceptor_(std::move(connectionAcceptor))
+    : connectionAcceptors_(std::move(connectionAcceptors))
     , disconnectStrategy_(disconnectStrategy) {
     start();
 }
@@ -42,20 +42,23 @@ void ConnectionAggregator::send(MessageEnvelope envelope) {
 }
 
 void ConnectionAggregator::run() {
-    try {
-        while (!isInterrupted()) {
-            auto connection = connectionAcceptor_->getConnection(std::chrono::milliseconds(100));
-            if (connection != nullptr) {
-                auto sendRunnable = std::unique_ptr<SendThread>(new SendThread(*connection, sendQueue_));
-                auto receiveRunnable = std::unique_ptr<ReceiveThread>(new ReceiveThread(*connection, receiveQueue_));
-                connections_.emplace_back(std::move(connection), sendRunnable->id(), receiveRunnable->id());
-                runnables_.addRunnable(std::move(sendRunnable));
-                runnables_.addRunnable(std::move(receiveRunnable));
+    while (!isInterrupted()) {
+        try {
+            for (auto& acceptor : connectionAcceptors_) {
+                auto connection = acceptor->accept(std::chrono::milliseconds(100));
+                if (connection != nullptr) {
+                    auto sendRunnable = std::unique_ptr<SendThread>(new SendThread(*connection, sendQueue_));
+                    auto receiveRunnable = std::unique_ptr<ReceiveThread>(new ReceiveThread(*connection, receiveQueue_));
+                    connections_.emplace_back(std::move(connection), sendRunnable->id(), receiveRunnable->id());
+                    runnables_.addRunnable(std::move(sendRunnable));
+                    runnables_.addRunnable(std::move(receiveRunnable));
+                }
             }
 
             try {
                 runnables_.rethrowException();
-            } catch (const ConnectionClosedError& err) {
+            }
+            catch (const ConnectionClosedError& err) {
                 if (disconnectStrategy_ == DisconnectStrategy::RemoveConnection) {
                     auto it = std::find_if(begin(connections_), end(connections_), [&](const ThreadedConnection& connection) {
                         return connection.connection->identifier() == err.connectionID();
@@ -64,18 +67,19 @@ void ConnectionAggregator::run() {
                     runnables_.removeRunnable(it->sendThreadID);
                     connections_.erase(it);
                     LDEBUG("Connection to peer has been lost");
-                } else {
+                }
+                else {
                     throw err;
                 }
             }
+        } catch (...) {
+            setException(std::current_exception());
         }
-    } catch (...) {
-        setException(std::current_exception());
     }
 }
 
 
-ConnectionAggregator::ReceiveThread::ReceiveThread(IProtocolConnection& connection, EnvelopeQueue& receiveQueue)
+ConnectionAggregator::ReceiveThread::ReceiveThread(IMessageConnection& connection, EnvelopeQueue& receiveQueue)
     : connection_(connection)
     , receiveQueue_(receiveQueue) {
     start();
@@ -100,7 +104,7 @@ void ConnectionAggregator::ReceiveThread::run() {
 }
 
 
-ConnectionAggregator::SendThread::SendThread(IProtocolConnection& connection, EnvelopeQueue& sendQueue)
+ConnectionAggregator::SendThread::SendThread(IMessageConnection& connection, EnvelopeQueue& sendQueue)
     : connection_(connection)
     , sendQueue_(sendQueue) {
     start();
