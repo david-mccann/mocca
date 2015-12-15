@@ -42,8 +42,8 @@ void ConnectionAggregator::send(MessageEnvelope envelope) {
 }
 
 void ConnectionAggregator::run() {
-    try {
-        while (!isInterrupted()) {
+    while (!isInterrupted()) {
+        try {
             auto connection = connectionAcceptor_->accept(std::chrono::milliseconds(100));
             if (connection != nullptr) {
                 auto sendRunnable = std::unique_ptr<SendThread>(new SendThread(*connection, sendQueue_));
@@ -68,9 +68,9 @@ void ConnectionAggregator::run() {
                     throw err;
                 }
             }
+        } catch (...) {
+            setException(std::current_exception());
         }
-    } catch (...) {
-        setException(std::current_exception());
     }
 }
 

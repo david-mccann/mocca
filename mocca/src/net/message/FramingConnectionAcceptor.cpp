@@ -12,8 +12,9 @@ FramingConnectionAcceptor::FramingConnectionAcceptor(std::unique_ptr<IStreamConn
 std::unique_ptr<IMessageConnection> FramingConnectionAcceptor::accept(std::chrono::milliseconds timeout) {
     auto stream = streamAcceptor_->accept(timeout);
     if (stream != nullptr) {
-        framingStrategy_->performHandshake(*stream, timeout);
-        return std::unique_ptr<IMessageConnection>(new FramingConnection(std::move(stream), framingStrategy_->clone()));
+        auto strategyCopy = framingStrategy_->clone();
+        strategyCopy->performHandshake(*stream, timeout);
+        return std::unique_ptr<IMessageConnection>(new FramingConnection(std::move(stream), std::move(strategyCopy)));
     }
     return nullptr;
 }
