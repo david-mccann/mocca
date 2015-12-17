@@ -1,6 +1,6 @@
 #include "mocca/base/CommandLineParser.h"
 
-#include "mocca/base/Containers.h"
+#include "mocca/base/ContainerTools.h"
 #include "mocca/base/Error.h"
 #include "mocca/base/StringTools.h"
 
@@ -43,7 +43,7 @@ void CommandLineParser::parse(int argc, const char** argv) {
         auto arg = std::string(argv[i]);
         auto separatorIndex = arg.find_first_of("=");
         auto argKey = arg.substr(0, separatorIndex);
-        if (findMemberEqual(options_, &Option::key, argKey) == end(options_)) {
+        if (findMemberEqual(begin(options_), end(options_), &Option::key, argKey) == end(options_)) {
             printHelp();
             throw ParserError("Unknown option: " + argKey, __FILE__, __LINE__);
         }
@@ -54,7 +54,7 @@ void CommandLineParser::parse(int argc, const char** argv) {
         for (const auto& opt : options_) {
             if (opt.key == argKey) {
                 if (!opt.allowedValues.empty()) {
-                    if (findMemberEqual(opt.allowedValues, &OptionValue::value, argValue) == end(opt.allowedValues)) {
+                    if (findMemberEqual(begin(opt.allowedValues), end(opt.allowedValues), &OptionValue::value, argValue) == end(opt.allowedValues)) {
                         auto allowedValues = collectMembers(begin(opt.allowedValues), end(opt.allowedValues), &OptionValue::value);
                         auto allowedValuesStr = makeString(begin(allowedValues), end(allowedValues));
                         throw ParserError(
