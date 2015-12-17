@@ -3,9 +3,13 @@
 #include "mocca/net/message/LoopbackConnection.h"
 #include "mocca/net/message/LoopbackConnectionAcceptor.h"
 
-#include "mocca/net/NetworkError.h"
+#include "mocca/net/Error.h"
 
 using namespace mocca::net;
+
+std::string LoopbackConnectionFactory::protocol() const {
+    return "loopback";
+}
 
 std::unique_ptr<IMessageConnection> LoopbackConnectionFactory::connect(const std::string& queueName) {
     if (!spawnedConnections_.count(queueName)) {

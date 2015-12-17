@@ -1,6 +1,6 @@
 #include "mocca/net/message/LoopbackConnection.h"
 
-#include "mocca/net/NetworkError.h"
+#include "mocca/net/Error.h"
 
 using namespace mocca;
 using namespace mocca::net;
@@ -46,6 +46,6 @@ ByteArray LoopbackConnection::receive(std::chrono::milliseconds timeout) const {
         }
     }
 
-    auto data = receiveQueue_->dequeue(timeout);
+    auto data = receiveQueue_->tryDequeue(timeout);
     return data.isNull() ? ByteArray() : data.release();
 }

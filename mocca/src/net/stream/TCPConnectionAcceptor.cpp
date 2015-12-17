@@ -2,7 +2,7 @@
 
 #include "mocca/base/StringTools.h"
 #include "mocca/log/LogManager.h"
-#include "mocca/net/stream/TCPConnection.h"
+#include "mocca/net/stream/Sockets.h"
 
 namespace mocca {
 namespace net {

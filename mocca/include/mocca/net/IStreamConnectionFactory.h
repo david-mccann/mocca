@@ -9,6 +9,7 @@ class IStreamConnectionFactory {
 public:
     virtual ~IStreamConnectionFactory() {}
 
+    virtual std::string protocol() const = 0;
     virtual std::unique_ptr<IStreamConnection> connect(const std::string& address) = 0;
     virtual std::unique_ptr<IStreamConnectionAcceptor> bind(const std::string& address) = 0;
 };

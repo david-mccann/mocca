@@ -3,7 +3,6 @@
 #include "mocca/base/Nullable.h"
 
 #include <algorithm>
-#include <chrono>
 #include <condition_variable>
 #include <functional>
 #include <list>
@@ -21,10 +20,22 @@ public:
         condition_.notify_all();
     }
 
+    /* Blocking dequeue operation. The calling thread is blocked until an item is available for
+     * being fetched from the queue. */
+    T dequeue() {
+        std::unique_lock<std::mutex> lock(mutex_);
+        while (queue_.empty()) {
+            condition_.wait(lock);
+        }
+        T val(std::move(queue_.front()));
+        queue_.pop_front();
+        return val;
+    }
+
     /* Dequeue operation with a timeout. The calling thread is blocked until either an item is
      * available for being fetched or the timeout expires. If the timeout expires, a null-object is
      * returned. */
-    Nullable<T> dequeue(std::chrono::milliseconds timeout) {
+    Nullable<T> tryDequeue(std::chrono::milliseconds timeout) {
         std::unique_lock<std::mutex> lock(mutex_);
         if (!condition_.wait_for(lock, timeout, [&] { return !queue_.empty(); })) {
             return Nullable<T>();
@@ -34,9 +45,9 @@ public:
         return val;
     }
 
-    /* Blocking dequeue operation with a predicate for filtering and a timeout. Like 'dequeue',
+    /* Blocking dequeue operation with a predicate for filtering and a timeout. Like 'tryDequeue',
     * but only items satisfying the predicate will be fetched.  */
-    Nullable<T> dequeueFiltered(std::function<bool(const T&)> predicate, std::chrono::milliseconds timeout) {
+    Nullable<T> tryDequeueFiltered(std::function<bool(const T&)> predicate, std::chrono::milliseconds timeout) {
         std::unique_lock<std::mutex> lock(mutex_);
         typename decltype(queue_)::iterator findIt;
         if (!condition_.wait_for(lock, timeout, [&] {

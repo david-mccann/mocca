@@ -1,7 +1,7 @@
 #include "mocca/net/ConnectionAggregator.h"
 
 #include "mocca/log/LogManager.h"
-#include "mocca/net/NetworkError.h"
+#include "mocca/net/Error.h"
 
 using namespace mocca::net;
 using namespace mocca;
@@ -33,7 +33,7 @@ void mocca::net::ConnectionAggregator::interrupt() {
 
 mocca::Nullable<MessageEnvelope> ConnectionAggregator::receive(std::chrono::milliseconds timeout) {
     rethrowException();
-    return receiveQueue_.dequeue(timeout);
+    return receiveQueue_.tryDequeue(timeout);
 }
 
 void ConnectionAggregator::send(MessageEnvelope envelope) {
@@ -118,7 +118,7 @@ void ConnectionAggregator::SendThread::run() {
     try {
         while (!isInterrupted()) {
             auto connectionID = connection_.identifier();
-            auto dataNullable = sendQueue_.dequeueFiltered(
+            auto dataNullable = sendQueue_.tryDequeueFiltered(
                 [&connectionID](const MessageEnvelope& envelope) { return envelope.senderID == connectionID; },
                 std::chrono::milliseconds(100));
             if (!dataNullable.isNull()) {

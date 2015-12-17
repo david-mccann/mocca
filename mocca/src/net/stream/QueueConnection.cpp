@@ -1,6 +1,6 @@
 #include "mocca/net/stream/QueueConnection.h"
 
-#include "mocca/net/NetworkError.h"
+#include "mocca/net/Error.h"
 
 
 using namespace mocca;
@@ -52,7 +52,7 @@ ByteArray QueueConnection::receive(uint32_t maxSize, std::chrono::milliseconds t
     }
     ByteArray result;
     while (result.size() < maxSize) {
-        auto dataNullable = receiveQueue_->dequeue(timeout);
+        auto dataNullable = receiveQueue_->tryDequeue(timeout);
         if (dataNullable.isNull()) {
             return result;
         }

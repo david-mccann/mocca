@@ -18,16 +18,23 @@ protected:
     }
 };
 
-
 TEST_F(MessageQueueTest, EnqueueDequeue) {
     MessageQueue<std::string> target;
 
-    ASSERT_TRUE(target.dequeue(std::chrono::milliseconds(20)).isNull());
+    ASSERT_TRUE(target.isEmpty());
+    ASSERT_EQ(0, target.size());
 
     target.enqueue("Test");
-    ASSERT_EQ("Test", target.dequeue(std::chrono::milliseconds(20)));
 
-    ASSERT_TRUE(target.dequeue(std::chrono::milliseconds(20)).isNull());
+    ASSERT_FALSE(target.isEmpty());
+    ASSERT_EQ(1, target.size());
+
+    auto s = target.dequeue();
+
+    ASSERT_EQ("Test", s);
+
+    ASSERT_TRUE(target.isEmpty());
+    ASSERT_EQ(0, target.size());
 }
 
 TEST_F(MessageQueueTest, EnqueueDequeueParallel) {
@@ -45,7 +52,7 @@ TEST_F(MessageQueueTest, EnqueueDequeueParallel) {
 
     std::vector<std::future<int>> futures;
     for (int i = 0; i < numItems; i++) {
-        futures.push_back(std::async(std::launch::async, [&target]() { return target.dequeue(std::chrono::milliseconds(2)).get(); }));
+        futures.push_back(std::async(std::launch::async, [&target]() { return target.dequeue(); }));
     }
 
     std::vector<int> result;
@@ -58,18 +65,18 @@ TEST_F(MessageQueueTest, EnqueueDequeueParallel) {
     ASSERT_TRUE(target.isEmpty());
 }
 
-TEST_F(MessageQueueTest, DequeueFiltered) {
+TEST_F(MessageQueueTest, TryDequeueFiltered) {
     {
         MessageQueue<std::string> target;
         target.enqueue("Test");
         target.enqueue("Test2");
-        auto s = target.dequeueFiltered([](const std::string& str) { return str == "Test2"; }, std::chrono::milliseconds(20));
+        auto s = target.tryDequeueFiltered([](const std::string& str) { return str == "Test2"; }, std::chrono::milliseconds(20));
         ASSERT_EQ(1, target.size());
     }
     {
         MessageQueue<std::string> target;
         target.enqueue("Test");
-        auto s = target.dequeueFiltered([](const std::string& str) { return str == "Test2"; }, std::chrono::milliseconds(20));
+        auto s = target.tryDequeueFiltered([](const std::string& str) { return str == "Test2"; }, std::chrono::milliseconds(20));
         ASSERT_TRUE(s.isNull());
         ASSERT_EQ(1, target.size());
     }
@@ -80,7 +87,7 @@ TEST_F(MessageQueueTest, DequeueFiltered) {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
             target.enqueue("Test2");
         });
-        auto s = target.dequeueFiltered([](const std::string& str) { return str == "Test2"; }, std::chrono::milliseconds(20));
+        auto s = target.tryDequeueFiltered([](const std::string& str) { return str == "Test2"; }, std::chrono::milliseconds(20));
         ASSERT_EQ("Test2", s);
         ASSERT_EQ(1, target.size());
         t.join();
@@ -92,8 +99,19 @@ TEST_F(MessageQueueTest, DequeueFiltered) {
             std::this_thread::sleep_for(std::chrono::milliseconds(40));
             target.enqueue("Test2");
         });
-        auto s = target.dequeueFiltered([](const std::string& str) { return str == "Test2"; }, std::chrono::milliseconds(20));
+        auto s = target.tryDequeueFiltered([](const std::string& str) { return str == "Test2"; }, std::chrono::milliseconds(20));
         ASSERT_TRUE(s.isNull());
         t.join();
     }
+}
+
+TEST_F(MessageQueueTest, TryDequeue) {
+    MessageQueue<std::string> target;
+
+    ASSERT_TRUE(target.tryDequeue(std::chrono::milliseconds(20)).isNull());
+
+    target.enqueue("Test");
+    ASSERT_EQ("Test", target.tryDequeue(std::chrono::milliseconds(20)));
+
+    ASSERT_TRUE(target.tryDequeue(std::chrono::milliseconds(20)).isNull());
 }

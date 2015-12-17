@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mocca/net/stream/Sockets.h"
+#include "mocca/net/stream/TCPConnection.h"
 #include "mocca/net/IStreamConnectionAcceptor.h"
 
 namespace mocca {

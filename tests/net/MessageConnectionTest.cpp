@@ -4,7 +4,7 @@
 #include "mocca/base/Thread.h"
 #include "mocca/base/ByteArray.h"
 #include "mocca/testing/NetworkTesting.h"
-#include "mocca/net/ConnectionFactorySelector.h"
+#include "mocca/net/NetworkServiceLocator.h"
 
 #include <future>
 #include <algorithm>
@@ -17,21 +17,21 @@ class NetworkServiceTest : public ::testing::TestWithParam<const char*> {
 protected:
     NetworkServiceTest() {
         // You can do set-up work for each test here.
-        ConnectionFactorySelector::addDefaultFactories();
-        target = &ConnectionFactorySelector::messageConnectionFactory(GetParam());
+        NetworkServiceLocator::provideAll();
+        target = NetworkServiceLocator::service(GetParam());
     }
 
     virtual ~NetworkServiceTest() {
-        ConnectionFactorySelector::removeAll();
+        NetworkServiceLocator::removeAll();
         // You can do clean-up work that doesn't throw exceptions here.
     }
 
-    IMessageConnectionFactory* target;
+    std::shared_ptr<IMessageConnectionFactory> target;
 };
 
 INSTANTIATE_TEST_CASE_P(InstantiationName,
     NetworkServiceTest,
-    ::testing::Values(ConnectionFactorySelector::queuePrefixed().c_str(), ConnectionFactorySelector::loopback().c_str()));
+    ::testing::Values(NetworkServiceLocator::queuePrefixed().c_str(), NetworkServiceLocator::loopback().c_str()));
 
 TEST_P(NetworkServiceTest, Identifier)
 {

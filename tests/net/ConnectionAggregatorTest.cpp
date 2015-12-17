@@ -1,12 +1,12 @@
 #include "gtest/gtest.h"
 
 #include "mocca/base/ByteArray.h"
-#include "mocca/base/ContainerTools.h"
+#include "mocca/base/Containers.h"
 #include "mocca/base/Error.h"
 #include "mocca/base/Thread.h"
 #include "mocca/net/ConnectionAggregator.h"
-#include "mocca/net/NetworkError.h"
-#include "mocca/net/ConnectionFactorySelector.h"
+#include "mocca/net/Error.h"
+#include "mocca/net/NetworkServiceLocator.h"
 #include "mocca/testing/NetworkTesting.h"
 
 #include <algorithm>
@@ -20,20 +20,20 @@ class ConnectionAggregatorTest : public ::testing::TestWithParam<const char*> {
 protected:
     ConnectionAggregatorTest() {
         // You can do set-up work for each test here.
-        ConnectionFactorySelector::addDefaultFactories();
-        target = &ConnectionFactorySelector::messageConnectionFactory(GetParam());
+        NetworkServiceLocator::provideAll();
+        target = NetworkServiceLocator::service(GetParam());
     }
 
     virtual ~ConnectionAggregatorTest() {
-        ConnectionFactorySelector::removeAll();
+        NetworkServiceLocator::removeAll();
         // You can do clean-up work that doesn't throw exceptions here.
     }
 
-    IMessageConnectionFactory* target;
+    std::shared_ptr<IMessageConnectionFactory> target;
 };
 
 INSTANTIATE_TEST_CASE_P(InstantiationName, ConnectionAggregatorTest,
-                        ::testing::Values(ConnectionFactorySelector::queuePrefixed().c_str(), ConnectionFactorySelector::loopback().c_str()));
+                        ::testing::Values(NetworkServiceLocator::queuePrefixed().c_str(), NetworkServiceLocator::loopback().c_str()));
 
 TEST_P(ConnectionAggregatorTest, EnqueueDequeue) {
     ConnectionAggregator target(mocca::makeUniquePtrVec<IMessageConnectionAcceptor>(this->target->bind(createBindingAddress(GetParam()))));

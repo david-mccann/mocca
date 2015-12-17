@@ -7,6 +7,9 @@
 
 using namespace mocca::net;
 
+std::string mocca::net::TCPConnectionFactory::protocol() const {
+    return "tcp";
+}
 
 std::unique_ptr<IStreamConnection> TCPConnectionFactory::connect(const std::string& address) {
     TCPNetworkAddress networkAddress(address);

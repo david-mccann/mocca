@@ -12,6 +12,7 @@ public:
     FramingConnectionFactory(std::unique_ptr<IStreamConnectionFactory> streamConnectionFactory,
                          std::unique_ptr<FramingStrategy> framingStrategy);
 
+    std::string protocol() const override;
     std::unique_ptr<IMessageConnection> connect(const std::string& address) override;
     std::unique_ptr<IMessageConnectionAcceptor> bind(const std::string& address) override;
 

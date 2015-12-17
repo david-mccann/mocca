@@ -2,10 +2,14 @@
 
 #include "mocca/net/stream/QueueConnection.h"
 #include "mocca/net/stream/QueueConnectionAcceptor.h"
-#include "mocca/net/NetworkError.h"
+
+#include "mocca/net/Error.h"
 
 using namespace mocca::net;
 
+std::string QueueConnectionFactory::protocol() const {
+    return "queue";
+}
 
 std::unique_ptr<IStreamConnection> QueueConnectionFactory::connect(const std::string& queueName) {
     if (!spawnedConnections_.count(queueName)) {

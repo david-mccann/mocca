@@ -1,7 +1,7 @@
 #include "mocca/net/framing/WebSocketProtocol.h"
 
 #include "mocca/base/Endian.h"
-#include "mocca/net/NetworkError.h"
+#include "mocca/net/Error.h"
 #include "mocca/net/framing/FramingUtils.h"
 
 #include "base64/base64.h"
@@ -12,6 +12,10 @@ using namespace mocca::net;
 
 std::unique_ptr<FramingStrategy> WebSocketProtocol::clone() const {
     return std::unique_ptr<FramingStrategy>(new WebSocketProtocol(*this));
+}
+
+std::string mocca::net::WebSocketProtocol::protocol() const {
+    return "ws";
 }
 
 void WebSocketProtocol::performHandshake(IStreamConnection& connection, std::chrono::milliseconds timeout) {
