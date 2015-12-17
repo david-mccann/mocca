@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "mocca/net/Error.h"
+#include "mocca/net/NetworkError.h"
 #include "mocca/net/stream/stddefines.h"
 
 #ifdef DETECTED_OS_WINDOWS

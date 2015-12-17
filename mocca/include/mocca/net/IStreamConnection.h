@@ -4,6 +4,7 @@
 
 #include <chrono>
 #include <mutex>
+#include <string>
 
 namespace mocca {
 namespace net {

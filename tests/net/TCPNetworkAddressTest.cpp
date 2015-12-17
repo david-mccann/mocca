@@ -1,8 +1,9 @@
 #include "gtest/gtest.h"
 
 #include "mocca/net/stream/TCPNetworkAddress.h"
-#include "mocca/net/Error.h"
+#include "mocca/base/Error.h"
 
+using namespace mocca;
 using namespace mocca::net;
 
 class TCPNetworkAddressTest : public ::testing::Test {
@@ -22,9 +23,9 @@ TEST_F(TCPNetworkAddressTest, Ctor1) {
 		ASSERT_EQ("localhost", target.ip());
 		ASSERT_EQ(1234, target.port());
 	}
-	ASSERT_THROW(TCPNetworkAddress("", 1234), NetworkError);
-	ASSERT_THROW(TCPNetworkAddress("", 66666), NetworkError);
-	ASSERT_THROW(TCPNetworkAddress("", -1), NetworkError);
+	ASSERT_THROW(TCPNetworkAddress("", 1234), Error);
+	ASSERT_THROW(TCPNetworkAddress("", 66666), Error);
+	ASSERT_THROW(TCPNetworkAddress("", -1), Error);
 }
 
 TEST_F(TCPNetworkAddressTest, Ctor2) {
@@ -33,10 +34,10 @@ TEST_F(TCPNetworkAddressTest, Ctor2) {
 		ASSERT_EQ("localhost", target.ip());
 		ASSERT_EQ(1234, target.port());
 	}
-	ASSERT_THROW(TCPNetworkAddress("localhost"), NetworkError);
-	ASSERT_THROW(TCPNetworkAddress("localhost:bla:1234"), NetworkError);
-	ASSERT_THROW(TCPNetworkAddress("localhost:66666"), NetworkError);
-	ASSERT_THROW(TCPNetworkAddress("localhost:-1"), NetworkError);
+	ASSERT_THROW(TCPNetworkAddress("localhost"), Error);
+	ASSERT_THROW(TCPNetworkAddress("localhost:bla:1234"), Error);
+	ASSERT_THROW(TCPNetworkAddress("localhost:66666"), Error);
+	ASSERT_THROW(TCPNetworkAddress("localhost:-1"), Error);
 }
 
 TEST_F(TCPNetworkAddressTest, address) {

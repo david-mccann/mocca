@@ -34,8 +34,6 @@ public:
         msg_ = str.str();
     }
 
-    virtual ~Error() {}
-
     const char* what() const NOEXCEPT override { return msg_.c_str(); }
 
 protected:

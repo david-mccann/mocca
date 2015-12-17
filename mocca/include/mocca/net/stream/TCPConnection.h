@@ -1,9 +1,7 @@
 #pragma once
 
-#include "mocca/base/ByteArray.h"
 #include "mocca/net/IStreamConnection.h"
 #include "mocca/net/stream/Sockets.h"
-#include "mocca/net/stream/TCPNetworkAddress.h"
 
 namespace mocca {
 namespace net {

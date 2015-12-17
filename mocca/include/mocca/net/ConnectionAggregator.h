@@ -19,8 +19,6 @@ struct MessageEnvelope {
     std::string senderID;
 };
 
-using EnvelopeQueue = MessageQueue<MessageEnvelope>;
-
 class ConnectionAggregator : public Runnable {
 public:
     enum class DisconnectStrategy { RemoveConnection, ThrowException };
@@ -38,6 +36,8 @@ private:
     void run() override;
 
 private:
+    using EnvelopeQueue = MessageQueue<MessageEnvelope>;
+
     class ReceiveThread : public Runnable {
     public:
         ReceiveThread(IMessageConnection& connection, EnvelopeQueue& receiveQueue);
@@ -66,7 +66,7 @@ private:
 
     struct ThreadedConnection {
         // ctor only needed because of stupid vs2013
-        ThreadedConnection(std::unique_ptr<IMessageConnection> connection, std::thread::id receiveThreadID, std::thread::id sendThreadID)
+        ThreadedConnection(std::unique_ptr<IMessageConnection> connection, const std::thread::id& receiveThreadID, const std::thread::id& sendThreadID)
             : connection(std::move(connection))
             , receiveThreadID(receiveThreadID)
             , sendThreadID(sendThreadID) {}

@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "mocca/base/Endian.h"
-#include "mocca/net/Error.h"
+#include "mocca/net/NetworkError.h"
 #include "mocca/net/framing/FramingUtils.h"
 #include "mocca/net/framing/WebSocketProtocol.h"
 #include "mocca/net/message/FramingConnectionFactory.h"

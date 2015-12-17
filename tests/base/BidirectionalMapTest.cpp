@@ -1,21 +1,21 @@
 #include "gtest/gtest.h"
 
-#include "mocca/base/Containers.h"
+#include "mocca/base/BidirectionalMap.h"
 
 using namespace mocca;
 
-class ContainersTest : public ::testing::Test {
+class BidirectionalMapTest : public ::testing::Test {
 protected:
-	ContainersTest() {
+	BidirectionalMapTest() {
 		// You can do set-up work for each test here.
 	}
 
-	virtual ~ContainersTest() {
+	virtual ~BidirectionalMapTest() {
 		// You can do clean-up work that doesn't throw exceptions here.
 	}
 };
 
-TEST_F(ContainersTest, Size) {
+TEST_F(BidirectionalMapTest, Size) {
 	BidirectionalMap<int, std::string> target;
 	ASSERT_EQ(0, target.size());
 	target.insert(42, "meaning of life");
@@ -24,14 +24,14 @@ TEST_F(ContainersTest, Size) {
 	ASSERT_EQ(2, target.size());
 }
 
-TEST_F(ContainersTest, Empty) {
+TEST_F(BidirectionalMapTest, Empty) {
 	BidirectionalMap<int, std::string> target;
 	ASSERT_TRUE(target.empty());
 	target.insert(42, "meaning of life");
 	ASSERT_FALSE(target.empty());
 }
 
-TEST_F(ContainersTest, InsertReplace) {
+TEST_F(BidirectionalMapTest, InsertReplace) {
 	BidirectionalMap<int, std::string> target;
 	target.insert(42, "meaning of life");
 	target.insert(42, "meaningless number");
@@ -39,20 +39,20 @@ TEST_F(ContainersTest, InsertReplace) {
 	ASSERT_EQ("meaningless number", target.getByFirst(42));
 }
 
-TEST_F(ContainersTest, GetByFirst) {
+TEST_F(BidirectionalMapTest, GetByFirst) {
 	BidirectionalMap<int, std::string> target;
 	target.insert(42, "meaning of life");
 	target.insert(666, "number of the beast");
 	ASSERT_EQ("meaning of life", target.getByFirst(42));
 	ASSERT_EQ("number of the beast", target.getByFirst(666));
 }
-TEST_F(ContainersTest, GetByFirstNotFound) {
+TEST_F(BidirectionalMapTest, GetByFirstNotFound) {
 	BidirectionalMap<int, std::string> target;
 	target.insert(42, "meaning of life");
 	ASSERT_THROW(target.getByFirst(43), Error);
 }
 
-TEST_F(ContainersTest, GetBySecond) {
+TEST_F(BidirectionalMapTest, GetBySecond) {
 	BidirectionalMap<int, std::string> target;
 	target.insert(42, "meaning of life");
 	target.insert(666, "number of the beast");
@@ -60,13 +60,13 @@ TEST_F(ContainersTest, GetBySecond) {
 	ASSERT_EQ(666, target.getBySecond("number of the beast"));
 }
 
-TEST_F(ContainersTest, GetBySecondNotFound) {
+TEST_F(BidirectionalMapTest, GetBySecondNotFound) {
 	BidirectionalMap<int, std::string> target;
 	target.insert(42, "meaning of life");
 	ASSERT_THROW(target.getBySecond("meaningless number"), Error);
 }
 
-TEST_F(ContainersTest, SubscriptInsert) {
+TEST_F(BidirectionalMapTest, SubscriptInsert) {
 	BidirectionalMap<int, std::string> target;
 	target[42] = "meaning of life";
 	ASSERT_EQ(1, target.size());
@@ -74,7 +74,7 @@ TEST_F(ContainersTest, SubscriptInsert) {
 	ASSERT_EQ(42, target.getBySecond("meaning of life"));
 }
 
-TEST_F(ContainersTest, SubscriptReplace) {
+TEST_F(BidirectionalMapTest, SubscriptReplace) {
 	BidirectionalMap<int, std::string> target;
 	target[42] = "meaning of life";
 	target[42] = "meaningless number";
@@ -82,53 +82,9 @@ TEST_F(ContainersTest, SubscriptReplace) {
 	ASSERT_EQ("meaningless number", target.getByFirst(42));
 }
 
-TEST_F(ContainersTest, SubscriptRead) {
+TEST_F(BidirectionalMapTest, SubscriptRead) {
 	BidirectionalMap<int, std::string> target;
 	ASSERT_EQ(std::string(), target[42]);
 	target[42] = "meaning of life";
 	ASSERT_EQ("meaning of life", target[42]);
-}
-
-TEST_F(ContainersTest, FindMemberEqual) {
-    struct TestStruct {
-        int val;
-        int getVal() const { return val; }
-    };
-    
-    {
-        std::vector<TestStruct> v{ { 17 },{ 23 },{ 42 } };
-        auto result = mocca::findMemberEqual(v, &TestStruct::getVal, 23);
-        ASSERT_EQ(23, result->val);
-    }
-    {
-        std::vector<TestStruct> v{ { 17 },{ 23 },{ 42 } };
-        auto result = mocca::findMemberEqual(v, &TestStruct::getVal, 4711);
-        ASSERT_EQ(end(v), result);
-    }
-}
-
-TEST_F(ContainersTest, CollectMembers) {
-    struct SomeStruct {
-        std::string val1;
-        int val2;
-    };
-    std::vector<SomeStruct> vec{ {"first", 1}, {"second", 2} };
-    auto res = collectMembers(begin(vec), end(vec), &SomeStruct::val1);
-    ASSERT_EQ(2, res.size());
-    ASSERT_EQ("first", res[0]);
-    ASSERT_EQ("second", res[1]);
-}
-
-TEST_F(ContainersTest, MakeUnique) {
-    auto x = makeUnique<std::string>("Hello World");
-    ASSERT_EQ(*x, "Hello World");
-    auto y = makeUnique<std::string>(5, 'z');
-    ASSERT_EQ(*y, "zzzzz");
-}
-
-TEST_F(ContainersTest, MakeUniquePtrVec) {
-    auto x = makeUniquePtrVec<std::string>(makeUnique<std::string>("Hello"), makeUnique<std::string>("World"));
-    ASSERT_EQ(2, x.size());
-    ASSERT_EQ("Hello", *x[0]);
-    ASSERT_EQ("World", *x[1]);
 }
