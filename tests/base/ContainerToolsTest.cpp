@@ -48,7 +48,7 @@ TEST_F(ContainerToolsTest, CollectMembers) {
 }
 
 TEST_F(ContainerToolsTest, MakeUniquePtrVec) {
-    auto x = makeUniquePtrVec<std::string>(makeUnique<std::string>("Hello"), makeUnique<std::string>("World"));
+    auto x = makeUniquePtrVec(makeUnique<std::string>("Hello"), makeUnique<std::string>("World"));
     ASSERT_EQ(2, x.size());
     ASSERT_EQ("Hello", *x[0]);
     ASSERT_EQ("World", *x[1]);

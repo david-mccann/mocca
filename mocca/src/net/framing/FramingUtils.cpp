@@ -30,7 +30,7 @@ ByteArray mocca::net::readUntil(IStreamConnection& stream, const std::string& de
 ByteArray mocca::net::readExactly(IStreamConnection& stream, uint32_t size, std::chrono::milliseconds timeout) {
     ByteArray result(size);
     while (result.size() < size) {
-        auto chunk = stream.receive(size, timeout);
+        auto chunk = stream.receive(size - result.size(), timeout);
         if (chunk.isEmpty()) {
             return ByteArray(); // fixme: if no data is returned, the queue should not be modified
         }

@@ -5,8 +5,8 @@
 #include "mocca/base/Error.h"
 #include "mocca/base/Thread.h"
 #include "mocca/net/ConnectionAggregator.h"
-#include "mocca/net/NetworkError.h"
 #include "mocca/net/ConnectionFactorySelector.h"
+#include "mocca/net/NetworkError.h"
 #include "mocca/testing/NetworkTesting.h"
 
 #include <algorithm>
@@ -32,11 +32,11 @@ protected:
     IMessageConnectionFactory* target;
 };
 
-INSTANTIATE_TEST_CASE_P(InstantiationName, ConnectionAggregatorTest,
-                        ::testing::Values(ConnectionFactorySelector::queuePrefixed().c_str(), ConnectionFactorySelector::loopback().c_str()));
+INSTANTIATE_TEST_CASE_P(InstantiationName, ConnectionAggregatorTest, ::testing::Values(ConnectionFactorySelector::queuePrefixed().c_str(),
+                                                                                       ConnectionFactorySelector::loopback().c_str()));
 
 TEST_P(ConnectionAggregatorTest, EnqueueDequeue) {
-    ConnectionAggregator target(mocca::makeUniquePtrVec<IMessageConnectionAcceptor>(this->target->bind(createBindingAddress(GetParam()))));
+    ConnectionAggregator target(mocca::makeUniquePtrVec(this->target->bind(createBindingAddress(GetParam()))));
 
     auto clientConnection1 = this->target->connect(createAddress(GetParam()));
     auto clientConnection2 = this->target->connect(createAddress(GetParam()));
@@ -59,8 +59,8 @@ TEST_P(ConnectionAggregatorTest, EnqueueDequeue) {
 }
 
 TEST_P(ConnectionAggregatorTest, MultipleAcceptors) {
-    ConnectionAggregator target(mocca::makeUniquePtrVec<IMessageConnectionAcceptor>(
-        this->target->bind(createBindingAddress(GetParam())), this->target->bind(createBindingAddress(GetParam(), 1))));
+    ConnectionAggregator target(mocca::makeUniquePtrVec(this->target->bind(createBindingAddress(GetParam())),
+                                                        this->target->bind(createBindingAddress(GetParam(), 1))));
 
     auto clientConnection1 = this->target->connect(createAddress(GetParam()));
     auto clientConnection2 = this->target->connect(createAddress(GetParam(), 1));
@@ -83,7 +83,7 @@ TEST_P(ConnectionAggregatorTest, MultipleAcceptors) {
 }
 
 TEST_P(ConnectionAggregatorTest, SendReceiveParallel) {
-    ConnectionAggregator target(mocca::makeUniquePtrVec<IMessageConnectionAcceptor>(this->target->bind(createBindingAddress(GetParam()))));
+    ConnectionAggregator target(mocca::makeUniquePtrVec(this->target->bind(createBindingAddress(GetParam()))));
 
     auto clientConnection1 = this->target->connect(createAddress(GetParam()));
     auto clientConnection2 = this->target->connect(createAddress(GetParam()));
@@ -125,7 +125,7 @@ TEST_P(ConnectionAggregatorTest, SendReceiveParallel) {
 }
 
 TEST_P(ConnectionAggregatorTest, DisconnectStrategyThrowException) {
-    ConnectionAggregator target(mocca::makeUniquePtrVec<IMessageConnectionAcceptor>(this->target->bind(createBindingAddress(GetParam()))),
+    ConnectionAggregator target(mocca::makeUniquePtrVec(this->target->bind(createBindingAddress(GetParam()))),
                                 ConnectionAggregator::DisconnectStrategy::ThrowException);
     {
         auto clientConnection = this->target->connect(createAddress(GetParam()));
@@ -145,7 +145,7 @@ TEST_P(ConnectionAggregatorTest, DisconnectStrategyThrowException) {
 }
 
 TEST_P(ConnectionAggregatorTest, DisconnectStrategyRemoveConnection) {
-    ConnectionAggregator target(mocca::makeUniquePtrVec<IMessageConnectionAcceptor>(this->target->bind(createBindingAddress(GetParam()))));
+    ConnectionAggregator target(mocca::makeUniquePtrVec(this->target->bind(createBindingAddress(GetParam()))));
     {
         auto clientConnection = this->target->connect(createAddress(GetParam()));
         std::this_thread::sleep_for(std::chrono::milliseconds(100));

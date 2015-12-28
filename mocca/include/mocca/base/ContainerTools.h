@@ -37,8 +37,8 @@ Iter findMemberEqual(Iter it, Iter itEnd, U (IterValueType<Iter>::*MemFn)() cons
     return itEnd;
 }
 
-template <typename T, typename... Args> std::vector<std::unique_ptr<T>> makeUniquePtrVec(Args&&... args) {
-    std::unique_ptr<T> tmp[] = {std::move(args)...};
+template <typename T, typename... Args> std::vector<std::unique_ptr<T>> makeUniquePtrVec(std::unique_ptr<T> arg, Args&&... args) {
+    std::unique_ptr<T> tmp[] = {std::move(arg), std::move(args)...};
     return std::vector<std::unique_ptr<T>>{std::make_move_iterator(std::begin(tmp)), std::make_move_iterator(std::end(tmp))};
 }
 }
