@@ -13,15 +13,15 @@ using namespace mocca;
 using namespace mocca::net;
 using namespace mocca::testing;
 
-class NetworkServiceTest : public ::testing::TestWithParam<const char*> {
+class MessageConnectionTest : public ::testing::TestWithParam<const char*> {
 protected:
-    NetworkServiceTest() {
+    MessageConnectionTest() {
         // You can do set-up work for each test here.
         ConnectionFactorySelector::addDefaultFactories();
         target = &ConnectionFactorySelector::messageConnectionFactory(GetParam());
     }
 
-    virtual ~NetworkServiceTest() {
+    virtual ~MessageConnectionTest() {
         ConnectionFactorySelector::removeAll();
         // You can do clean-up work that doesn't throw exceptions here.
     }
@@ -30,10 +30,10 @@ protected:
 };
 
 INSTANTIATE_TEST_CASE_P(InstantiationName,
-    NetworkServiceTest,
+    MessageConnectionTest,
     ::testing::Values(ConnectionFactorySelector::queuePrefixed().c_str(), ConnectionFactorySelector::loopback().c_str()));
 
-TEST_P(NetworkServiceTest, Identifier)
+TEST_P(MessageConnectionTest, Identifier)
 {
     {
         // identifier is not empty
@@ -59,7 +59,7 @@ TEST_P(NetworkServiceTest, Identifier)
     }
 }
 
-TEST_P(NetworkServiceTest, AcceptorConnections) {
+TEST_P(MessageConnectionTest, AcceptorConnections) {
     {
         // cannot connect to an unbound port
         ASSERT_THROW(this->target->connect(createAddress(GetParam())), Error);
@@ -101,7 +101,7 @@ TEST_P(NetworkServiceTest, AcceptorConnections) {
     }
 }
 
-TEST_P(NetworkServiceTest, SendAndReceive) {
+TEST_P(MessageConnectionTest, SendAndReceive) {
     {
         // client sends to server
         auto acceptor = this->target->bind(createBindingAddress(GetParam()));
@@ -141,7 +141,7 @@ TEST_P(NetworkServiceTest, SendAndReceive) {
     }
 }
 
-TEST_P(NetworkServiceTest, ReceiveTimeout) {
+TEST_P(MessageConnectionTest, ReceiveTimeout) {
     auto acceptor = this->target->bind(createBindingAddress(GetParam()));
     auto clientConnection = this->target->connect(createAddress(GetParam()));
     auto serverConnection = acceptor->accept();
@@ -150,7 +150,7 @@ TEST_P(NetworkServiceTest, ReceiveTimeout) {
     ASSERT_TRUE(recPacket.isEmpty());
 }
 
-TEST_P(NetworkServiceTest, ReceiveTimeoutClient) {
+TEST_P(MessageConnectionTest, ReceiveTimeoutClient) {
     auto acceptor = this->target->bind(createBindingAddress(GetParam()));
     auto clientConnection = this->target->connect(createAddress(GetParam()));
     auto serverConnection = acceptor->accept();
@@ -159,7 +159,7 @@ TEST_P(NetworkServiceTest, ReceiveTimeoutClient) {
     ASSERT_TRUE(recPacket.isEmpty());
 }
 
-TEST_P(NetworkServiceTest, SendReceiveParallel) {
+TEST_P(MessageConnectionTest, SendReceiveParallel) {
     auto acceptor = this->target->bind(createBindingAddress(GetParam()));
     auto clientConnection = this->target->connect(createAddress(GetParam()));
     auto serverConnection = acceptor->accept();
@@ -170,12 +170,13 @@ TEST_P(NetworkServiceTest, SendReceiveParallel) {
     for (int i = 0; i < numItems; i++) {
         data.push_back("item " + std::to_string(i));
     }
-
-    mocca::AutoJoinThread a([&clientConnection, data] {
-        for (auto item : data) {
-            clientConnection->send(std::move(ByteArray() << item));
-        }
-    });
+    {
+        mocca::AutoJoinThread a([&clientConnection, data] {
+            for (auto item : data) {
+                clientConnection->send(std::move(ByteArray() << item));
+            }
+        });
+    }
 
     std::vector<std::future<std::string>> futures;
     for (int i = 0; i < numItems; ++i) {
