@@ -1,21 +1,18 @@
 #pragma once
 
 #include "mocca/net/IMessageConnectionAcceptor.h"
-#include "mocca/net/message/LoopbackConnection.h"
+#include "mocca/net/message/LoopbackConnectionSpawner.h"
 
 namespace mocca {
 namespace net {
 
 class LoopbackConnectionAcceptor : public IMessageConnectionAcceptor {
 public:
-    using LoopbackConnectionQueue = MessageQueue<std::unique_ptr<LoopbackConnection>>;
-
-    LoopbackConnectionAcceptor(std::shared_ptr<LoopbackConnectionQueue> connectionQueue);
-
+    LoopbackConnectionAcceptor(std::shared_ptr<LoopbackConnectionSpawner> spawner);
     std::unique_ptr<IMessageConnection> accept(std::chrono::milliseconds timeout) override;
 
 private:
-    std::shared_ptr<LoopbackConnectionQueue> connectionQueue_;
+    std::shared_ptr<LoopbackConnectionSpawner> spawner_;
 };
 }
 }

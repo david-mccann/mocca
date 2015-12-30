@@ -1,21 +1,18 @@
 #pragma once
 
 #include "mocca/net/IStreamConnectionAcceptor.h"
-#include "mocca/net/stream/QueueConnection.h"
+#include "mocca/net/stream/QueueConnectionSpawner.h"
 
 namespace mocca {
 namespace net {
 
 class QueueConnectionAcceptor : public IStreamConnectionAcceptor {
 public:
-    using LoopbackConnectionQueue = MessageQueue<std::unique_ptr<QueueConnection>>;
-
-    QueueConnectionAcceptor(std::shared_ptr<LoopbackConnectionQueue> connectionQueue);
-    
+    QueueConnectionAcceptor(std::shared_ptr<QueueConnectionSpawner> spawner);
     std::unique_ptr<IStreamConnection> accept(std::chrono::milliseconds timeout) override;
 
 private:
-    std::shared_ptr<LoopbackConnectionQueue> connectionQueue_;
+    std::shared_ptr<QueueConnectionSpawner> spawner_;
 };
 }
 }
