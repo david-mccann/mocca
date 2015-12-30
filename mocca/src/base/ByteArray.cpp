@@ -32,6 +32,12 @@ void swap(ByteArray& lhs, ByteArray& rhs) {
     swap(lhs.readPos_, rhs.readPos_);
 }
 
+ByteArray& mocca::ByteArray::operator=(ByteArray other) {
+    ByteArray tmp(std::move(other));
+    swap(tmp, *this);
+    return *this;
+}
+
 ByteArray mocca::ByteArray::clone() const {
     return ByteArray::createFromRaw(data(), size());
 }

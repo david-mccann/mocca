@@ -233,3 +233,13 @@ TEST_F(ByteArrayTest, BuildByteArray) {
     ASSERT_EQ(20.0, std::get<3>(x));
     ASSERT_EQ("blubb2", std::get<4>(x));
 }
+
+TEST_F(ByteArrayTest, MoveAssignment) {
+    ByteArray b1;
+    b1 << 42;
+    ByteArray b2;
+    b2 = std::move(b1);
+    int x;
+    b2 >> x;
+    ASSERT_EQ(42, x);
+}

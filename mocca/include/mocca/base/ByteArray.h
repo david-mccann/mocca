@@ -17,6 +17,8 @@ public:
 
     friend void swap(ByteArray& lhs, ByteArray& rhs);
 
+    ByteArray& operator=(ByteArray other);
+
     ByteArray clone() const;
 
     unsigned char* data();
