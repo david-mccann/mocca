@@ -71,56 +71,36 @@ Endpoint TCPConnectionAcceptor::connectionEndpoint() const {
         throw NetworkError("Error retrieving hostname (" + getLastWinsockError() + ")", __FILE__, __LINE__);
     }
 
+    std::string address("127.0.0.1");
     addrinfo* infos;
     getaddrinfo(hostName, nullptr, nullptr, &infos);
     for (addrinfo* ai = infos; ai != nullptr; ai = ai->ai_next) {
         if (ai->ai_family == AF_INET) {
             sockaddr_in* addr = (struct sockaddr_in*)ai->ai_addr;
-            Endpoint ep(protocol(), std::string(inet_ntoa(addr->sin_addr)) + ":" + std::to_string(port_));
-          return ep;
+            address = inet_ntoa(addr->sin_addr);
         }
     }
-    throw NetworkError("Error retrieving local IP address", __FILE__, __LINE__);
+    return Endpoint(protocol(), address + ":" + std::to_string(port_));
 }
 #else
 Endpoint TCPConnectionAcceptor::connectionEndpoint() const {
-    return Endpoint(protocol(), "127.0.0.1:1234");
-    /*
-    struct ifaddrs* ifAddrStruct = NULL;
-    struct ifaddrs* ifa = NULL;
-    void* tmpAddrPtr = NULL;
-
+    std::string address("127.0.0.1");
+    ifaddrs* ifAddrStruct = nullptr;
     getifaddrs(&ifAddrStruct);
-
-    for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
-        char const* wlanName = "en0";
-
-        if (!ifa->ifa_addr || strcmp(wlanName, ifa->ifa_name) != 0) {
-            continue;
-        }
-        if (ifa->ifa_addr->sa_family == AF_INET) { // check it is IP4
-                                                   // is a valid IP4 Address
-            tmpAddrPtr = &((struct sockaddr_in*)ifa->ifa_addr)->sin_addr;
+    for (ifaddrs* ifa = ifAddrStruct; ifa != nullptr; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr->sa_family == AF_INET) {
+            in_addr* addr = &((struct sockaddr_in*)ifa->ifa_addr)->sin_addr;
             char addressBuffer[INET_ADDRSTRLEN];
-            inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
-
-            if (addressBuffer[0] == '1')
-                return addressBuffer;
-
-        } else if (ifa->ifa_addr->sa_family == AF_INET6) { // check it is IP6
-                                                           // is a valid IP6 Address
-            tmpAddrPtr = &((struct sockaddr_in6*)ifa->ifa_addr)->sin6_addr;
-            char addressBuffer[INET6_ADDRSTRLEN];
-            inet_ntop(AF_INET6, tmpAddrPtr, addressBuffer, INET6_ADDRSTRLEN);
-
-            if (addressBuffer[0] == '1')
-                return addressBuffer;
+            inet_ntop(AF_INET, addr, addressBuffer, INET_ADDRSTRLEN);
+            if (addressBuffer[0] == '1') {
+                address = addressBuffer;
+            }
         }
     }
-    if (ifAddrStruct != NULL)
+    if (ifAddrStruct != nullptr) {
         freeifaddrs(ifAddrStruct);
-
-    return "127.0.0.1";*/
+    }
+    return Endpoint(protocol(), address + ":" + std::to_string(port_));
 }
 #endif
 }
