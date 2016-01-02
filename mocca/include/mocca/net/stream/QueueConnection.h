@@ -16,6 +16,7 @@ public:
     ~QueueConnection();
 
     std::string identifier() const override;
+    Endpoint peerEndpoint() const override;
     void send(ByteArray message, std::chrono::milliseconds timeout) const override;
     ByteArray receive(uint32_t maxSize, std::chrono::milliseconds timeout) const override;
 
@@ -29,9 +30,6 @@ private:
 
     std::shared_ptr<SQ> outSignalQueue_;
     std::shared_ptr<SQ> inSignalQueue_;
-
-    mutable int numSendConnections_;
-    mutable int numReceiveConnections_;
 };
 }
 }

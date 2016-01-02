@@ -11,6 +11,7 @@ public:
     FramingConnection(std::unique_ptr<IStreamConnection> stream, std::unique_ptr<FramingStrategy> framingStrategy);
 
     std::string identifier() const override;
+    Endpoint peerEndpoint() const override;
     void send(ByteArray message, std::chrono::milliseconds timeout) const override;
     ByteArray receive(std::chrono::milliseconds timeout) const override;
 

@@ -9,14 +9,6 @@ FramingConnectionAcceptor::FramingConnectionAcceptor(std::unique_ptr<IStreamConn
     : streamAcceptor_(std::move(streamAcceptor))
     , framingStrategy_(std::move(framingStrategy)) {}
 
-std::string mocca::net::FramingConnectionAcceptor::protocol() const {
-    return streamAcceptor_->protocol() + "." + framingStrategy_->name();
-}
-
-Endpoint mocca::net::FramingConnectionAcceptor::connectionEndpoint() const {
-    return Endpoint(protocol(), streamAcceptor_->connectionEndpoint().address());
-}
-
 std::unique_ptr<IMessageConnection> FramingConnectionAcceptor::accept(std::chrono::milliseconds timeout) {
     auto stream = streamAcceptor_->accept(timeout);
     if (stream != nullptr) {

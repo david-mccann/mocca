@@ -11,6 +11,11 @@ std::string FramingConnection::identifier() const {
     return stream_->identifier();
 }
 
+Endpoint FramingConnection::peerEndpoint() const {
+    Endpoint streamEndpoint = stream_->peerEndpoint();
+    return Endpoint(streamEndpoint.protocol() + "." + framingStrategy_->name(), streamEndpoint.address());
+}
+
 void FramingConnection::send(ByteArray message, std::chrono::milliseconds timeout) const {
     framingStrategy_->writeFrameToStream(*stream_, std::move(message), timeout);
 }

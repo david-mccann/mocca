@@ -7,6 +7,7 @@ namespace net {
 
 class Endpoint {
 public:
+    Endpoint();
     Endpoint(const std::string& protocol, const std::string& address);
     Endpoint(const std::string& str);
 

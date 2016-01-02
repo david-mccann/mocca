@@ -5,6 +5,8 @@
 
 using namespace mocca::net;
 
+Endpoint::Endpoint() {}
+
 Endpoint::Endpoint(const std::string& protocol, const std::string& address)
     : protocol_(protocol)
     , address_(address) {}

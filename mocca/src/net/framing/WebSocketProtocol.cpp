@@ -14,7 +14,7 @@ std::unique_ptr<FramingStrategy> WebSocketProtocol::clone() const {
     return std::unique_ptr<FramingStrategy>(new WebSocketProtocol(*this));
 }
 
-std::string mocca::net::WebSocketProtocol::name() const {
+std::string WebSocketProtocol::name() const {
     return "ws";
 }
 

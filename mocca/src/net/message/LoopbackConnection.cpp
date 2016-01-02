@@ -27,6 +27,10 @@ std::string LoopbackConnection::identifier() const {
     return identifier_;
 }
 
+Endpoint mocca::net::LoopbackConnection::peerEndpoint() const {
+    return Endpoint("loopback", "local");
+}
+
 void LoopbackConnection::send(ByteArray message, std::chrono::milliseconds timeout) const {
     auto signal = inSignalQueue_->dequeueNoWait();
     if (!signal.isNull()) {
