@@ -14,6 +14,10 @@ std::unique_ptr<FramingStrategy> WebSocketProtocol::clone() const {
     return std::unique_ptr<FramingStrategy>(new WebSocketProtocol(*this));
 }
 
+std::string mocca::net::WebSocketProtocol::name() const {
+    return "ws";
+}
+
 void WebSocketProtocol::performHandshake(IStreamConnection& connection, std::chrono::milliseconds timeout) {
     receiveHandshake(connection, timeout);
     sendHandshakeResponse(connection, timeout);

@@ -10,7 +10,8 @@ namespace net {
 class FramingConnectionAcceptor : public IMessageConnectionAcceptor {
 public:
     FramingConnectionAcceptor(std::unique_ptr<IStreamConnectionAcceptor> streamAcceptor, std::unique_ptr<FramingStrategy> framingStrategy);
-
+    std::string protocol() const override;
+    Endpoint connectionEndpoint() const override;
     std::unique_ptr<IMessageConnection> accept(std::chrono::milliseconds timeout);
 
 private:
