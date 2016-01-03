@@ -2,6 +2,7 @@
 
 #include "mocca/net/IStreamConnection.h"
 #include "mocca/net/stream/Sockets.h"
+#include "mocca/base/Nullable.h"
 
 namespace mocca {
 namespace net {
@@ -17,6 +18,7 @@ public:
 
 private:
     std::unique_ptr<IVDA::ConnectionSocket> socket_;
+    mutable Nullable<ConnectionID> connectionID_;
 };
 }
 }

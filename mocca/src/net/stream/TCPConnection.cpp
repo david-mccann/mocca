@@ -20,11 +20,15 @@ TCPConnection::~TCPConnection() {
 }
 
 ConnectionID TCPConnection::connectionID() const {
+    if (!connectionID_.isNull()) {
+        return connectionID_;
+    }
     std::string localIP, peerIP;
     uint16_t localPort, peerPort;
     socket_->GetLocalNetworkAddress().GetAddress(localIP, localPort);
     socket_->GetPeerNetworkAddress().GetAddress(peerIP, peerPort);
-    return ConnectionID{Endpoint("tcp", localIP, std::to_string(localPort)), Endpoint("tcp", peerIP, std::to_string(peerPort))};
+    connectionID_ = ConnectionID{ Endpoint("tcp", localIP, std::to_string(localPort)), Endpoint("tcp", peerIP, std::to_string(peerPort)) };
+    return connectionID_;
 }
 
 void TCPConnection::send(ByteArray message, std::chrono::milliseconds timeout) const {

@@ -13,6 +13,7 @@ TCPConnectionAcceptor::TCPConnectionAcceptor(int port)
     try {
         server_.SetReuseAddress(true);
         server_.SetNonBlocking(true);
+        server_.SetNoDelay(true);
         server_.Bind(IVDA::NetworkAddress(IVDA::NetworkAddress::Any, port_));
         server_.Listen(3); // ???
     } catch (const IVDA::SocketException& err) {
@@ -30,6 +31,7 @@ std::unique_ptr<IStreamConnection> TCPConnectionAcceptor::accept(std::chrono::mi
         // critical situation, so we ignore the error
     }
     if (connectionSocket) {
+        connectionSocket->SetNoDelay(true);
         auto socketPtr = std::unique_ptr<IVDA::ConnectionSocket>(connectionSocket);
         auto ip = connectionSocket->GetPeerAddress();
         LDEBUG("Accepted TCP connection on port " << port_ << " from " << ip);
