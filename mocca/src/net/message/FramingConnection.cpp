@@ -7,8 +7,8 @@ FramingConnection::FramingConnection(std::unique_ptr<IStreamConnection> stream, 
     : stream_(std::move(stream))
     , framingStrategy_(std::move(framingStrategy)) {}
 
-std::string FramingConnection::identifier() const {
-    return stream_->identifier();
+ConnectionID FramingConnection::connectionID() const {
+    return stream_->connectionID();
 }
 
 void FramingConnection::send(ByteArray message, std::chrono::milliseconds timeout) const {

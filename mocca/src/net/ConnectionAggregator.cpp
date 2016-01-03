@@ -6,13 +6,13 @@
 using namespace mocca::net;
 using namespace mocca;
 
-MessageEnvelope::MessageEnvelope(mocca::ByteArray msg, std::string id)
+MessageEnvelope::MessageEnvelope(mocca::ByteArray msg, ConnectionID id)
     : message(std::move(msg))
-    , senderID(std::move(id)) {}
+    , connectionID(std::move(id)) {}
 
 MessageEnvelope::MessageEnvelope(MessageEnvelope&& other)
     : message(std::move(other.message))
-    , senderID(std::move(other.senderID)) {}
+    , connectionID(std::move(other.connectionID)) {}
 
 
 ConnectionAggregator::ConnectionAggregator(std::vector<std::unique_ptr<IMessageConnectionAcceptor>> connectionAcceptors,
@@ -57,18 +57,16 @@ void ConnectionAggregator::run() {
 
             try {
                 runnables_.rethrowException();
-            }
-            catch (const ConnectionClosedError& err) {
+            } catch (const ConnectionClosedError& err) {
                 if (disconnectStrategy_ == DisconnectStrategy::RemoveConnection) {
                     auto it = std::find_if(begin(connections_), end(connections_), [&](const ThreadedConnection& connection) {
-                        return connection.connection->identifier() == err.connectionID();
+                        return connection.connection->connectionID() == err.connectionID();
                     });
                     runnables_.removeRunnable(it->receiveThreadID);
                     runnables_.removeRunnable(it->sendThreadID);
                     connections_.erase(it);
                     LDEBUG("Connection to peer has been lost");
-                }
-                else {
+                } else {
                     throw err;
                 }
             }
@@ -94,7 +92,7 @@ void ConnectionAggregator::ReceiveThread::run() {
         while (!isInterrupted()) {
             auto data = connection_.receive();
             if (!data.isEmpty()) {
-                MessageEnvelope envelope(std::move(data), connection_.identifier());
+                MessageEnvelope envelope(std::move(data), connection_.connectionID());
                 receiveQueue_.enqueue(std::move(envelope));
             }
         }
@@ -117,10 +115,10 @@ mocca::net::ConnectionAggregator::SendThread::~SendThread() {
 void ConnectionAggregator::SendThread::run() {
     try {
         while (!isInterrupted()) {
-            auto connectionID = connection_.identifier();
-            auto dataNullable = sendQueue_.dequeueFiltered(
-                [&connectionID](const MessageEnvelope& envelope) { return envelope.senderID == connectionID; },
-                std::chrono::milliseconds(100));
+            auto connectionID = connection_.connectionID();
+            auto dataNullable =
+                sendQueue_.dequeueFiltered([&connectionID](const MessageEnvelope& envelope) { return envelope.connectionID == connectionID; },
+                                           std::chrono::milliseconds(100));
             if (!dataNullable.isNull()) {
                 auto data = dataNullable.release();
                 connection_.send(std::move(data.message));

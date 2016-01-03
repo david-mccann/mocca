@@ -7,7 +7,6 @@
 
 using namespace mocca::net;
 
-
 std::unique_ptr<IStreamConnection> TCPConnectionFactory::connect(const std::string& address) {
     TCPNetworkAddress networkAddress(address);
     auto socket = std::unique_ptr<IVDA::TCPSocket>(new IVDA::TCPSocket());
@@ -25,6 +24,6 @@ std::unique_ptr<IStreamConnection> TCPConnectionFactory::connect(const std::stri
 }
 
 std::unique_ptr<IStreamConnectionAcceptor> TCPConnectionFactory::bind(const std::string& address) {
-    int port = TCPNetworkAddress::parsePort(address);
-    return std::unique_ptr<IStreamConnectionAcceptor>(new TCPConnectionAcceptor(port));
+    TCPNetworkAddress tcpAddress(address);
+    return std::unique_ptr<IStreamConnectionAcceptor>(new TCPConnectionAcceptor(tcpAddress.port()));
 }

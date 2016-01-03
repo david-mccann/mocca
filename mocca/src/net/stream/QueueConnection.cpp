@@ -7,8 +7,8 @@ using namespace mocca;
 using namespace mocca::net;
 
 QueueConnection::QueueConnection(std::shared_ptr<MQ> sendQueue, std::shared_ptr<MQ> receiveQueue, std::shared_ptr<SQ> outSignalQueue,
-                                 std::shared_ptr<SQ> inSignalQueue)
-    : identifier_(createIdentifier())
+                                 std::shared_ptr<SQ> inSignalQueue, const ConnectionID& connectionID)
+    : connectionID_(connectionID)
     , sendQueue_(sendQueue)
     , receiveQueue_(receiveQueue)
     , outSignalQueue_(outSignalQueue)
@@ -18,21 +18,15 @@ QueueConnection::~QueueConnection() {
     outSignalQueue_->enqueue(Signal::Disconnect);
 }
 
-std::string QueueConnection::createIdentifier() {
-    static unsigned int count = 0;
-    ++count;
-    return "queue_" + std::to_string(count);
-}
-
-std::string QueueConnection::identifier() const {
-    return identifier_;
+ConnectionID QueueConnection::connectionID() const {
+    return connectionID_;
 }
 
 void QueueConnection::send(ByteArray message, std::chrono::milliseconds timeout) const {
     auto signal = inSignalQueue_->dequeueNoWait();
     if (!signal.isNull()) {
         if (signal == Signal::Disconnect) {
-            throw ConnectionClosedError("Connection to peer has been closed", identifier_, __FILE__, __LINE__);
+            throw ConnectionClosedError("Connection to peer has been closed", connectionID_, __FILE__, __LINE__);
         }
     }
     auto messageData = message.data();
@@ -47,7 +41,7 @@ ByteArray QueueConnection::receive(uint32_t maxSize, std::chrono::milliseconds t
     auto signal = inSignalQueue_->dequeueNoWait();
     if (!signal.isNull()) {
         if (signal == Signal::Disconnect) {
-            throw ConnectionClosedError("Connection to peer has been closed", identifier_, __FILE__, __LINE__);
+            throw ConnectionClosedError("Connection to peer has been closed", connectionID_, __FILE__, __LINE__);
         }
     }
     ByteArray result;

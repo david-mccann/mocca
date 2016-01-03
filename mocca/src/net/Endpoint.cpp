@@ -5,33 +5,35 @@
 
 using namespace mocca::net;
 
-Endpoint::Endpoint(const std::string& protocol, const std::string& address)
-    : protocol_(protocol)
-    , address_(address) {}
+Endpoint::Endpoint() {}
+
+Endpoint::Endpoint(const std::string& protocol, const std::string& machine, const std::string& port)
+    : protocol(protocol)
+    , machine(machine)
+    , port(port) {}
 
 Endpoint::Endpoint(const std::string& str) {
-    auto index = str.find_first_of(':');
-    if (index == std::string::npos) {
-        throw Error(mocca::formatString("Cannot initialize endpoint from string '%%'", str), __FILE__, __LINE__);
+    auto split = mocca::splitString<std::string>(str, ':');
+    if (split.size() != 3) {
+        throw Error(
+            mocca::formatString("Cannot initialize endpoint from string '%%' (does not match format <protocol>:<machine>:<port>)", str),
+            __FILE__, __LINE__);
     }
-    protocol_ = str.substr(0, index);
-    address_ = str.substr(index + 1, std::string::npos);
+    protocol = split[0];
+    machine = split[1];
+    port = split[2];
 }
 
 bool Endpoint::equals(const Endpoint& other) const {
-    return protocol_ == other.protocol_ && address_ == other.address_;
+    return protocol == other.protocol && machine == other.machine && port == other.port;
 }
 
 std::string Endpoint::toString() const {
-    return protocol_ + ":" + address_;
-}
-
-std::string Endpoint::protocol() const {
-    return protocol_;
+    return protocol + ":" + machine + ":" + port;
 }
 
 std::string Endpoint::address() const {
-    return address_;
+    return machine + ":" + port;
 }
 
 namespace mocca {

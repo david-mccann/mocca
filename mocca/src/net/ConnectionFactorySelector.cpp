@@ -91,12 +91,12 @@ void ConnectionFactorySelector::addDefaultFactories() {
 }
 
 std::unique_ptr<IMessageConnectionAcceptor> ConnectionFactorySelector::bind(const Endpoint& endpoint) {
-    auto& serv = messageConnectionFactory(endpoint.protocol());
+    auto& serv = messageConnectionFactory(endpoint.protocol);
     return serv.bind(endpoint.address());
 }
 
 std::unique_ptr<IMessageConnection> ConnectionFactorySelector::connect(const Endpoint& endpoint) {
-    auto& serv = messageConnectionFactory(endpoint.protocol());
+    auto& serv = messageConnectionFactory(endpoint.protocol);
     return serv.connect(endpoint.address());
 }
 

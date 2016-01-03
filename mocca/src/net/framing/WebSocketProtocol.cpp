@@ -14,7 +14,7 @@ std::unique_ptr<FramingStrategy> WebSocketProtocol::clone() const {
     return std::unique_ptr<FramingStrategy>(new WebSocketProtocol(*this));
 }
 
-std::string mocca::net::WebSocketProtocol::name() const {
+std::string WebSocketProtocol::name() const {
     return "ws";
 }
 
@@ -126,7 +126,7 @@ ByteArray WebSocketProtocol::readFrameFromStream(IStreamConnection& connection, 
 #endif
 
     if (data[0] == 0x88) {
-        throw ConnectionClosedError("WebSocket connection closed", connection.identifier(), __FILE__, __LINE__);
+        throw ConnectionClosedError("WebSocket connection closed", connection.connectionID(), __FILE__, __LINE__);
     }
 
     // read the basic payload byte

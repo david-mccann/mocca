@@ -12,8 +12,15 @@ std::unique_ptr<IMessageConnection> LoopbackConnectionSpawner::getClientConnecti
     auto signalQueue1 = std::make_shared<LoopbackConnection::SQ>();
     auto signalQueue2 = std::make_shared<LoopbackConnection::SQ>();
 
-    std::unique_ptr<LoopbackConnection> serverConnection(new LoopbackConnection(messageQueue1, messageQueue2, signalQueue1, signalQueue2));
-    std::unique_ptr<IMessageConnection> clientConnection(new LoopbackConnection(messageQueue2, messageQueue1, signalQueue2, signalQueue1));
+    static unsigned int connectionCounter = 0;
+    Endpoint ep1("loopback", "local", "#" + std::to_string(connectionCounter++));
+    Endpoint ep2("loopback", "local", "#" + std::to_string(connectionCounter++));
+    ConnectionID serverID{ep1, ep2};
+    ConnectionID clientID{ep2, ep1};
+    std::unique_ptr<LoopbackConnection> serverConnection(
+        new LoopbackConnection(messageQueue1, messageQueue2, signalQueue1, signalQueue2, serverID));
+    std::unique_ptr<IMessageConnection> clientConnection(
+        new LoopbackConnection(messageQueue2, messageQueue1, signalQueue2, signalQueue1, clientID));
 
     serverConnections_.enqueue(std::move(serverConnection));
     return clientConnection;

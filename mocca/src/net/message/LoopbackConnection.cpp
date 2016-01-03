@@ -6,8 +6,8 @@ using namespace mocca;
 using namespace mocca::net;
 
 LoopbackConnection::LoopbackConnection(std::shared_ptr<MQ> sendQueue, std::shared_ptr<MQ> receiveQueue, std::shared_ptr<SQ> outSignalQueue,
-                                       std::shared_ptr<SQ> inSignalQueue)
-    : identifier_(createIdentifier())
+                                       std::shared_ptr<SQ> inSignalQueue, const ConnectionID& connectionID)
+    : connectionID_(connectionID)
     , sendQueue_(sendQueue)
     , receiveQueue_(receiveQueue)
     , outSignalQueue_(outSignalQueue)
@@ -17,21 +17,15 @@ LoopbackConnection::~LoopbackConnection() {
     outSignalQueue_->enqueue(Signal::Disconnect);
 }
 
-std::string LoopbackConnection::createIdentifier() {
-    static unsigned int count = 0;
-    ++count;
-    return "loopback_" + std::to_string(count);
-}
-
-std::string LoopbackConnection::identifier() const {
-    return identifier_;
+ConnectionID LoopbackConnection::connectionID() const {
+    return connectionID_;
 }
 
 void LoopbackConnection::send(ByteArray message, std::chrono::milliseconds timeout) const {
     auto signal = inSignalQueue_->dequeueNoWait();
     if (!signal.isNull()) {
         if (signal == Signal::Disconnect) {
-            throw ConnectionClosedError("Connection to peer has been closed", identifier_, __FILE__, __LINE__);
+            throw ConnectionClosedError("Connection to peer has been closed", connectionID_, __FILE__, __LINE__);
         }
     }
 
@@ -42,7 +36,7 @@ ByteArray LoopbackConnection::receive(std::chrono::milliseconds timeout) const {
     auto signal = inSignalQueue_->dequeueNoWait();
     if (!signal.isNull()) {
         if (signal == Signal::Disconnect) {
-            throw ConnectionClosedError("Connection to peer has been closed", identifier_, __FILE__, __LINE__);
+            throw ConnectionClosedError("Connection to peer has been closed", connectionID_, __FILE__, __LINE__);
         }
     }
 
