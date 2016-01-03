@@ -13,11 +13,10 @@ namespace net {
 
 struct MessageEnvelope {
     MessageEnvelope() {}
-    MessageEnvelope(mocca::ByteArray msg, std::string id, Endpoint endpoint);
+    MessageEnvelope(mocca::ByteArray msg, std::string id);
     MessageEnvelope(MessageEnvelope&& other);
     mocca::ByteArray message;
     std::string senderID;
-    Endpoint peerEndpoint;
 };
 
 class ConnectionAggregator : public Runnable {

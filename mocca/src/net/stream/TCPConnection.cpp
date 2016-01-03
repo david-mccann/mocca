@@ -30,13 +30,6 @@ std::string TCPConnection::createIdentifier() {
     return "tcp_" + std::to_string(count);
 }
 
-Endpoint mocca::net::TCPConnection::peerEndpoint() const {
-    std::string address;
-    uint16_t port;
-    socket_->GetPeerNetworkAddress().GetAddress(address, port);
-    return Endpoint("tcp", address + ":" + std::to_string(port));
-}
-
 void TCPConnection::send(ByteArray message, std::chrono::milliseconds timeout) const {
     try {
         socket_->SendData((const int8_t*)message.data(), message.size(), static_cast<uint32_t>(timeout.count()));

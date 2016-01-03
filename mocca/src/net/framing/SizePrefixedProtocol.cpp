@@ -9,7 +9,7 @@ std::unique_ptr<FramingStrategy> mocca::net::SizePrefixedProtocol::clone() const
     return std::unique_ptr<FramingStrategy>(new SizePrefixedProtocol(*this));
 }
 
-std::string SizePrefixedProtocol::name() const {
+std::string mocca::net::SizePrefixedProtocol::name() const {
     return "prefixed";
 }
 

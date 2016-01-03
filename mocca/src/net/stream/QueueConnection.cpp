@@ -28,10 +28,6 @@ std::string QueueConnection::identifier() const {
     return identifier_;
 }
 
-Endpoint mocca::net::QueueConnection::peerEndpoint() const {
-    return Endpoint("queue", "local");
-}
-
 void QueueConnection::send(ByteArray message, std::chrono::milliseconds timeout) const {
     auto signal = inSignalQueue_->dequeueNoWait();
     if (!signal.isNull()) {

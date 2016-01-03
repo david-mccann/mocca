@@ -12,7 +12,6 @@ public:
     ~TCPConnection();
 
     std::string identifier() const override;
-    Endpoint peerEndpoint() const override;
     void send(ByteArray message, std::chrono::milliseconds timeout) const override;
     ByteArray receive(uint32_t maxSize, std::chrono::milliseconds timeout) const override;
 
