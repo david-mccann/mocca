@@ -10,7 +10,7 @@ class FramingConnection : public IMessageConnection {
 public:
     FramingConnection(std::unique_ptr<IStreamConnection> stream, std::unique_ptr<FramingStrategy> framingStrategy);
 
-    std::string identifier() const override;
+    ConnectionID connectionID() const override;
     void send(ByteArray message, std::chrono::milliseconds timeout) const override;
     ByteArray receive(std::chrono::milliseconds timeout) const override;
 

@@ -11,16 +11,12 @@ public:
     TCPConnection(std::unique_ptr<IVDA::ConnectionSocket> socket);
     ~TCPConnection();
 
-    std::string identifier() const override;
+    ConnectionID connectionID() const override;
     void send(ByteArray message, std::chrono::milliseconds timeout) const override;
     ByteArray receive(uint32_t maxSize, std::chrono::milliseconds timeout) const override;
 
 private:
-    static std::string createIdentifier();
-
-private:
     std::unique_ptr<IVDA::ConnectionSocket> socket_;
-    std::string identifier_;
 };
 }
 }

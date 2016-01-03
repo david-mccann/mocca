@@ -12,26 +12,20 @@ public:
     using SQ = MessageQueue<Signal>;
 
     LoopbackConnection(std::shared_ptr<MQ> sendQueue, std::shared_ptr<MQ> receiveQueue, std::shared_ptr<SQ> outSignalQueue,
-                       std::shared_ptr<SQ> inSignalQueue);
+                       std::shared_ptr<SQ> inSignalQueue, const ConnectionID& connectionID);
     ~LoopbackConnection();
 
-    std::string identifier() const override;
+    ConnectionID connectionID() const override;
     void send(ByteArray message, std::chrono::milliseconds timeout) const override;
     ByteArray receive(std::chrono::milliseconds timeout) const override;
 
 private:
-    static std::string createIdentifier();
-
-private:
-    std::string identifier_;
+    ConnectionID connectionID_;
     std::shared_ptr<MQ> sendQueue_;
     std::shared_ptr<MQ> receiveQueue_;
 
     std::shared_ptr<SQ> outSignalQueue_;
     std::shared_ptr<SQ> inSignalQueue_;
-
-    mutable int numSendConnections_;
-    mutable int numReceiveConnections_;
 };
 }
 }
