@@ -39,10 +39,10 @@ TEST_P(MessageConnectionTest, Identifier)
         // identifier is not empty
         auto acceptor = this->target->bind(createBindingAddress(GetParam()));
         auto clientConnection = this->target->connect(createAddress(GetParam()));
-        ASSERT_FALSE(clientConnection->identifier().empty());
+        ASSERT_FALSE(clientConnection->connectionID().toString().empty());
         auto serverConnection = acceptor->accept();
         ASSERT_FALSE(serverConnection == nullptr);
-        ASSERT_FALSE(serverConnection->identifier().empty());
+        ASSERT_FALSE(serverConnection->connectionID().toString().empty());
     }
     {
         // identifiers are distinct
@@ -53,9 +53,9 @@ TEST_P(MessageConnectionTest, Identifier)
         auto serverConnection2 = acceptor->accept();
         ASSERT_FALSE(serverConnection1 == nullptr);
         ASSERT_FALSE(serverConnection2 == nullptr);
-        ASSERT_NE(clientConnection1->identifier(), clientConnection2->identifier());
-        ASSERT_NE(clientConnection2->identifier(), serverConnection1->identifier());
-        ASSERT_NE(serverConnection1->identifier(), serverConnection2->identifier());
+        ASSERT_FALSE(clientConnection1->connectionID() == clientConnection2->connectionID());
+        ASSERT_FALSE(clientConnection2->connectionID() == serverConnection1->connectionID());
+        ASSERT_FALSE(serverConnection1->connectionID() == serverConnection2->connectionID());
     }
 }
 

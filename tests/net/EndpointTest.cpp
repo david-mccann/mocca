@@ -18,14 +18,15 @@ protected:
 
 TEST_F(EndpointTest, Ctor) {
     {
-        Endpoint ep("protocol", "address");
-        ASSERT_EQ("protocol", ep.protocol());
-        ASSERT_EQ("address", ep.address());
+        Endpoint ep("protocol", "machine", "port");
+        ASSERT_EQ("protocol", ep.protocol);
+        ASSERT_EQ("machine", ep.machine);
     }
     {
-        Endpoint ep("protocol:address");
-        ASSERT_EQ("protocol", ep.protocol());
-        ASSERT_EQ("address", ep.address());
+        Endpoint ep("protocol:machine:port");
+        ASSERT_EQ("protocol", ep.protocol);
+        ASSERT_EQ("machine", ep.machine);
+        ASSERT_EQ("port", ep.port);
     }
     {
         ASSERT_THROW(Endpoint("malformed"), mocca::Error);
@@ -33,7 +34,7 @@ TEST_F(EndpointTest, Ctor) {
 }
 
 TEST_F(EndpointTest, ToString) {
-    Endpoint ep("protocol", "address");
+    Endpoint ep("protocol", "machine", "port");
     Endpoint ep2(ep.toString());
     ASSERT_EQ(ep, ep2);
 }

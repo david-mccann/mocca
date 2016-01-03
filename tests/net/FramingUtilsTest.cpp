@@ -21,7 +21,7 @@ protected:
         }
         std::unique_ptr<QueueConnection> stream(new QueueConnection(
             std::make_shared<QueueConnection::MQ>(), receiveQueue,
-            std::make_shared<QueueConnection::SQ>(), std::make_shared<QueueConnection::SQ>()));
+            std::make_shared<QueueConnection::SQ>(), std::make_shared<QueueConnection::SQ>(), ConnectionID()));
         return stream;
     }
 };
