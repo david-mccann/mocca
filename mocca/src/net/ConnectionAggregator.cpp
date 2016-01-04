@@ -6,7 +6,7 @@
 using namespace mocca::net;
 using namespace mocca;
 
-MessageEnvelope::MessageEnvelope(mocca::ByteArray msg, const ConnectionID& id)
+MessageEnvelope::MessageEnvelope(mocca::ByteArray msg, std::shared_ptr<const ConnectionID> id)
     : message(std::move(msg))
     , connectionID(id) {}
 
@@ -60,7 +60,7 @@ void ConnectionAggregator::run() {
             } catch (const ConnectionClosedError& err) {
                 if (disconnectStrategy_ == DisconnectStrategy::RemoveConnection) {
                     auto it = std::find_if(begin(connections_), end(connections_), [&](const ThreadedConnection& connection) {
-                        return connection.connection->connectionID() == err.connectionID();
+                        return *connection.connection->connectionID() == err.connectionID();
                     });
                     runnables_.removeRunnable(it->receiveThreadID);
                     runnables_.removeRunnable(it->sendThreadID);

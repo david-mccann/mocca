@@ -7,7 +7,7 @@ FramingConnection::FramingConnection(std::unique_ptr<IStreamConnection> stream, 
     : stream_(std::move(stream))
     , framingStrategy_(std::move(framingStrategy)) {}
 
-const ConnectionID& FramingConnection::connectionID() const {
+std::shared_ptr<const ConnectionID> FramingConnection::connectionID() const {
     return stream_->connectionID();
 }
 

@@ -126,7 +126,7 @@ ByteArray WebSocketProtocol::readFrameFromStream(IStreamConnection& connection, 
 #endif
 
     if (data[0] == 0x88) {
-        throw ConnectionClosedError("WebSocket connection closed", connection.connectionID(), __FILE__, __LINE__);
+        throw ConnectionClosedError("WebSocket connection closed", *connection.connectionID(), __FILE__, __LINE__);
     }
 
     // read the basic payload byte
