@@ -63,7 +63,7 @@ public:
         }
     }
 
-    T get() const {
+    const T& get() const {
         if (!isNull_) {
             return value_;
         } else {
@@ -79,7 +79,7 @@ public:
         }
     }
 
-    operator T() const { return get(); }
+    operator const T&() const { return get(); }
 
     bool isNull() const { return isNull_; }
 
