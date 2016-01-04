@@ -34,12 +34,12 @@ TEST_F(ObjectPoolTest, CreateAndReturnOneObject) {
 
 TEST_F(ObjectPoolTest, CreateAndReturnMultipleObjects) {
     ObjectPool<MyObject> pool(20);
-    std::vector<std::shared_ptr<MyObject>> objects;
+    std::vector<ObjectPool<MyObject>::ObjectPtr> objects;
     for (int i = 1; i <= 20; ++i) {
         auto obj = pool.getObject();
         ASSERT_TRUE(obj->str.empty());
         obj->str = "bla";
-        objects.push_back(obj);
+        objects.push_back(std::move(obj));
         ASSERT_EQ(20 - i, pool.numFreeObjects());
     }
     objects.clear();
@@ -48,7 +48,7 @@ TEST_F(ObjectPoolTest, CreateAndReturnMultipleObjects) {
 
 TEST_F(ObjectPoolTest, IncreasePoolSize) {
     ObjectPool<MyObject> pool(20);
-    std::vector<std::shared_ptr<MyObject>> objects;
+    std::vector<ObjectPool<MyObject>::ObjectPtr> objects;
     for (int i = 1; i <= 50; ++i) {
         objects.push_back(pool.getObject());
     }
