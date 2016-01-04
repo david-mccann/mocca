@@ -12,7 +12,8 @@ ByteArray mocca::net::readUntil(IStreamConnection& stream, const std::string& de
     while (cont) {
         auto chunk = stream.receive(chunkSize, timeout);
         if (chunk.isEmpty()) {
-            return ByteArray(); // fixme
+            stream.putBack(result);
+            return ByteArray();
         }
         auto offset = result.size() - std::min(static_cast<uint32_t>(delim.size()), result.size());
         result.append(chunk);
@@ -32,7 +33,8 @@ ByteArray mocca::net::readExactly(IStreamConnection& stream, uint32_t size, std:
     while (result.size() < size) {
         auto chunk = stream.receive(size - result.size(), timeout);
         if (chunk.isEmpty()) {
-            return ByteArray(); // fixme
+            stream.putBack(result);
+            return ByteArray();
         }
         result.append(chunk);
     }

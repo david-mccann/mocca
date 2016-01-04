@@ -37,7 +37,7 @@ void QueueConnection::send(ByteArray message, std::chrono::milliseconds timeout)
     }
 }
 
-ByteArray QueueConnection::receive(uint32_t maxSize, std::chrono::milliseconds timeout) const {
+ByteArray QueueConnection::readFromStream(uint32_t maxSize, std::chrono::milliseconds timeout) const {
     auto signal = inSignalQueue_->dequeueNoWait();
     if (!signal.isNull()) {
         if (signal == Signal::Disconnect) {

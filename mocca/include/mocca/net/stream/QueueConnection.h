@@ -17,7 +17,9 @@ public:
 
     std::shared_ptr<const ConnectionID> connectionID() const override;
     void send(ByteArray message, std::chrono::milliseconds timeout) const override;
-    ByteArray receive(uint32_t maxSize, std::chrono::milliseconds timeout) const override;
+
+private:
+    ByteArray readFromStream(uint32_t maxSize, std::chrono::milliseconds timeout) const override;
 
 private:
     std::shared_ptr<const ConnectionID> connectionID_;

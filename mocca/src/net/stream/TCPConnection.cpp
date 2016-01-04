@@ -43,7 +43,7 @@ void TCPConnection::send(ByteArray message, std::chrono::milliseconds timeout) c
     }
 }
 
-ByteArray TCPConnection::receive(uint32_t maxSize, std::chrono::milliseconds timeout) const {
+ByteArray TCPConnection::readFromStream(uint32_t maxSize, std::chrono::milliseconds timeout) const {
     try {
         ByteArray message(maxSize);
         auto bytesRead = socket_->ReceiveData((int8_t*)message.data(), maxSize, static_cast<uint32_t>(timeout.count()));
