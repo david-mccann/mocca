@@ -6,9 +6,9 @@
 using namespace mocca::net;
 using namespace mocca;
 
-MessageEnvelope::MessageEnvelope(mocca::ByteArray msg, ConnectionID id)
+MessageEnvelope::MessageEnvelope(mocca::ByteArray msg, const ConnectionID& id)
     : message(std::move(msg))
-    , connectionID(std::move(id)) {}
+    , connectionID(id) {}
 
 MessageEnvelope::MessageEnvelope(MessageEnvelope&& other)
     : message(std::move(other.message))

@@ -13,7 +13,7 @@ namespace net {
 
 struct MessageEnvelope {
     MessageEnvelope() {}
-    MessageEnvelope(mocca::ByteArray msg, ConnectionID id);
+    MessageEnvelope(mocca::ByteArray msg, const ConnectionID& id);
     MessageEnvelope(MessageEnvelope&& other);
     mocca::ByteArray message;
     ConnectionID connectionID;

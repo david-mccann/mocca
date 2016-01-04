@@ -19,15 +19,15 @@ TCPConnection::~TCPConnection() {
     }
 }
 
-ConnectionID TCPConnection::connectionID() const {
-    if (!connectionID_.isNull()) {
-        return connectionID_;
+const ConnectionID& TCPConnection::connectionID() const {
+    if (!initialized_) {
+        std::string localIP, peerIP;
+        uint16_t localPort, peerPort;
+        socket_->GetLocalNetworkAddress().GetAddress(localIP, localPort);
+        socket_->GetPeerNetworkAddress().GetAddress(peerIP, peerPort);
+        connectionID_ = ConnectionID{ Endpoint("tcp", localIP, std::to_string(localPort)), Endpoint("tcp", peerIP, std::to_string(peerPort)) };
+        initialized_ = true;
     }
-    std::string localIP, peerIP;
-    uint16_t localPort, peerPort;
-    socket_->GetLocalNetworkAddress().GetAddress(localIP, localPort);
-    socket_->GetPeerNetworkAddress().GetAddress(peerIP, peerPort);
-    connectionID_ = ConnectionID{ Endpoint("tcp", localIP, std::to_string(localPort)), Endpoint("tcp", peerIP, std::to_string(peerPort)) };
     return connectionID_;
 }
 

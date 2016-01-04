@@ -18,7 +18,7 @@ QueueConnection::~QueueConnection() {
     outSignalQueue_->enqueue(Signal::Disconnect);
 }
 
-ConnectionID QueueConnection::connectionID() const {
+const ConnectionID& QueueConnection::connectionID() const {
     return connectionID_;
 }
 

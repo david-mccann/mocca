@@ -15,7 +15,7 @@ public:
                        std::shared_ptr<SQ> inSignalQueue, const ConnectionID& connectionID);
     ~LoopbackConnection();
 
-    ConnectionID connectionID() const override;
+    const ConnectionID& connectionID() const override;
     void send(ByteArray message, std::chrono::milliseconds timeout) const override;
     ByteArray receive(std::chrono::milliseconds timeout) const override;
 

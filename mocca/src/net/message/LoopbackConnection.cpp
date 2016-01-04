@@ -17,7 +17,7 @@ LoopbackConnection::~LoopbackConnection() {
     outSignalQueue_->enqueue(Signal::Disconnect);
 }
 
-ConnectionID LoopbackConnection::connectionID() const {
+const ConnectionID& LoopbackConnection::connectionID() const {
     return connectionID_;
 }
 

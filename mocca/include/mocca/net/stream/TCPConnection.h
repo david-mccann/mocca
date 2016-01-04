@@ -12,13 +12,14 @@ public:
     TCPConnection(std::unique_ptr<IVDA::ConnectionSocket> socket);
     ~TCPConnection();
 
-    ConnectionID connectionID() const override;
+    const ConnectionID& connectionID() const override;
     void send(ByteArray message, std::chrono::milliseconds timeout) const override;
     ByteArray receive(uint32_t maxSize, std::chrono::milliseconds timeout) const override;
 
 private:
     std::unique_ptr<IVDA::ConnectionSocket> socket_;
-    mutable Nullable<ConnectionID> connectionID_;
+    mutable ConnectionID connectionID_;
+    mutable bool initialized_;
 };
 }
 }
