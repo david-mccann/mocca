@@ -55,7 +55,7 @@ public:
         if (!queue_.empty()) {
             T val(std::move(queue_.front()));
             queue_.pop_front();
-            return val;
+            return Nullable<T>(std::move(val));
         }
         return Nullable<T>();
     }
