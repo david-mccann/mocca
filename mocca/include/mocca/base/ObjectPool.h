@@ -11,8 +11,7 @@ template <typename T> class ObjectPool {
     void customDelete(T* obj) {
         obj->clear();
         std::unique_lock<std::mutex> lock(mutex_);
-        freeObjects_.push_back(
-            std::unique_ptr<T, std::function<void(T*)>>(obj, std::bind(&ObjectPool::customDelete, this, std::placeholders::_1)));
+        freeObjects_.push_back(obj);
     }
 
 public:
@@ -21,7 +20,7 @@ public:
     ObjectPool(size_t initialSize)
         : initialSize_(initialSize) {
         for (size_t i = 0; i < initialSize_; ++i) {
-            freeObjects_.push_back(ObjectPtr(new T(), std::bind(&ObjectPool::customDelete, this, std::placeholders::_1)));
+            freeObjects_.push_back(new T());
         }
     }
 
@@ -29,12 +28,12 @@ public:
         std::unique_lock<std::mutex> lock(mutex_);
         if (freeObjects_.empty()) {
             for (size_t i = 0; i < initialSize_; ++i) {
-                freeObjects_.push_back(ObjectPtr(new T(), std::bind(&ObjectPool::customDelete, this, std::placeholders::_1)));
+                freeObjects_.push_back(new T());
             }
         }
-        auto obj = std::move(freeObjects_.front());
+        auto obj = freeObjects_.front();
         freeObjects_.pop_front();
-        return obj;
+        return std::unique_ptr<T, std::function<void(T*)>>(obj, std::bind(&ObjectPool::customDelete, this, std::placeholders::_1));
     }
 
     size_t numFreeObjects() {
@@ -44,7 +43,7 @@ public:
 
 private:
     std::mutex mutex_;
-    std::list<ObjectPtr> freeObjects_;
+    std::list<T*> freeObjects_;
     size_t initialSize_;
 };
 }
