@@ -8,15 +8,7 @@
 namespace mocca {
 
 template <typename T> class ObjectPool {
-    void customDelete(T* obj) {
-        obj->clear();
-        std::unique_lock<std::mutex> lock(mutex_);
-        freeObjects_.push_back(obj);
-    }
-
 public:
-    using ObjectPtr = std::unique_ptr<T, std::function<void(T*)>>;
-
     ObjectPool(size_t initialSize)
         : initialSize_(initialSize) {
         for (size_t i = 0; i < initialSize_; ++i) {
@@ -24,16 +16,25 @@ public:
         }
     }
 
+    using ObjectPtr = std::unique_ptr<T, std::function<void(T*)>>;
     ObjectPtr getObject() {
-        std::unique_lock<std::mutex> lock(mutex_);
-        if (freeObjects_.empty()) {
-            for (size_t i = 0; i < initialSize_; ++i) {
-                freeObjects_.push_back(new T());
+        T* obj = nullptr;
+        {
+            std::unique_lock<std::mutex> lock(mutex_);
+            if (freeObjects_.empty()) {
+                for (size_t i = 0; i < initialSize_; ++i) {
+                    freeObjects_.push_back(new T());
+                }
             }
+            obj = freeObjects_.front();
+            freeObjects_.pop_front();
         }
-        auto obj = freeObjects_.front();
-        freeObjects_.pop_front();
-        return std::unique_ptr<T, std::function<void(T*)>>(obj, std::bind(&ObjectPool::customDelete, this, std::placeholders::_1));
+        auto deleter = [this](T* obj) {
+            obj->clear();
+            std::unique_lock<std::mutex> lock(mutex_);
+            freeObjects_.push_back(obj);
+        };
+        return std::unique_ptr<T, decltype(deleter)>(obj, deleter);
     }
 
     size_t numFreeObjects() {

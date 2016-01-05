@@ -24,8 +24,12 @@ void WebSocketProtocol::performHandshake(IStreamConnection& connection, std::chr
 }
 
 void mocca::net::WebSocketProtocol::receiveHandshake(IStreamConnection& connection, std::chrono::milliseconds timeout) {
-    auto handshake = readUntil(connection, "\r\n\r\n");
-    std::string handshakeStr((char*)handshake.data(), handshake.size());
+    ByteArray headerBuffer;
+    if (readUntil(connection, headerBuffer, "\r\n\r\n") == ReadStatus::Incomplete) {
+        connection.putBack(headerBuffer);
+        throw NetworkError("Timeout while trying to receive WebSocket handshake", __FILE__, __LINE__);
+    }
+    std::string handshakeStr((char*)headerBuffer.data(), headerBuffer.size());
     std::stringstream stream(handshakeStr);
     std::string line;
     getline(stream, line);
@@ -113,39 +117,45 @@ ByteArray WebSocketProtocol::readFrameFromStream(IStreamConnection& connection, 
     std::lock_guard<IStreamConnection> lock(connection);
 
     // read the flags byte
-    auto data = readExactly(connection, 1, timeout);
-    if (data.isEmpty()) {
-        return ByteArray();
+    ByteArray prefixBuffer(14);
+    readExactly(connection, prefixBuffer, 1, timeout);
+    if (prefixBuffer.isEmpty()) {
+        return ByteArray(); // no data read from stream
     }
+
 #ifdef MOCCA_RUNTIME_CHECKS
-    if (data[0] != 0x81 && data[0] != 0x88) { // 0x81 = final fragment, text frame; 0x88 = final fragment, close connection
+    if (prefixBuffer[0] != 0x81 && prefixBuffer[0] != 0x88) { // 0x81 = final fragment, text frame; 0x88 = final fragment, close connection
         std::stringstream stream;
-        stream << std::hex << static_cast<int>(data[0]);
+        stream << std::hex << static_cast<int>(prefixBuffer[0]);
         throw Error("Invalid WebSocket frame: unsupported or malformed (flag byte: " + stream.str() + ")", __FILE__, __LINE__);
     }
 #endif
 
-    if (data[0] == 0x88) {
+    if (prefixBuffer[0] == 0x88) {
         throw ConnectionClosedError("WebSocket connection closed", *connection.connectionID(), __FILE__, __LINE__);
     }
 
     // read the basic payload byte
-    data.append(readExactly(connection, 1, timeout));
+    if (readExactly(connection, prefixBuffer, 1, timeout) == ReadStatus::Incomplete) {
+        connection.putBack(prefixBuffer);
+        return ByteArray();
+    }
 
     // read additional payload-size bytes and the mask bytes
-    unsigned char basicSize = data[1] & 0x7F;
+    unsigned char basicSize = prefixBuffer[1] & 0x7F;
     uint64_t payloadSize = 0;
     int maskOffset = 2;
+    ReadStatus status;
     if (basicSize <= 125) {
         payloadSize = basicSize;
-        data.append(readExactly(connection, 4, timeout)); // 4 bytes mask
+        status = readExactly(connection, prefixBuffer, 4, timeout); // 4 bytes mask
     } else if (basicSize == 126) {
-        data.append(readExactly(connection, 6, timeout)); // 2 bytes payload length + 4 bytes mask
-        payloadSize = swap_uint16(*reinterpret_cast<uint16_t*>(data.data() + 2));
+        status = readExactly(connection, prefixBuffer, 6, timeout); // 2 bytes payload length + 4 bytes mask
+        payloadSize = swap_uint16(*reinterpret_cast<uint16_t*>(prefixBuffer.data() + 2));
         maskOffset = 4;
     } else if (basicSize == 127) {
-        data.append(readExactly(connection, 12, timeout)); // 8 bytes payload length + 4 bytes mask
-        payloadSize = swap_uint64(*reinterpret_cast<uint64_t*>(data.data() + 2));
+        status = readExactly(connection, prefixBuffer, 12, timeout); // 8 bytes payload length + 4 bytes mask
+        payloadSize = swap_uint64(*reinterpret_cast<uint64_t*>(prefixBuffer.data() + 2));
 #ifdef MOCCA_RUNTIME_CHECKS
         if (payloadSize > std::numeric_limits<uint32_t>::max()) {
             throw Error("Invalid WebSocket frame: frame size exceeds buffer size", __FILE__, __LINE__);
@@ -158,14 +168,23 @@ ByteArray WebSocketProtocol::readFrameFromStream(IStreamConnection& connection, 
         throw Error("Invalid WebSocket frame: malformed payload-size", __FILE__, __LINE__);
     }
 #endif
+    if (status == ReadStatus::Incomplete) {
+        connection.putBack(prefixBuffer);
+        return ByteArray();
+    }
 
     // read and unmask payload data
-    ByteArray payload = readExactly(connection, static_cast<uint32_t>(payloadSize), timeout);
-    unsigned char* mask = data.data() + maskOffset;
-    for (unsigned long int i = 0; i < payloadSize; ++i) {
-        payload[i] ^= mask[i % 4];
+    ByteArray payloadBuffer;
+    if (readExactly(connection, payloadBuffer, static_cast<uint32_t>(payloadSize), timeout) == ReadStatus::Incomplete) {
+        connection.putBack(payloadBuffer);
+        connection.putBack(prefixBuffer);
+        return ByteArray();
     }
-    return payload;
+    unsigned char* mask = prefixBuffer.data() + maskOffset;
+    for (unsigned long int i = 0; i < payloadSize; ++i) {
+        payloadBuffer[i] ^= mask[i % 4];
+    }
+    return payloadBuffer;
 }
 
 void WebSocketProtocol::writeFrameToStream(IStreamConnection& connection, ByteArray frame, std::chrono::milliseconds timeout) {

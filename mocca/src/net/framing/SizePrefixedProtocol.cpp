@@ -15,13 +15,21 @@ std::string SizePrefixedProtocol::name() const {
 
 ByteArray SizePrefixedProtocol::readFrameFromStream(IStreamConnection& connection, std::chrono::milliseconds timeout) {
     std::lock_guard<IStreamConnection> lock(connection);
-    auto sizeData = readExactly(connection, sizeof(uint32_t), timeout);
-    if (sizeData.isEmpty()) {
+
+    ByteArray sizeBuffer;
+    if (readExactly(connection, sizeBuffer, sizeof(uint32_t), timeout) == ReadStatus::Incomplete) {
+        connection.putBack(sizeBuffer);
         return ByteArray();
     }
-    auto frameSize = sizeData.read<uint32_t>();
-    auto frame = readExactly(connection, frameSize, timeout);
-    return frame;
+
+    ByteArray buffer;
+    auto frameSize = sizeBuffer.read<uint32_t>();
+    if (readExactly(connection, buffer, frameSize, timeout) == ReadStatus::Incomplete) {
+        connection.putBack(buffer);
+        connection.putBack(sizeBuffer);
+        return ByteArray();
+    }
+    return buffer;
 }
 
 void SizePrefixedProtocol::writeFrameToStream(IStreamConnection& connection, ByteArray frame, std::chrono::milliseconds timeout) {

@@ -26,5 +26,9 @@ ByteArray IStreamConnection::receive(uint32_t maxSize, std::chrono::milliseconds
 }
 
 void IStreamConnection::putBack(const ByteArray& data) {
-    putBackData_.append(data);
+    ByteArray newPutBackData(putBackData_.size() - putBackReadPos_ + data.size());
+    newPutBackData.append(data);
+    newPutBackData.append(putBackData_.data() + putBackReadPos_, putBackData_.size() - putBackReadPos_);
+    putBackData_ = std::move(newPutBackData);
+    putBackReadPos_ = 0;
 }

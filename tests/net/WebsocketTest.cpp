@@ -135,7 +135,7 @@ TEST_F(WebsocketTest, SendSmallPayload) {
     auto lbClientConnection = lbService.connect("mq");
     lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
     auto wsServerConnection = wsAcceptor->accept();
-    readUntil(*lbClientConnection, "\r\n\r\n"); // remove hanshake response from client buffer
+    readUntil(*lbClientConnection, ByteArray(), "\r\n\r\n"); // remove hanshake response from client buffer
 
     unsigned char payloadSize = 125;
     auto payload = createPayloadData(payloadSize);
@@ -157,7 +157,7 @@ TEST_F(WebsocketTest, SendMediumPayload) {
     auto lbClientConnection = lbService.connect("mq");
     lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
     auto wsServerConnection = wsAcceptor->accept();
-    readUntil(*lbClientConnection, "\r\n\r\n"); // remove hanshake response from client buffer
+    readUntil(*lbClientConnection, ByteArray(), "\r\n\r\n"); // remove hanshake response from client buffer
 
     uint16_t payloadSize = 40000;
     uint16_t payloadSizeBE = swap_uint16(payloadSize);
@@ -181,7 +181,7 @@ TEST_F(WebsocketTest, SendBigPayload) {
     auto lbClientConnection = lbService.connect("mq");
     lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
     auto wsServerConnection = wsAcceptor->accept();
-    readUntil(*lbClientConnection, "\r\n\r\n"); // remove hanshake response from client buffer
+    readUntil(*lbClientConnection, ByteArray(), "\r\n\r\n"); // remove hanshake response from client buffer
 
     uint64_t payloadSize = 70000;
     uint64_t payloadSizeBE = swap_uint64(payloadSize);
