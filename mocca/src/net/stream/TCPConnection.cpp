@@ -7,6 +7,10 @@ namespace net {
 
 TCPConnection::TCPConnection(std::unique_ptr<IVDA::ConnectionSocket> socket)
     : socket_(move(socket)) {
+    socket->SetNonBlocking(true);
+    socket->SetNoSigPipe(true); // disable sigpipe to prevent crashes
+    socket->SetNoDelay(true); // disable Nagle algorithm for low-latency transmission
+
     std::string localIP, peerIP;
     uint16_t localPort, peerPort;
     socket_->GetLocalNetworkAddress().GetAddress(localIP, localPort);

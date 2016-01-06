@@ -10,7 +10,6 @@ using namespace mocca::net;
 std::unique_ptr<IStreamConnection> TCPConnectionFactory::connect(const std::string& address) {
     TCPNetworkAddress networkAddress(address);
     auto socket = std::unique_ptr<IVDA::TCPSocket>(new IVDA::TCPSocket());
-    socket->SetNonBlocking(true);
     try {
         socket->Connect(IVDA::NetworkAddress(networkAddress.ip(), networkAddress.port()));
     } catch (const IVDA::SocketConnectionException& err) {
