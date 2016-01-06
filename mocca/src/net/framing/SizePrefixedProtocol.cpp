@@ -14,7 +14,7 @@ std::string SizePrefixedProtocol::name() const {
 }
 
 ByteArray SizePrefixedProtocol::readFrameFromStream(IStreamConnection& connection, std::chrono::milliseconds timeout) {
-    std::lock_guard<IStreamConnection> lock(connection);
+    std::lock_guard<std::mutex> lock(connection.receiveMutex());
 
     ByteArray sizeBuffer;
     if (readExactly(connection, sizeBuffer, sizeof(uint32_t), timeout) == ReadStatus::Incomplete) {
@@ -34,6 +34,7 @@ ByteArray SizePrefixedProtocol::readFrameFromStream(IStreamConnection& connectio
 
 void SizePrefixedProtocol::writeFrameToStream(IStreamConnection& connection, ByteArray frame, std::chrono::milliseconds timeout) {
     // fixme: performance loss; implement prepend method for ByteArray
+    std::lock_guard<std::mutex> lock(connection.sendMutex());
     ByteArray newFrame(frame.size() + sizeof(uint32_t));
     newFrame << frame.size();
     newFrame.append(frame);

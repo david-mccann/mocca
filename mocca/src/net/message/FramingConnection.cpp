@@ -11,6 +11,10 @@ std::shared_ptr<const ConnectionID> FramingConnection::connectionID() const {
     return stream_->connectionID();
 }
 
+bool FramingConnection::isConnected() const {
+    return stream_->isConnected();
+}
+
 void FramingConnection::send(ByteArray message, std::chrono::milliseconds timeout) const {
     framingStrategy_->writeFrameToStream(*stream_, std::move(message), timeout);
 }

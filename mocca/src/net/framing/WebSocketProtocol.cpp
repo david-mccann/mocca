@@ -25,9 +25,12 @@ void WebSocketProtocol::performHandshake(IStreamConnection& connection, std::chr
 
 void mocca::net::WebSocketProtocol::receiveHandshake(IStreamConnection& connection, std::chrono::milliseconds timeout) {
     ByteArray headerBuffer;
-    if (readUntil(connection, headerBuffer, "\r\n\r\n") == ReadStatus::Incomplete) {
-        connection.putBack(headerBuffer);
-        throw NetworkError("Timeout while trying to receive WebSocket handshake", __FILE__, __LINE__);
+    {
+        std::lock_guard<std::mutex> lock(connection.receiveMutex());
+        if (readUntil(connection, headerBuffer, "\r\n\r\n") == ReadStatus::Incomplete) {
+            connection.putBack(headerBuffer);
+            throw NetworkError("Timeout while trying to receive WebSocket handshake", __FILE__, __LINE__);
+        }
     }
     std::string handshakeStr((char*)headerBuffer.data(), headerBuffer.size());
     std::stringstream stream(handshakeStr);
@@ -89,6 +92,7 @@ void WebSocketProtocol::sendHandshakeResponse(IStreamConnection& connection, std
     stream << "Sec-WebSocket-Accept: " << serverKey << "\r\n";
     stream << "\r\n";
     auto responseStr = stream.str();
+    std::lock_guard<std::mutex> lock(connection.sendMutex());
     connection.send(ByteArray::createFromRaw(responseStr.c_str(), responseStr.size()));
 }
 
@@ -114,7 +118,7 @@ void WebSocketProtocol::sendHandshakeResponse(IStreamConnection& connection, std
 */
 
 ByteArray WebSocketProtocol::readFrameFromStream(IStreamConnection& connection, std::chrono::milliseconds timeout) {
-    std::lock_guard<IStreamConnection> lock(connection);
+    std::lock_guard<std::mutex> lock(connection.receiveMutex());
 
     // read the flags byte
     ByteArray prefixBuffer(14);
@@ -214,5 +218,6 @@ void WebSocketProtocol::writeFrameToStream(IStreamConnection& connection, ByteAr
     // append payload
     sendBuffer.append(frame);
 
+    std::lock_guard<std::mutex> lock(connection.sendMutex());
     connection.send(std::move(sendBuffer));
 }

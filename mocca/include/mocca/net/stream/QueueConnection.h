@@ -16,6 +16,7 @@ public:
     ~QueueConnection();
 
     std::shared_ptr<const ConnectionID> connectionID() const override;
+    bool isConnected() const override;
     void send(ByteArray message, std::chrono::milliseconds timeout) const override;
 
 private:
@@ -23,6 +24,7 @@ private:
 
 private:
     std::shared_ptr<const ConnectionID> connectionID_;
+    mutable bool connected_;
 
     std::shared_ptr<MQ> sendQueue_;
     std::shared_ptr<MQ> receiveQueue_;
