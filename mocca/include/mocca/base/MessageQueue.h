@@ -5,8 +5,8 @@
 #include <algorithm>
 #include <chrono>
 #include <condition_variable>
+#include <deque>
 #include <functional>
-#include <list>
 #include <mutex>
 
 namespace mocca {
@@ -16,14 +16,16 @@ template <typename T> class MessageQueue {
 public:
     /* Enqueue an item and notify all waiting threads. */
     void enqueue(T t) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        queue_.push_back(std::move(t));
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            queue_.push_back(std::move(t));
+        }
         condition_.notify_all();
     }
 
     /* Dequeue operation with a timeout. The calling thread is blocked until either an item is
-     * available for being fetched or the timeout expires. If the timeout expires, a null-object is
-     * returned. */
+    * available for being fetched or the timeout expires. If the timeout expires, a null-object is
+    * returned. */
     Nullable<T> dequeue(std::chrono::milliseconds timeout) {
         std::unique_lock<std::mutex> lock(mutex_);
         if (!condition_.wait_for(lock, timeout, [&] { return !queue_.empty(); })) {
@@ -71,7 +73,7 @@ public:
     }
 
 private:
-    std::list<T> queue_;
+    std::deque<T> queue_;
     mutable std::mutex mutex_;
     std::condition_variable condition_;
 };

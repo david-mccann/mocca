@@ -14,6 +14,20 @@ MessageEnvelope::MessageEnvelope(MessageEnvelope&& other)
     : message(std::move(other.message))
     , connectionID(std::move(other.connectionID)) {}
 
+namespace mocca {
+namespace net {
+void swap(MessageEnvelope& lhs, MessageEnvelope& rhs) {
+    using std::swap;
+    swap(lhs.connectionID, rhs.connectionID);
+    swap(lhs.message, rhs.message);
+}
+}
+}
+
+MessageEnvelope& mocca::net::MessageEnvelope::operator=(MessageEnvelope other) {
+    swap(other, *this);
+    return *this;
+}
 
 ConnectionAggregator::ConnectionAggregator(std::vector<std::unique_ptr<IMessageConnectionAcceptor>> connectionAcceptors,
                                            DisconnectStrategy disconnectStrategy)
@@ -116,9 +130,9 @@ void ConnectionAggregator::SendThread::run() {
     try {
         while (!isInterrupted()) {
             auto connectionID = connection_.connectionID();
-            auto dataNullable =
-                sendQueue_.dequeueFiltered([&connectionID](const MessageEnvelope& envelope) { return envelope.connectionID == connectionID; },
-                                           std::chrono::milliseconds(100));
+            auto dataNullable = sendQueue_.dequeueFiltered(
+                [&connectionID](const MessageEnvelope& envelope) { return envelope.connectionID == connectionID; },
+                std::chrono::milliseconds(100));
             if (!dataNullable.isNull()) {
                 auto data = dataNullable.release();
                 connection_.send(std::move(data.message));

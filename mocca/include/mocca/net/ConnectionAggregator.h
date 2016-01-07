@@ -5,6 +5,7 @@
 #include "mocca/base/Thread.h"
 #include "mocca/net/IMessageConnectionAcceptor.h"
 
+#include <list>
 #include <vector>
 
 namespace mocca {
@@ -15,6 +16,8 @@ struct MessageEnvelope {
     MessageEnvelope() {}
     MessageEnvelope(mocca::ByteArray msg, std::shared_ptr<const ConnectionID> id);
     MessageEnvelope(MessageEnvelope&& other);
+    friend void swap(MessageEnvelope& lhs, MessageEnvelope& rhs);
+    MessageEnvelope& operator=(MessageEnvelope other);
     mocca::ByteArray message;
     std::shared_ptr<const ConnectionID> connectionID;
 };
@@ -66,7 +69,8 @@ private:
 
     struct ThreadedConnection {
         // ctor only needed because of stupid vs2013
-        ThreadedConnection(std::unique_ptr<IMessageConnection> connection, const std::thread::id& receiveThreadID, const std::thread::id& sendThreadID)
+        ThreadedConnection(std::unique_ptr<IMessageConnection> connection, const std::thread::id& receiveThreadID,
+                           const std::thread::id& sendThreadID)
             : connection(std::move(connection))
             , receiveThreadID(receiveThreadID)
             , sendThreadID(sendThreadID) {}

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <functional>
-#include <list>
+#include <vector>
 #include <memory>
 #include <mutex>
 
@@ -26,8 +26,8 @@ public:
                     freeObjects_.push_back(new T());
                 }
             }
-            obj = freeObjects_.front();
-            freeObjects_.pop_front();
+            obj = freeObjects_.back();
+            freeObjects_.pop_back();
         }
         auto deleter = [this](T* obj) {
             obj->clear();
@@ -44,7 +44,7 @@ public:
 
 private:
     std::mutex mutex_;
-    std::list<T*> freeObjects_;
+    std::vector<T*> freeObjects_;
     size_t initialSize_;
 };
 }
