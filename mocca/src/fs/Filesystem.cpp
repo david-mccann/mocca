@@ -16,6 +16,7 @@
 #ifdef _WIN32
 #include <Windows.h>
 #else
+#include <unistd.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #endif
@@ -29,6 +30,15 @@ bool mocca::fs::exists(const Path& path) {
 #else
     struct stat buf;
     return (stat(path.toString().c_str(), &buf) == 0);
+#endif
+}
+
+void mocca::fs::removeFile(const Path & path)
+{
+#ifdef WIN32
+    DeleteFileA(path.toString().c_str());
+#else
+    unlink(path.toString().c_str());
 #endif
 }
 
