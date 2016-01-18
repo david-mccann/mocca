@@ -23,6 +23,7 @@ public:
     std::string extension() const;
 
     std::string toString() const;
+    operator std::string() const;
 
     Path parent() const;
 

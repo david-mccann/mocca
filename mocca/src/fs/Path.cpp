@@ -45,6 +45,10 @@ std::string Path::toString() const {
     return path_;
 }
 
+mocca::fs::Path::operator std::string() const {
+    return toString();
+}
+
 Path Path::parent() const {
     size_t index = path_.find_last_of("/");
     if (index == std::string::npos) {
