@@ -27,7 +27,7 @@ ReadStatus mocca::net::readUntil(IStreamConnection& stream, ByteArray& buffer, c
         auto searchEnd = buffer.data() + buffer.size();
         auto searchIt = std::search(searchBegin, searchEnd, begin(delim), end(delim));
         if (searchIt != searchEnd) {
-            buffer.setSize(std::distance(buffer.data(), searchIt) + delim.size());
+            buffer.setSize(static_cast<uint32_t>(std::distance(buffer.data(), searchIt) + delim.size()));
             cont = false;
         }
     }

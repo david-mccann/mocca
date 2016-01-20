@@ -101,7 +101,7 @@ void WebSocketProtocol::sendHandshakeResponse(IStreamConnection& connection, std
     stream << "\r\n";
     auto responseStr = stream.str();
     std::lock_guard<std::mutex> lock(connection.sendMutex());
-    connection.send(ByteArray::createFromRaw(responseStr.c_str(), responseStr.size()));
+    connection.send(ByteArray::createFromRaw(responseStr.c_str(), static_cast<uint32_t>(responseStr.size())));
 }
 
 /*
