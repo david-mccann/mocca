@@ -41,8 +41,7 @@ void swap(ByteArray& lhs, ByteArray& rhs) {
 }
 
 ByteArray& mocca::ByteArray::operator=(ByteArray other) {
-    ByteArray tmp(std::move(other));
-    swap(tmp, *this);
+    swap(other, *this);
     return *this;
 }
 

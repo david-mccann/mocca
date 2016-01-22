@@ -1,3 +1,11 @@
+/****************************************************************
+* Copyright (C) 2016 Andrey Krekhov, David McCann
+*
+* The content of this file may not be copied and/or distributed
+* without the expressed permission of the copyright owner.
+*
+****************************************************************/
+
 #include <numeric>
 #include <future>
 
@@ -96,4 +104,15 @@ TEST_F(MessageQueueTest, DequeueFiltered) {
         ASSERT_TRUE(s.isNull());
         t.join();
     }
+}
+
+
+TEST_F(MessageQueueTest, Performance) {
+    MessageQueue<std::string> target;
+
+    for (int i = 0; i < 10000; ++i) {
+        auto x = target.dequeue(std::chrono::milliseconds(1));
+    }
+
+
 }
