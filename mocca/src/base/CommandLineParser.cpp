@@ -62,7 +62,8 @@ void CommandLineParser::parse(int argc, const char** argv) {
         for (const auto& opt : options_) {
             if (opt.key == argKey) {
                 if (!opt.allowedValues.empty()) {
-                    if (findMemberEqual(begin(opt.allowedValues), end(opt.allowedValues), &OptionValue::value, argValue) == end(opt.allowedValues)) {
+                    if (findMemberEqual(begin(opt.allowedValues), end(opt.allowedValues), &OptionValue::value, argValue) ==
+                        end(opt.allowedValues)) {
                         auto allowedValues = collectMembers(begin(opt.allowedValues), end(opt.allowedValues), &OptionValue::value);
                         auto allowedValuesStr = makeString(begin(allowedValues), end(allowedValues));
                         throw ParserError(

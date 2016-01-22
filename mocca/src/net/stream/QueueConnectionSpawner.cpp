@@ -25,8 +25,10 @@ std::unique_ptr<IStreamConnection> QueueConnectionSpawner::getClientConnection()
     Endpoint ep2("queue", "local", "#" + std::to_string(connectionCounter++));
     std::shared_ptr<const ConnectionID> serverID(std::make_shared<const ConnectionID>(ep1, ep2));
     std::shared_ptr<const ConnectionID> clientID(std::make_shared<const ConnectionID>(ep2, ep1));
-    std::unique_ptr<QueueConnection> serverConnection(new QueueConnection(messageQueue1, messageQueue2, signalQueue1, signalQueue2, serverID));
-    std::unique_ptr<IStreamConnection> clientConnection(new QueueConnection(messageQueue2, messageQueue1, signalQueue2, signalQueue1, clientID));
+    std::unique_ptr<QueueConnection> serverConnection(
+        new QueueConnection(messageQueue1, messageQueue2, signalQueue1, signalQueue2, serverID));
+    std::unique_ptr<IStreamConnection> clientConnection(
+        new QueueConnection(messageQueue2, messageQueue1, signalQueue2, signalQueue1, clientID));
 
     serverConnections_.enqueue(std::move(serverConnection));
     return clientConnection;

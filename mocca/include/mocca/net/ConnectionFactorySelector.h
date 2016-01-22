@@ -12,8 +12,8 @@
 #include "mocca/net/IMessageConnectionFactory.h"
 #include "mocca/net/IStreamConnectionFactory.h"
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 namespace mocca {
 namespace net {
@@ -21,7 +21,7 @@ class ConnectionFactorySelector {
 public:
     static IMessageConnectionFactory& messageConnectionFactory(const std::string& protocol);
     static IStreamConnectionFactory& streamConnectionFactory(const std::string& protocol);
-    
+
     static void addMessageConnectionFactory(std::unique_ptr<IMessageConnectionFactory> factory, const std::string& protocol);
     static void addStreamConnectionFactory(std::unique_ptr<IStreamConnectionFactory> factory, const std::string& protocol);
     static void addDefaultFactories();

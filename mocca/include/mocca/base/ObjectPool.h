@@ -9,9 +9,9 @@
 #pragma once
 
 #include <functional>
-#include <vector>
 #include <memory>
 #include <mutex>
+#include <vector>
 
 namespace mocca {
 

@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "mocca/net/stream/Sockets.h"
 #include "mocca/net/IStreamConnectionAcceptor.h"
+#include "mocca/net/stream/Sockets.h"
 
 namespace mocca {
 namespace net {

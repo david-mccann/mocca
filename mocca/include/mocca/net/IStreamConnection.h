@@ -26,7 +26,7 @@ public:
     virtual bool isConnected() const = 0;
     virtual void send(ByteArray message, std::chrono::milliseconds timeout = std::chrono::milliseconds(100)) const = 0;
     ByteArray receive(uint32_t maxSize, std::chrono::milliseconds timeout = std::chrono::milliseconds(100)) const;
-    
+
     void putBack(const ByteArray& data);
     std::mutex& sendMutex() { return sendMutex_; }
     std::mutex& receiveMutex() { return receiveMutex_; }

@@ -25,8 +25,7 @@ template <typename Iter, typename U> std::vector<U> collectMembers(Iter it, Iter
     return result;
 }
 
-template <typename Iter, typename U>
-Iter findMemberEqual(Iter it, Iter itEnd, const U IterValueType<Iter>::*Mem, const U& val) {
+template <typename Iter, typename U> Iter findMemberEqual(Iter it, Iter itEnd, const U IterValueType<Iter>::*Mem, const U& val) {
     for (; it != itEnd; ++it) {
         if (*it.*Mem == val) {
             return it;
@@ -35,8 +34,7 @@ Iter findMemberEqual(Iter it, Iter itEnd, const U IterValueType<Iter>::*Mem, con
     return itEnd;
 }
 
-template <typename Iter, typename U>
-Iter findMemberEqual(Iter it, Iter itEnd, U (IterValueType<Iter>::*MemFn)() const, const U& val) {
+template <typename Iter, typename U> Iter findMemberEqual(Iter it, Iter itEnd, U (IterValueType<Iter>::*MemFn)() const, const U& val) {
     for (; it != itEnd; ++it) {
         if ((*it.*MemFn)() == val) {
             return it;

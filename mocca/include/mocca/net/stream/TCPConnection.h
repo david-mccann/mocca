@@ -8,9 +8,9 @@
 
 #pragma once
 
+#include "mocca/base/Nullable.h"
 #include "mocca/net/IStreamConnection.h"
 #include "mocca/net/stream/Sockets.h"
-#include "mocca/base/Nullable.h"
 
 namespace mocca {
 namespace net {

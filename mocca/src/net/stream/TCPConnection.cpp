@@ -17,7 +17,7 @@ TCPConnection::TCPConnection(std::unique_ptr<IVDA::ConnectionSocket> socket)
     : socket_(move(socket)) {
     socket_->SetNonBlocking(true);
     socket_->SetNoSigPipe(true); // disable sigpipe to prevent crashes
-    socket_->SetNoDelay(true); // disable Nagle algorithm for low-latency transmission
+    socket_->SetNoDelay(true);   // disable Nagle algorithm for low-latency transmission
 
     std::string localIP, peerIP;
     uint16_t localPort, peerPort;
