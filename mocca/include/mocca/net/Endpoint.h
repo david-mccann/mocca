@@ -14,8 +14,7 @@ namespace mocca {
 namespace net {
 
 struct Endpoint {
-public:
-    Endpoint();
+    Endpoint() = default;
     Endpoint(const std::string& protocol, const std::string& machine, const std::string& port);
     Endpoint(const std::string& str);
 
@@ -30,5 +29,18 @@ public:
     std::string machine;
     std::string port;
 };
+
+struct TCPEndpoint : public Endpoint {
+    TCPEndpoint() = default;
+    TCPEndpoint(const std::string& ip, const std::string& port);
+    TCPEndpoint(const std::string& str);
+};
+
+struct WSEndpoint : public Endpoint {
+    WSEndpoint() = default;
+    WSEndpoint(const std::string& ip, const std::string& port);
+    WSEndpoint(const std::string& str);
+};
+
 }
 }

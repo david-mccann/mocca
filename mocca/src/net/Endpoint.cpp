@@ -13,8 +13,6 @@
 
 using namespace mocca::net;
 
-Endpoint::Endpoint() {}
-
 Endpoint::Endpoint(const std::string& protocol, const std::string& machine, const std::string& port)
     : protocol(protocol)
     , machine(machine)
@@ -55,3 +53,16 @@ std::ostream& operator<<(std::ostream& os, const Endpoint& obj) {
 }
 }
 }
+
+TCPEndpoint::TCPEndpoint(const std::string& ip, const std::string& port)
+    : Endpoint("tcp.prefixed", ip, port) {}
+
+TCPEndpoint::TCPEndpoint(const std::string& str)
+    : Endpoint("tcp.prefixed:" + str) {}
+
+
+WSEndpoint::WSEndpoint(const std::string& ip, const std::string& port)
+    : Endpoint("tcp.ws", ip, port) {}
+
+WSEndpoint::WSEndpoint(const std::string& str)
+    : Endpoint("tcp.ws:" + str) {}
