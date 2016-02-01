@@ -42,5 +42,6 @@ struct WSEndpoint : public Endpoint {
     WSEndpoint(const std::string& str);
 };
 
+bool isTCPLocalhost(const Endpoint& endpoint);
 }
 }

@@ -51,6 +51,11 @@ bool operator==(const Endpoint& lhs, const Endpoint& rhs) {
 std::ostream& operator<<(std::ostream& os, const Endpoint& obj) {
     return os << obj.toString();
 }
+
+bool isTCPLocalhost(const Endpoint& endpoint) {
+    return (endpoint.protocol.find("tcp") != std::string::npos) &&
+           (endpoint.machine == "localhost" || endpoint.machine == "127.0.0.1");
+}
 }
 }
 
