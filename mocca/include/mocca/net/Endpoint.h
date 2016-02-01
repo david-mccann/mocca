@@ -20,6 +20,7 @@ struct Endpoint {
 
     bool equals(const Endpoint& other) const;
     friend bool operator==(const Endpoint& lhs, const Endpoint& rhs);
+    friend bool operator!=(const Endpoint& lhs, const Endpoint& rhs);
 
     std::string toString() const;
     friend std::ostream& operator<<(std::ostream& os, const Endpoint& obj);

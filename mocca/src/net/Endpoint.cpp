@@ -48,6 +48,10 @@ bool operator==(const Endpoint& lhs, const Endpoint& rhs) {
     return lhs.equals(rhs);
 }
 
+bool operator!=(const Endpoint& lhs, const Endpoint& rhs) {
+    return !lhs.equals(rhs);
+}
+
 std::ostream& operator<<(std::ostream& os, const Endpoint& obj) {
     return os << obj.toString();
 }
