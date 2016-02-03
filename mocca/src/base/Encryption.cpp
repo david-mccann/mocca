@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <random>
+#include <cstring>
 
 std::string mocca::impl::createIv() {
     std::array<uint16_t, 8> randomData;
