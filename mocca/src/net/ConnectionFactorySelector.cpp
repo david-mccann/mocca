@@ -66,6 +66,9 @@ void ConnectionFactorySelector::removeAll() {
 }
 
 void ConnectionFactorySelector::addDefaultFactories() {
+    messageConnectionFactories_.clear();
+    streamConnectionFactories_.clear();
+
     // tcp
     addStreamConnectionFactory(makeUnique<TCPConnectionFactory>(), tcp());
 
