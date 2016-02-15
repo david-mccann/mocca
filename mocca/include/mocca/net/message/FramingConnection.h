@@ -26,6 +26,7 @@ public:
 private:
     std::unique_ptr<IStreamConnection> stream_;
     std::unique_ptr<FramingStrategy> framingStrategy_;
+    std::shared_ptr<const ConnectionID> connectionID_;
 };
 }
 }

@@ -13,7 +13,15 @@ using namespace mocca::net;
 
 FramingConnection::FramingConnection(std::unique_ptr<IStreamConnection> stream, std::unique_ptr<FramingStrategy> framingStrategy)
     : stream_(std::move(stream))
-    , framingStrategy_(std::move(framingStrategy)) {}
+    , framingStrategy_(std::move(framingStrategy)) {
+    auto localEndpont = stream_->connectionID()->localEndpoint;
+    auto peerEndpoint = stream_->connectionID()->peerEndpoint;
+
+    localEndpont.protocol = localEndpont.protocol + "." + framingStrategy_->name();
+    peerEndpoint.protocol = peerEndpoint.protocol + "." + framingStrategy_->name();
+
+    connectionID_ = std::make_shared<ConnectionID>(localEndpont, peerEndpoint);
+}
 
 std::shared_ptr<const ConnectionID> FramingConnection::connectionID() const {
     return stream_->connectionID();

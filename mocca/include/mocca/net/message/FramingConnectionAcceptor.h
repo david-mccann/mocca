@@ -20,10 +20,12 @@ public:
     FramingConnectionAcceptor(std::unique_ptr<IStreamConnectionAcceptor> streamAcceptor, std::unique_ptr<FramingStrategy> framingStrategy);
 
     std::unique_ptr<IMessageConnection> accept(std::chrono::milliseconds timeout);
-
+    std::shared_ptr<const Endpoint> localEndpoint() const override;
+    
 private:
     std::unique_ptr<IStreamConnectionAcceptor> streamAcceptor_;
     std::unique_ptr<FramingStrategy> framingStrategy_;
+    std::shared_ptr<const Endpoint> endpoint_;
 };
 }
 }

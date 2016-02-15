@@ -18,9 +18,11 @@ class LoopbackConnectionAcceptor : public IMessageConnectionAcceptor {
 public:
     LoopbackConnectionAcceptor(std::shared_ptr<LoopbackConnectionSpawner> spawner);
     std::unique_ptr<IMessageConnection> accept(std::chrono::milliseconds timeout) override;
-
+    std::shared_ptr<const Endpoint> localEndpoint() const override;
+    
 private:
     std::shared_ptr<LoopbackConnectionSpawner> spawner_;
+    std::shared_ptr<const Endpoint> endpoint_;
 };
 }
 }

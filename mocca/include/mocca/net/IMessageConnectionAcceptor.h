@@ -21,6 +21,7 @@ public:
     virtual ~IMessageConnectionAcceptor() {}
 
     virtual std::unique_ptr<IMessageConnection> accept(std::chrono::milliseconds timeout = std::chrono::milliseconds(100)) = 0;
+    virtual std::shared_ptr<const Endpoint> localEndpoint() const = 0;
 };
 }
 }

@@ -19,10 +19,11 @@ public:
     TCPConnectionAcceptor(int port);
 
     std::unique_ptr<IStreamConnection> accept(std::chrono::milliseconds timeout) override;
-
+    virtual std::shared_ptr<const Endpoint> localEndpoint() const override;
+    
 private:
-    int port_;
     IVDA::TCPServer server_;
+    std::shared_ptr<const Endpoint> endpoint_;
 };
 }
 }

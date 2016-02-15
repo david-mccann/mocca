@@ -15,14 +15,13 @@
 namespace mocca {
 namespace net {
 
-TCPConnectionAcceptor::TCPConnectionAcceptor(int port)
-    : port_(port) {
-
+TCPConnectionAcceptor::TCPConnectionAcceptor(int port) {
     try {
-        server_.SetReuseAddress(true);
+        // server_.SetReuseAddress(true);
         server_.SetNonBlocking(true);
-        server_.Bind(IVDA::NetworkAddress(IVDA::NetworkAddress::Any, port_));
+        server_.Bind(IVDA::NetworkAddress(IVDA::NetworkAddress::Any, port));
         server_.Listen(3); // ???
+        endpoint_ = std::make_shared<Endpoint>("tcp", "*", std::to_string(server_.GetLocalPort()));
     } catch (const IVDA::SocketException& err) {
         std::string internalError = mocca::joinString(err.what(), ", ", err.internalError());
         throw NetworkError("Network error while binding to port (internal error: " + internalError + ")", __FILE__, __LINE__);
@@ -40,10 +39,14 @@ std::unique_ptr<IStreamConnection> TCPConnectionAcceptor::accept(std::chrono::mi
     if (connectionSocket) {
         auto socketPtr = std::unique_ptr<IVDA::ConnectionSocket>(connectionSocket);
         auto ip = connectionSocket->GetPeerAddress();
-        LDEBUG("Accepted TCP connection on port " << port_ << " from " << ip);
+        LDEBUG("Accepted TCP connection on local endpoint " << *endpoint_);
         return std::unique_ptr<IStreamConnection>(new TCPConnection(std::move(socketPtr)));
     }
     return nullptr;
+}
+
+std::shared_ptr<const Endpoint> TCPConnectionAcceptor::localEndpoint() const {
+    return endpoint_;
 }
 }
 }

@@ -41,7 +41,7 @@ void mocca::net::TCPNetworkAddress::checkIp(const std::string& ip) {
 }
 
 void mocca::net::TCPNetworkAddress::checkPort(int port) {
-    if (port < 1 || port > 65535) {
+    if (port < 0 || port > 65535) {
         throw Error("Port number " + std::to_string(port) + " is out of range", __FILE__, __LINE__);
     }
 }
