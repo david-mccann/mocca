@@ -105,14 +105,3 @@ TEST_F(MessageQueueTest, DequeueFiltered) {
         t.join();
     }
 }
-
-
-TEST_F(MessageQueueTest, Performance) {
-    MessageQueue<std::string> target;
-
-    for (int i = 0; i < 10000; ++i) {
-        auto x = target.dequeue(std::chrono::milliseconds(1));
-    }
-
-
-}
