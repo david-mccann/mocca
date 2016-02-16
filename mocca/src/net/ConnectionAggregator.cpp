@@ -80,6 +80,7 @@ void ConnectionAggregator::run() {
             try {
                 runnables_.rethrowException();
             } catch (const ConnectionClosedError& err) {
+                LDEBUG("Connection to peer " << err.connectionID().peerEndpoint << " has been lost");
                 if (disconnectStrategy_ == DisconnectStrategy::RemoveConnection) {
                     auto it = std::find_if(begin(connections_), end(connections_), [&](const ThreadedConnection& connection) {
                         return *connection.connection->connectionID() == err.connectionID();
@@ -87,7 +88,6 @@ void ConnectionAggregator::run() {
                     runnables_.removeRunnable(it->receiveThreadID);
                     runnables_.removeRunnable(it->sendThreadID);
                     connections_.erase(it);
-                    LDEBUG("Connection to peer has been lost");
                 } else {
                     throw err;
                 }
