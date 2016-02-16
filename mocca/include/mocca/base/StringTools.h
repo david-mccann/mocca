@@ -11,6 +11,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <ostream>
 
 #include "mocca/base/Error.h"
 
@@ -67,4 +68,18 @@ template <typename T> std::string joinString(const T& value) {
 template <typename T, typename... Args> std::string joinString(const T& value, const Args&... args) {
     return joinString(value) + joinString(args...);
 }
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec) {
+    std::stringstream str;
+    str << "[";
+    for (auto it = begin(vec); it != end(vec); ++it) {
+        str << *it;
+        if (it != --end(vec)) {
+            str << ", ";
+        }
+    }
+    str << "]";
+    return os << str.str();
 }
