@@ -70,35 +70,33 @@ void ConnectionFactorySelector::addDefaultFactories() {
     streamConnectionFactories_.clear();
 
     // tcp
-    addStreamConnectionFactory(makeUnique<TCPConnectionFactory>(), tcp());
+    addStreamConnectionFactory(mocca::make_unique<TCPConnectionFactory>(), tcp());
 
     // queue
-    addStreamConnectionFactory(makeUnique<QueueConnectionFactory>(), queue());
+    addStreamConnectionFactory(mocca::make_unique<QueueConnectionFactory>(), queue());
 
     // tcp.prefixed
-    addMessageConnectionFactory(makeUnique<FramingConnectionFactory>(std::unique_ptr<IStreamConnectionFactory>(new TCPConnectionFactory()),
-                                                                     std::unique_ptr<FramingStrategy>(new SizePrefixedProtocol())),
+    addMessageConnectionFactory(mocca::make_unique<FramingConnectionFactory>(mocca::make_unique<TCPConnectionFactory>(),
+                                                                             mocca::make_unique<SizePrefixedProtocol>()),
                                 tcpPrefixed());
 
     // queue.prefixed
-    addMessageConnectionFactory(
-        makeUnique<FramingConnectionFactory>(std::unique_ptr<IStreamConnectionFactory>(new QueueConnectionFactory()),
-                                             std::unique_ptr<FramingStrategy>(new SizePrefixedProtocol())),
-        queuePrefixed());
+    addMessageConnectionFactory(mocca::make_unique<FramingConnectionFactory>(mocca::make_unique<QueueConnectionFactory>(),
+                                                                             mocca::make_unique<SizePrefixedProtocol>()),
+                                queuePrefixed());
 
     // tcp.ws
-    addMessageConnectionFactory(makeUnique<FramingConnectionFactory>(std::unique_ptr<IStreamConnectionFactory>(new TCPConnectionFactory()),
-                                                                     std::unique_ptr<FramingStrategy>(new WebSocketProtocol())),
-                                tcpWebSocket());
+    addMessageConnectionFactory(
+        mocca::make_unique<FramingConnectionFactory>(mocca::make_unique<TCPConnectionFactory>(), mocca::make_unique<WebSocketProtocol>()),
+        tcpWebSocket());
 
     // queue.ws
     addMessageConnectionFactory(
-        makeUnique<FramingConnectionFactory>(std::unique_ptr<IStreamConnectionFactory>(new QueueConnectionFactory()),
-                                             std::unique_ptr<FramingStrategy>(new WebSocketProtocol())),
+        mocca::make_unique<FramingConnectionFactory>(mocca::make_unique<QueueConnectionFactory>(), mocca::make_unique<WebSocketProtocol>()),
         queueWebSocket());
 
     // loopback
-    addMessageConnectionFactory(makeUnique<LoopbackConnectionFactory>(), loopback());
+    addMessageConnectionFactory(mocca::make_unique<LoopbackConnectionFactory>(), loopback());
 }
 
 std::unique_ptr<IMessageConnectionAcceptor> ConnectionFactorySelector::bind(const Endpoint& endpoint) {
