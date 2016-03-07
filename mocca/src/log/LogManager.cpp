@@ -93,8 +93,8 @@ std::string LogManager::stringFromLevel(LogLevel level) {
         return "Error";
     case LogLevel::Fatal:
         return "Fatal";
-    case LogLevel::None:
-        return "None";
+    case LogLevel::NoLog:
+        return "NoLog";
     }
     assert(false);
     return "";
@@ -133,11 +133,11 @@ void LogManager::initialize(LogManager::LogLevel level, bool immediateFlush) {
         else
             _manager = new LogManager_P<LogLevel::Fatal, false>();
         break;
-    case LogLevel::None:
+    case LogLevel::NoLog:
         if (immediateFlush)
-            _manager = new LogManager_P<LogLevel::None, true>();
+            _manager = new LogManager_P<LogLevel::NoLog, true>();
         else
-            _manager = new LogManager_P<LogLevel::None, false>();
+            _manager = new LogManager_P<LogLevel::NoLog, false>();
         break;
     }
     assert(_manager != 0);

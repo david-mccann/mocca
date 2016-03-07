@@ -97,7 +97,7 @@ std::string HTMLLog::colorForLevel(LogManager::LogLevel level) {
         return "#FF0000";
     case LogManager::LogLevel::Fatal:
         return "#00FFFF";
-    case LogManager::LogLevel::None:
+    case LogManager::LogLevel::NoLog:
         return "#FFFFFF";
     }
     assert(false);

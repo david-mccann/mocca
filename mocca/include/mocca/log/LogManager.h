@@ -89,7 +89,7 @@ public:
         /**
  * Used as a placeholder to inhibit all LogMessages
  */
-        None = 1 << 5
+        NoLog = 1 << 5
     };
 
     /**
