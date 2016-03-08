@@ -55,4 +55,15 @@ template <typename T, typename... Args> std::vector<std::unique_ptr<T>> makeUniq
     result.insert(result.end(), std::make_move_iterator(tail.begin()), std::make_move_iterator(tail.end()));
     return result;
 }
+
+template <typename Base, typename Iter>
+std::vector<Base*> transformToBasePtrVec(Iter it, Iter itEnd) {
+    std::vector<Base*> result;
+    using ValueType = typename std::iterator_traits<Iter>::value_type;
+    for (; it != itEnd; ++it) {
+        result.push_back(static_cast<Base*>(const_cast<ValueType*>(&*it)));
+    }
+    return result;
+}
+
 }
