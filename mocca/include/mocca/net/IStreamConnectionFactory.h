@@ -18,7 +18,7 @@ public:
     virtual ~IStreamConnectionFactory() {}
 
     virtual std::unique_ptr<IStreamConnection> connect(const std::string& address) = 0;
-    virtual std::unique_ptr<IStreamConnectionAcceptor> bind(const std::string& address) = 0;
+    virtual std::unique_ptr<IStreamConnectionAcceptor> bind(const std::string& machine, const std::string& port) = 0;
 };
 }
 }

@@ -30,7 +30,7 @@ std::unique_ptr<IStreamConnection> TCPConnectionFactory::connect(const std::stri
     return std::unique_ptr<IStreamConnection>(new TCPConnection(std::move(socket)));
 }
 
-std::unique_ptr<IStreamConnectionAcceptor> TCPConnectionFactory::bind(const std::string& address) {
-    TCPNetworkAddress tcpAddress(address);
+std::unique_ptr<IStreamConnectionAcceptor> TCPConnectionFactory::bind(const std::string& machine, const std::string& port) {
+    TCPNetworkAddress tcpAddress(machine, port == Endpoint::autoPort() ? 0 : std::stoi(port));
     return std::unique_ptr<IStreamConnectionAcceptor>(new TCPConnectionAcceptor(tcpAddress.port()));
 }

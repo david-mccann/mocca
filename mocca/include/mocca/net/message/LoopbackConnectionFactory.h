@@ -18,7 +18,7 @@ namespace net {
 class LoopbackConnectionFactory : public IMessageConnectionFactory {
 public:
     std::unique_ptr<IMessageConnection> connect(const std::string& name) override;
-    std::unique_ptr<IMessageConnectionAcceptor> bind(const std::string& name) override;
+    std::unique_ptr<IMessageConnectionAcceptor> bind(const std::string& machine, const std::string& port) override;
 
 private:
     std::shared_ptr<LoopbackConnectionSpawner> getSpawner(const std::string& name);

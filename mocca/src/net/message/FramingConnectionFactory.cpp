@@ -23,9 +23,9 @@ std::unique_ptr<IMessageConnection> FramingConnectionFactory::connect(const std:
         new FramingConnection(streamConnectionFactory_->connect(address), framingStrategy_->clone()));
 }
 
-std::unique_ptr<IMessageConnectionAcceptor> FramingConnectionFactory::bind(const std::string& address) {
+std::unique_ptr<IMessageConnectionAcceptor> FramingConnectionFactory::bind(const std::string& machine, const std::string& port) {
     return std::unique_ptr<IMessageConnectionAcceptor>(
-        new FramingConnectionAcceptor(streamConnectionFactory_->bind(address), framingStrategy_->clone()));
+        new FramingConnectionAcceptor(streamConnectionFactory_->bind(machine, port), framingStrategy_->clone()));
 }
 
 IStreamConnectionFactory& mocca::net::FramingConnectionFactory::streamConnectionFactory() {

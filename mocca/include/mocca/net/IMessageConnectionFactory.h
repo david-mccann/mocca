@@ -18,7 +18,7 @@ public:
     virtual ~IMessageConnectionFactory() {}
 
     virtual std::unique_ptr<IMessageConnection> connect(const std::string& address) = 0;
-    virtual std::unique_ptr<IMessageConnectionAcceptor> bind(const std::string& address) = 0;
+    virtual std::unique_ptr<IMessageConnectionAcceptor> bind(const std::string& machine, const std::string& port) = 0;
 };
 }
 }

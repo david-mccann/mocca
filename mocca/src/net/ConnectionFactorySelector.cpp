@@ -101,7 +101,7 @@ void ConnectionFactorySelector::addDefaultFactories() {
 
 std::unique_ptr<IMessageConnectionAcceptor> ConnectionFactorySelector::bind(const Endpoint& endpoint) {
     auto& serv = messageConnectionFactory(endpoint.protocol);
-    return serv.bind(endpoint.address());
+    return serv.bind(endpoint.machine, endpoint.port);
 }
 
 std::unique_ptr<IMessageConnection> ConnectionFactorySelector::connect(const Endpoint& endpoint) {

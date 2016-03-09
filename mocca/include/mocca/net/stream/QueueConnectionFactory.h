@@ -18,7 +18,7 @@ namespace net {
 class QueueConnectionFactory : public IStreamConnectionFactory {
 public:
     std::unique_ptr<IStreamConnection> connect(const std::string& name) override;
-    std::unique_ptr<IStreamConnectionAcceptor> bind(const std::string& name) override;
+    std::unique_ptr<IStreamConnectionAcceptor> bind(const std::string& machine, const std::string& port) override;
 
 private:
     std::shared_ptr<QueueConnectionSpawner> getSpawner(const std::string& name);

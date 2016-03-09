@@ -18,6 +18,8 @@ struct Endpoint {
     explicit Endpoint(const std::string& protocol, const std::string& machine, const std::string& port);
     explicit Endpoint(const std::string& str);
 
+    static const std::string& autoPort();
+
     bool equals(const Endpoint& other) const;
     friend bool operator==(const Endpoint& lhs, const Endpoint& rhs);
     friend bool operator!=(const Endpoint& lhs, const Endpoint& rhs);

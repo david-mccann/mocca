@@ -23,13 +23,24 @@ std::string mocca::testing::createAddress(const std::string& protocol, int index
     throw Error("Invalid protocol " + protocol, __FILE__, __LINE__);
 }
 
-std::string mocca::testing::createBindingAddress(const std::string& protocol, int index) {
+std::string mocca::testing::createBindingMachine(const std::string& protocol) {
+    if (protocol.find("tcp") != std::string::npos) {
+        return "0.0.0.0";
+    } else if (protocol.find("queue") != std::string::npos) {
+        return "local";
+    } else if (protocol.find("loopback") != std::string::npos) {
+        return "local";
+    }
+    throw Error("Invalid protocol " + protocol, __FILE__, __LINE__);
+}
+
+std::string mocca::testing::createBindingPort(const std::string& protocol, int index) {
     if (protocol.find("tcp") != std::string::npos) {
         return std::to_string(5678 + index);
     } else if (protocol.find("queue") != std::string::npos) {
-        return "local:queue_" + std::to_string(index);
+        return "queue_" + std::to_string(index);
     } else if (protocol.find("loopback") != std::string::npos) {
-        return "local:loopback_" + std::to_string(index);
+        return "loopback_" + std::to_string(index);
     }
     throw Error("Invalid protocol " + protocol, __FILE__, __LINE__);
 }
@@ -39,5 +50,5 @@ Endpoint mocca::testing::createConnectionEndpoint(const std::string& protocol, i
 }
 
 Endpoint mocca::testing::createBindingEndpoint(const std::string& protocol, int index) {
-    return Endpoint(protocol + ":" + createBindingAddress(protocol, index));
+    return Endpoint(protocol, createBindingMachine(protocol), createBindingPort(protocol, index));
 }

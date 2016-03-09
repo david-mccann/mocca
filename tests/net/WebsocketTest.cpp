@@ -74,7 +74,7 @@ protected:
 };
 
 TEST_F(WebsocketTest, ReceiveSmallPayload) {
-    auto wsAcceptor = factory->bind("local:mq");
+    auto wsAcceptor = factory->bind("local", "mq");
     auto& lbService = factory->streamConnectionFactory();
     auto lbClientConnection = lbService.connect("local:mq");
     lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
@@ -94,7 +94,7 @@ TEST_F(WebsocketTest, ReceiveSmallPayload) {
 }
 
 TEST_F(WebsocketTest, ReceiveMediumPayload) {
-    auto wsAcceptor = factory->bind("local:mq");
+    auto wsAcceptor = factory->bind("local", "mq");
     auto& lbService = factory->streamConnectionFactory();
     auto lbClientConnection = lbService.connect("local:mq");
     lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
@@ -116,7 +116,7 @@ TEST_F(WebsocketTest, ReceiveMediumPayload) {
 }
 
 TEST_F(WebsocketTest, ReceiveBigPayload) {
-    auto wsAcceptor = factory->bind("local:mq");
+    auto wsAcceptor = factory->bind("local", "mq");
     auto& lbService = factory->streamConnectionFactory();
     auto lbClientConnection = lbService.connect("local:mq");
     lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
@@ -138,7 +138,7 @@ TEST_F(WebsocketTest, ReceiveBigPayload) {
 }
 
 TEST_F(WebsocketTest, SendSmallPayload) {
-    auto wsAcceptor = factory->bind("local:mq");
+    auto wsAcceptor = factory->bind("local", "mq");
     auto& lbService = factory->streamConnectionFactory();
     auto lbClientConnection = lbService.connect("local:mq");
     lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
@@ -161,7 +161,7 @@ TEST_F(WebsocketTest, SendSmallPayload) {
 }
 
 TEST_F(WebsocketTest, SendMediumPayload) {
-    auto wsAcceptor = factory->bind("local:mq");
+    auto wsAcceptor = factory->bind("local", "mq");
     auto& lbService = factory->streamConnectionFactory();
     auto lbClientConnection = lbService.connect("local:mq");
     lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
@@ -186,7 +186,7 @@ TEST_F(WebsocketTest, SendMediumPayload) {
 }
 
 TEST_F(WebsocketTest, SendBigPayload) {
-    auto wsAcceptor = factory->bind("local:mq");
+    auto wsAcceptor = factory->bind("local", "mq");
     auto& lbService = factory->streamConnectionFactory();
     auto lbClientConnection = lbService.connect("local:mq");
     lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
@@ -211,7 +211,7 @@ TEST_F(WebsocketTest, SendBigPayload) {
 }
 
 TEST_F(WebsocketTest, CloseConnection) {
-    auto wsAcceptor = factory->bind("local:mq");
+    auto wsAcceptor = factory->bind("local", "mq");
     auto& lbService = factory->streamConnectionFactory();
     auto lbClientConnection = lbService.connect("local:mq");
     lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));

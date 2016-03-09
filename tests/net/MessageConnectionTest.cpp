@@ -43,9 +43,11 @@ INSTANTIATE_TEST_CASE_P(InstantiationName,
 
 TEST_P(MessageConnectionTest, Identifier)
 {
+    auto machine = createBindingMachine(GetParam());
+    auto port = createBindingPort(GetParam());
     {
         // identifier is not empty
-        auto acceptor = this->target->bind(createBindingAddress(GetParam()));
+        auto acceptor = this->target->bind(machine, port);
         auto clientConnection = this->target->connect(createAddress(GetParam()));
         ASSERT_FALSE(clientConnection->connectionID()->toString().empty());
         auto serverConnection = acceptor->accept();
@@ -54,7 +56,7 @@ TEST_P(MessageConnectionTest, Identifier)
     }
     {
         // identifiers are distinct
-        auto acceptor = this->target->bind(createBindingAddress(GetParam()));
+        auto acceptor = this->target->bind(machine, port);
         auto clientConnection1 = this->target->connect(createAddress(GetParam()));
         auto clientConnection2 = this->target->connect(createAddress(GetParam()));
         auto serverConnection1 = acceptor->accept();
@@ -68,24 +70,26 @@ TEST_P(MessageConnectionTest, Identifier)
 }
 
 TEST_P(MessageConnectionTest, AcceptorConnections) {
+    auto machine = createBindingMachine(GetParam());
+    auto port = createBindingPort(GetParam());
     {
         // cannot connect to an unbound port
         ASSERT_THROW(this->target->connect(createAddress(GetParam())), Error);
     }
     {
         // acceptor has no connection when no client connects
-        auto acceptor = this->target->bind(createBindingAddress(GetParam()));
+        auto acceptor = this->target->bind(machine, port);
         ASSERT_TRUE(acceptor->accept(std::chrono::milliseconds(1)) == nullptr);
     }
     {
         // acceptor has a connection when a client connects
-        auto acceptor = this->target->bind(createBindingAddress(GetParam()));
+        auto acceptor = this->target->bind(machine, port);
         auto connection = this->target->connect(createAddress(GetParam()));
         ASSERT_FALSE(acceptor->accept() == nullptr);
     }
     {
         // acceptor has two conenctions when two clients connect
-        auto acceptor = this->target->bind(createBindingAddress(GetParam()));
+        auto acceptor = this->target->bind(machine, port);
         auto connection1 = this->target->connect(createAddress(GetParam()));
         auto connection2 = this->target->connect(createAddress(GetParam()));
         ASSERT_FALSE(acceptor->accept() == nullptr);
@@ -93,7 +97,7 @@ TEST_P(MessageConnectionTest, AcceptorConnections) {
     }
     {
         // connection is removed when dequeued
-        auto acceptor = this->target->bind(createBindingAddress(GetParam()));
+        auto acceptor = this->target->bind(machine, port);
         auto connection = this->target->connect(createAddress(GetParam()));
         auto connectionFromAcceptor = acceptor->accept();
         ASSERT_FALSE(connectionFromAcceptor == nullptr);
@@ -101,8 +105,8 @@ TEST_P(MessageConnectionTest, AcceptorConnections) {
     }
     {
         // each acceptor has its own queue
-        auto acceptor1 = this->target->bind(createBindingAddress(GetParam()));
-        auto acceptor2 = this->target->bind(createBindingAddress(GetParam(), 1));
+        auto acceptor1 = this->target->bind(machine, port);
+        auto acceptor2 = this->target->bind(machine, createBindingPort(GetParam(), 1));
         auto connection = this->target->connect(createAddress(GetParam(), 1));
         ASSERT_TRUE(acceptor1->accept(std::chrono::milliseconds(1)) == nullptr);
         ASSERT_FALSE(acceptor2->accept() == nullptr);
@@ -110,9 +114,11 @@ TEST_P(MessageConnectionTest, AcceptorConnections) {
 }
 
 TEST_P(MessageConnectionTest, SendAndReceive) {
+    auto machine = createBindingMachine(GetParam());
+    auto port = createBindingPort(GetParam());
     {
         // client sends to server
-        auto acceptor = this->target->bind(createBindingAddress(GetParam()));
+        auto acceptor = this->target->bind(machine, port);
         auto clientConnection = this->target->connect(createAddress(GetParam()));
         auto serverConnection = acceptor->accept();
         ASSERT_FALSE(serverConnection == nullptr);
@@ -122,7 +128,7 @@ TEST_P(MessageConnectionTest, SendAndReceive) {
     }
     {
         // server sends to client
-        auto acceptor = this->target->bind(createBindingAddress(GetParam()));
+        auto acceptor = this->target->bind(machine, port);
         auto clientConnection = this->target->connect(createAddress(GetParam()));
         auto serverConnection = acceptor->accept();
         ASSERT_FALSE(serverConnection == nullptr);
@@ -132,7 +138,7 @@ TEST_P(MessageConnectionTest, SendAndReceive) {
     }
     {
         // two different clients and two receivers on the same port
-        auto acceptor = this->target->bind(createBindingAddress(GetParam()));
+        auto acceptor = this->target->bind(machine, port);
         auto clientConnection1 = this->target->connect(createAddress(GetParam()));
         auto serverConnection1 = acceptor->accept();
         ASSERT_FALSE(serverConnection1 == nullptr);
@@ -150,7 +156,9 @@ TEST_P(MessageConnectionTest, SendAndReceive) {
 }
 
 TEST_P(MessageConnectionTest, ReceiveTimeout) {
-    auto acceptor = this->target->bind(createBindingAddress(GetParam()));
+    auto machine = createBindingMachine(GetParam());
+    auto port = createBindingPort(GetParam()); 
+    auto acceptor = this->target->bind(machine, port);
     auto clientConnection = this->target->connect(createAddress(GetParam()));
     auto serverConnection = acceptor->accept();
     ASSERT_FALSE(serverConnection == nullptr);
@@ -159,7 +167,9 @@ TEST_P(MessageConnectionTest, ReceiveTimeout) {
 }
 
 TEST_P(MessageConnectionTest, ReceiveTimeoutClient) {
-    auto acceptor = this->target->bind(createBindingAddress(GetParam()));
+    auto machine = createBindingMachine(GetParam());
+    auto port = createBindingPort(GetParam()); 
+    auto acceptor = this->target->bind(machine, port);
     auto clientConnection = this->target->connect(createAddress(GetParam()));
     auto serverConnection = acceptor->accept();
     ASSERT_FALSE(serverConnection == nullptr);
@@ -168,7 +178,9 @@ TEST_P(MessageConnectionTest, ReceiveTimeoutClient) {
 }
 
 TEST_P(MessageConnectionTest, SendReceiveParallel) {
-    auto acceptor = this->target->bind(createBindingAddress(GetParam()));
+    auto machine = createBindingMachine(GetParam());
+    auto port = createBindingPort(GetParam()); 
+    auto acceptor = this->target->bind(machine, port);
     auto clientConnection = this->target->connect(createAddress(GetParam()));
     auto serverConnection = acceptor->accept();
     ASSERT_FALSE(serverConnection == nullptr);

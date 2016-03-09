@@ -22,7 +22,9 @@ std::unique_ptr<IMessageConnection> LoopbackConnectionFactory::connect(const std
     return spawner->getClientConnection();
 }
 
-std::unique_ptr<IMessageConnectionAcceptor> LoopbackConnectionFactory::bind(const std::string& name) {
+std::unique_ptr<IMessageConnectionAcceptor> LoopbackConnectionFactory::bind(const std::string& machine, const std::string& port) {
+    static int autoPortCount = 0;
+    std::string name = machine + ":" + (port == Endpoint::autoPort() ? std::to_string(autoPortCount++) : port);
     auto spawner = getSpawner(name);
     if (spawner == nullptr) {
         spawner = std::make_shared<LoopbackConnectionSpawner>(name);

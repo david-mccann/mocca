@@ -30,6 +30,11 @@ Endpoint::Endpoint(const std::string& str) {
     port = split[2];
 }
 
+const std::string& Endpoint::autoPort() {
+    static std::string port = "auto";
+    return port;
+}
+
 bool Endpoint::equals(const Endpoint& other) const {
     return protocol == other.protocol && machine == other.machine && port == other.port;
 }
@@ -57,8 +62,7 @@ std::ostream& operator<<(std::ostream& os, const Endpoint& obj) {
 }
 
 bool isTCPLocalhost(const Endpoint& endpoint) {
-    return (endpoint.protocol.find("tcp") != std::string::npos) &&
-           (endpoint.machine == "localhost" || endpoint.machine == "127.0.0.1");
+    return (endpoint.protocol.find("tcp") != std::string::npos) && (endpoint.machine == "localhost" || endpoint.machine == "127.0.0.1");
 }
 }
 }
