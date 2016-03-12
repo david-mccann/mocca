@@ -20,7 +20,7 @@ public:
 
     std::shared_ptr<const ConnectionID> connectionID() const override;
     bool isConnected() const override;
-    void send(ByteArray message, std::chrono::milliseconds timeout) const override;
+    void send(ByteArray message) const override;
     ByteArray receive(std::chrono::milliseconds timeout) const override;
 
 private:

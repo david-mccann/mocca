@@ -38,7 +38,7 @@ bool LoopbackConnection::isConnected() const {
     return connected_;
 }
 
-void LoopbackConnection::send(ByteArray message, std::chrono::milliseconds timeout) const {
+void LoopbackConnection::send(ByteArray message) const {
     if (!isConnected()) {
         throw ConnectionClosedError("Connection to peer has been closed", *connectionID_, __FILE__, __LINE__);
     }

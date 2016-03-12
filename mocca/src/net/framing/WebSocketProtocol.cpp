@@ -28,7 +28,7 @@ std::string WebSocketProtocol::name() const {
 
 void WebSocketProtocol::performHandshake(IStreamConnection& connection, std::chrono::milliseconds timeout) {
     receiveHandshake(connection, timeout);
-    sendHandshakeResponse(connection, timeout);
+    sendHandshakeResponse(connection);
 }
 
 void mocca::net::WebSocketProtocol::receiveHandshake(IStreamConnection& connection, std::chrono::milliseconds timeout) {
@@ -78,7 +78,7 @@ void mocca::net::WebSocketProtocol::receiveHandshake(IStreamConnection& connecti
     }
 }
 
-void WebSocketProtocol::sendHandshakeResponse(IStreamConnection& connection, std::chrono::milliseconds timeout) {
+void WebSocketProtocol::sendHandshakeResponse(IStreamConnection& connection) {
     auto serverKey = connectionInfo_.header.find("Sec-WebSocket-Key")->second;
     serverKey += "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
     SHA1 sha;
@@ -199,7 +199,7 @@ ByteArray WebSocketProtocol::readFrameFromStream(IStreamConnection& connection, 
     return payloadBuffer;
 }
 
-void WebSocketProtocol::writeFrameToStream(IStreamConnection& connection, ByteArray frame, std::chrono::milliseconds timeout) {
+void WebSocketProtocol::writeFrameToStream(IStreamConnection& connection, ByteArray frame) {
     auto payloadSize = frame.size();
     ByteArray sendBuffer(payloadSize + 10); // header size is at most 10 bytes
 

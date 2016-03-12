@@ -40,7 +40,7 @@ ByteArray SizePrefixedProtocol::readFrameFromStream(IStreamConnection& connectio
     return buffer;
 }
 
-void SizePrefixedProtocol::writeFrameToStream(IStreamConnection& connection, ByteArray frame, std::chrono::milliseconds timeout) {
+void SizePrefixedProtocol::writeFrameToStream(IStreamConnection& connection, ByteArray frame) {
     // fixme: performance loss; implement prepend method for ByteArray
     std::lock_guard<std::mutex> lock(connection.sendMutex());
     ByteArray newFrame(frame.size() + sizeof(uint32_t));

@@ -31,8 +31,8 @@ bool FramingConnection::isConnected() const {
     return stream_->isConnected();
 }
 
-void FramingConnection::send(ByteArray message, std::chrono::milliseconds timeout) const {
-    framingStrategy_->writeFrameToStream(*stream_, std::move(message), timeout);
+void FramingConnection::send(ByteArray message) const {
+    framingStrategy_->writeFrameToStream(*stream_, std::move(message));
 }
 
 ByteArray FramingConnection::receive(std::chrono::milliseconds timeout) const {

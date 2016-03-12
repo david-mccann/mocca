@@ -18,7 +18,7 @@ public:
     std::unique_ptr<FramingStrategy> clone() const override;
     std::string name() const override;
     ByteArray readFrameFromStream(IStreamConnection& connection, std::chrono::milliseconds timeout) override;
-    void writeFrameToStream(IStreamConnection& connection, ByteArray frame, std::chrono::milliseconds timeout) override;
+    void writeFrameToStream(IStreamConnection& connection, ByteArray frame) override;
 };
 }
 }

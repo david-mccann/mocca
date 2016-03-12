@@ -39,7 +39,7 @@ bool QueueConnection::isConnected() const {
     return connected_;
 }
 
-void QueueConnection::send(ByteArray message, std::chrono::milliseconds timeout) const {
+void QueueConnection::send(ByteArray message) const {
     if (!isConnected()) {
         throw ConnectionClosedError("Connection to peer has been closed", *connectionID_, __FILE__, __LINE__);
     }
