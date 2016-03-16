@@ -27,6 +27,7 @@ TEST_F(PathTest, Decompose) {
     Path path("C:\\mocca\\src\\fs\\Path.h");
     ASSERT_EQ("C:/mocca/src/fs", path.directory());
     ASSERT_EQ("Path.h", path.filename());
+    ASSERT_EQ("Path", path.filenameNoExt());
     ASSERT_EQ(".h", path.extension());
 }
 

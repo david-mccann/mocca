@@ -20,6 +20,7 @@ public:
 
     std::string directory() const;
     std::string filename() const;
+    std::string filenameNoExt() const;
     std::string extension() const;
 
     std::string toString() const;

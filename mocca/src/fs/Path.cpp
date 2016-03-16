@@ -27,8 +27,13 @@ std::string Path::directory() const {
 
 std::string Path::filename() const {
     size_t index = path_.find_last_of("/") + 1;
-    std::string name = path_.substr(index, path_.length() - index);
-    return name;
+    return path_.substr(index);
+}
+
+std::string Path::filenameNoExt() const {
+    size_t indexSlash = path_.find_last_of("/") + 1;
+    size_t indexDot = path_.find_last_of(".");
+    return path_.substr(indexSlash, indexDot - indexSlash);
 }
 
 std::string Path::extension() const {
@@ -37,8 +42,7 @@ std::string Path::extension() const {
     if (indexDot == std::string::npos || (indexSlash != std::string::npos && indexDot < indexSlash)) {
         return "";
     }
-    std::string ext = path_.substr(indexDot);
-    return ext;
+    return path_.substr(indexDot);
 }
 
 std::string Path::toString() const {

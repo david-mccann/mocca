@@ -19,5 +19,6 @@ void removeFile(const Path& path);
 bool isDirectory(const Path& path);
 void createDirectories(const Path& path);
 std::vector<Path> directoryContents(const Path& path);
+std::string readTextFile(const Path& path);
 }
 }

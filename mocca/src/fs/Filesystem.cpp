@@ -11,6 +11,7 @@
 #include "mocca/base/Error.h"
 #include "mocca/fs/Path.h"
 
+#include <fstream>
 #include <list>
 
 #ifdef _WIN32
@@ -97,4 +98,15 @@ std::vector<Path> mocca::fs::directoryContents(const Path& path) {
     }
 #endif
     return result;
+}
+
+std::string mocca::fs::readTextFile(const Path& path) {
+    std::ifstream file(path);
+    std::stringstream stream;
+    std::string line;
+    while (std::getline(file, line)) {
+        stream << line << std::endl;
+    }
+    file.close();
+    return stream.str();
 }
