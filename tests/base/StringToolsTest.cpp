@@ -89,7 +89,6 @@ TEST_F(StringTest, MakeString) {
     }
 }
 
-
 TEST_F(StringTest, FormatString) {
     ASSERT_EQ("First Second Third", formatString("First %% Third", "Second"));
     ASSERT_EQ("First Second Third", formatString("First %% %%", "Second", "Third"));
@@ -101,4 +100,42 @@ TEST_F(StringTest, FormatString) {
               formatString("First %% Third %%", Printable(23, 42), 3.14f));
     ASSERT_THROW(formatString("First %% (no more placeholders)", "ok", "not ok"),
                  mocca::Error);
+}
+
+TEST_F(StringTest, ReplaceAll) {
+    {
+        std::string target = "";
+        std::string search = "Hello";
+        std::string replace = "Goodbye";
+        replaceAll(target, search, replace);
+        ASSERT_EQ("", target);
+    }
+    {
+        std::string target = "Hello World";
+        std::string search = "";
+        std::string replace = "Goodbye";
+        replaceAll(target, search, replace);
+        ASSERT_EQ("Hello World", target);
+    }
+    {
+        std::string target = "Hello World";
+        std::string search = "Hello";
+        std::string replace = "";
+        replaceAll(target, search, replace);
+        ASSERT_EQ(" World", target);
+    }
+    {
+        std::string target = "Hello World";
+        std::string search = "Hello";
+        std::string replace = "Goodbye";
+        replaceAll(target, search, replace);
+        ASSERT_EQ("Goodbye World", target);
+    }
+    {
+        std::string target = "Hello World; Hello World";
+        std::string search = "Hello";
+        std::string replace = "Goodbye";
+        replaceAll(target, search, replace);
+        ASSERT_EQ("Goodbye World; Goodbye World", target);
+    }
 }

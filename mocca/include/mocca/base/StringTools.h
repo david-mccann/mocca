@@ -68,6 +68,9 @@ template <typename T> std::string joinString(const T& value) {
 template <typename T, typename... Args> std::string joinString(const T& value, const Args&... args) {
     return joinString(value) + joinString(args...);
 }
+
+// replace all occurrence of a search string in a target string with another string
+void replaceAll(std::string& target, const std::string& search, const std::string& replace);
 }
 
 template <typename T>
