@@ -48,7 +48,8 @@ bool TCPConnection::isConnected() const {
 
 void TCPConnection::send(ByteArray message) const {
     try {
-        socket_->SendData((const int8_t*)message.data(), message.size());
+	std::chrono::milliseconds timeout(1000 * 5);
+        socket_->SendData((const int8_t*)message.data(), message.size(), static_cast<uint32_t>(timeout.count()));
     } catch (const IVDA::SocketConnectionException& err) {
         throw ConnectionClosedError("Connection to peer " + connectionID_->peerEndpoint.toString() +
                                         " lost during send operation (internal error: " + err.what() + ")",
