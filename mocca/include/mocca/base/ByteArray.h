@@ -19,7 +19,7 @@ namespace mocca {
 
 class ByteArray {
 public:
-    ByteArray(uint32_t capacity = 256);
+    explicit ByteArray(uint32_t capacity = 256);
     ByteArray(const ByteArray& other) = delete;
     ByteArray(ByteArray&& other);
 
