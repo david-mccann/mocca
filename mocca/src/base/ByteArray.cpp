@@ -102,6 +102,11 @@ ByteArray ByteArray::createFromRaw(const void* raw, uint32_t size) {
     return std::move(byteArray);
 }
 
+ByteArray& ByteArray::operator<<(char val) {
+    append(&val, sizeof(char));
+    return *this;
+}
+
 ByteArray& ByteArray::operator<<(unsigned char val) {
     append(&val, sizeof(unsigned char));
     return *this;
