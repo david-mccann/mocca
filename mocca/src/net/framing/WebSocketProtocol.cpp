@@ -204,7 +204,12 @@ void WebSocketProtocol::writeFrameToStream(IStreamConnection& connection, ByteAr
     ByteArray sendBuffer(payloadSize + 10); // header size is at most 10 bytes
 
     // create the flags byte
-    unsigned char payloadFlags = 0x81;
+    unsigned char payloadFlags;
+    if(frame.size() < 300)
+        payloadFlags = 0x81;
+    else
+        payloadFlags = 0x82;
+    
     sendBuffer.append(&payloadFlags, 1);
 
     // create the length bytes
