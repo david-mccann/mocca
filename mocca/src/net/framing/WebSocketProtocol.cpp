@@ -199,16 +199,19 @@ ByteArray WebSocketProtocol::readFrameFromStream(IStreamConnection& connection, 
     return payloadBuffer;
 }
 
+
 void WebSocketProtocol::writeFrameToStream(IStreamConnection& connection, ByteArray frame) {
     auto payloadSize = frame.size();
     ByteArray sendBuffer(payloadSize + 10); // header size is at most 10 bytes
 
     // create the flags byte
     unsigned char payloadFlags;
-    if(frame.size() < 300)
-        payloadFlags = 0x81;
-    else
+    
+    //fixme bad hack for jpeg
+    if(frame.size() > 7 && frame.data()[6] == 'J' && frame.data()[7] == 'F')
         payloadFlags = 0x82;
+    else
+        payloadFlags = 0x81;
     
     sendBuffer.append(&payloadFlags, 1);
 
