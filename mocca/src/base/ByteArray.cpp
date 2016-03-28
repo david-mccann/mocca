@@ -99,7 +99,7 @@ ByteArray ByteArray::createFromRaw(const void* raw, uint32_t size) {
     ByteArray byteArray(size);
     memcpy(byteArray.data_.get(), raw, size);
     byteArray.size_ = size;
-    return std::move(byteArray);
+    return byteArray;
 }
 
 ByteArray& ByteArray::operator<<(char val) {
