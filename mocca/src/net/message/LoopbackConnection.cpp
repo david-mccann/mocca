@@ -40,14 +40,16 @@ bool LoopbackConnection::isConnected() const {
 
 void LoopbackConnection::send(ByteArray message) const {
     if (!isConnected()) {
-        throw ConnectionClosedError("Connection to peer has been closed", *connectionID_, __FILE__, __LINE__);
+        throw ConnectionClosedError("Connection to peer " + connectionID_->peerEndpoint.toString() + " has been closed", *connectionID_,
+                                    __FILE__, __LINE__);
     }
     sendQueue_->enqueue(std::move(message));
 }
 
 ByteArray LoopbackConnection::receive(std::chrono::milliseconds timeout) const {
     if (!isConnected()) {
-        throw ConnectionClosedError("Connection to peer has been closed", *connectionID_, __FILE__, __LINE__);
+        throw ConnectionClosedError("Connection to peer " + connectionID_->peerEndpoint.toString() + " has been closed", *connectionID_,
+                                    __FILE__, __LINE__);
     }
     auto data = receiveQueue_->dequeue(timeout);
     return data.isNull() ? ByteArray() : data.release();
