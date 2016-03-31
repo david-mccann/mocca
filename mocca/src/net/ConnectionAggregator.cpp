@@ -71,9 +71,13 @@ void ConnectionAggregator::run() {
                 if (connection != nullptr) {
                     auto sendRunnable = std::unique_ptr<SendThread>(new SendThread(*connection, sendQueue_));
                     auto receiveRunnable = std::unique_ptr<ReceiveThread>(new ReceiveThread(*connection, receiveQueue_));
+
+                    auto localMachine = connection->connectionID()->localEndpoint.machine;
+                    localMachineIDs_.insert(localMachine);
+
                     connections_.emplace_back(std::move(connection), sendRunnable->id(), receiveRunnable->id());
                     runnables_.addRunnable(std::move(sendRunnable));
-                    runnables_.addRunnable(std::move(receiveRunnable));
+                    runnables_.addRunnable(std::move(receiveRunnable));                    
                 }
             }
 
@@ -98,6 +102,9 @@ void ConnectionAggregator::run() {
     }
 }
 
+bool ConnectionAggregator::isLocalMachine(const std::string& machine) const {
+    return localMachineIDs_.count(machine);
+}
 
 ConnectionAggregator::ReceiveThread::ReceiveThread(IMessageConnection& connection, EnvelopeQueue& receiveQueue)
     : connection_(connection)

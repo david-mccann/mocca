@@ -15,6 +15,7 @@
 
 #include <list>
 #include <vector>
+#include <set>
 
 namespace mocca {
 namespace net {
@@ -42,6 +43,8 @@ public:
     void send(MessageEnvelope envelope);
 
     void interrupt() override;
+
+    bool isLocalMachine(const std::string& machine) const;
 
 private:
     void run() override;
@@ -94,6 +97,7 @@ private:
     EnvelopeQueue receiveQueue_;
     std::list<ThreadedConnection> connections_;
     RunnableGroup runnables_;
+    std::set<std::string> localMachineIDs_;
 };
 }
 }
