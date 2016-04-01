@@ -17,7 +17,7 @@ namespace net {
 
 class TCPConnection : public IStreamConnection {
 public:
-    TCPConnection(std::unique_ptr<IVDA::ConnectionSocket> socket);
+    TCPConnection(std::unique_ptr<IVDB::ConnectionSocket> socket);
     ~TCPConnection();
 
     std::shared_ptr<const ConnectionID> connectionID() const override;
@@ -28,7 +28,7 @@ private:
     ByteArray readFromStream(uint32_t maxSize, std::chrono::milliseconds timeout) const override;
 
 private:
-    std::unique_ptr<IVDA::ConnectionSocket> socket_;
+    std::unique_ptr<IVDB::ConnectionSocket> socket_;
     mutable std::shared_ptr<const ConnectionID> connectionID_;
 };
 }

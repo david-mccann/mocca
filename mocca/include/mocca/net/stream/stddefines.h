@@ -28,13 +28,13 @@
 
 /**
  \file    StdDefines.h
- \author    Jens Krueger, IVDA, SCI, Intel VCI
+ \author    Jens Krueger, IVDB, SCI, Intel VCI
  */
 
 #pragma once
 
-#ifndef IVDA_STDDEFINES
-#define IVDA_STDDEFINES
+#ifndef IVDB_STDDEFINES
+#define IVDB_STDDEFINES
 
 // Set faked variadic template argument count to a reasonable value.
 // The default value of 5 is pretty low for Visual Studio 2012.
@@ -135,26 +135,26 @@
 #undef min
 #endif
 
-namespace IVDA {
+namespace IVDB {
     static const uint32_t INFINITE_TIMEOUT = std::numeric_limits<uint32_t>::max();
 }
 
 #include <memory>
 
 // declare shared and weak pointer typedefs for given type name
-#define SHARED_PTR_IVDA(TypeName)\
+#define SHARED_PTR_IVDB(TypeName)\
   typedef std::shared_ptr<TypeName> TypeName##Ptr;\
   typedef std::weak_ptr<TypeName> TypeName##Wtr;
 
 // forward declare class name and declare its shared and weak pointer typedefs
-#define SHARED_PTR_IVDA_CLASS(ClassName)\
+#define SHARED_PTR_IVDB_CLASS(ClassName)\
   class ClassName;\
-  SHARED_PTR_IVDA(ClassName);
+  SHARED_PTR_IVDB(ClassName);
 
 // forward declare struct name and declare its shared and weak pointer typedefs
-#define SHARED_PTR_IVDA_STRUCT(StructName)\
+#define SHARED_PTR_IVDB_STRUCT(StructName)\
   struct StructName;\
-  SHARED_PTR_IVDA(StructName);
+  SHARED_PTR_IVDB(StructName);
 
 #endif // STDDEFINES_H
 

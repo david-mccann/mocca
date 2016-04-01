@@ -13,7 +13,7 @@
 namespace mocca {
 namespace net {
 
-TCPConnection::TCPConnection(std::unique_ptr<IVDA::ConnectionSocket> socket)
+TCPConnection::TCPConnection(std::unique_ptr<IVDB::ConnectionSocket> socket)
     : socket_(move(socket)) {
     socket_->SetNonBlocking(true);
     socket_->SetNoSigPipe(true); // disable sigpipe to prevent crashes
@@ -32,7 +32,7 @@ TCPConnection::~TCPConnection() {
         try {
             socket_->Disconnect();
             socket_->Close();
-        } catch (IVDA::SocketException&) {
+        } catch (IVDB::SocketException&) {
             // ignore exception; exceptions must not escape the destructor!
         }
     }
@@ -50,11 +50,11 @@ void TCPConnection::send(ByteArray message) const {
     try {
 	std::chrono::milliseconds timeout(1000 * 5);
         socket_->SendData((const int8_t*)message.data(), message.size(), static_cast<uint32_t>(timeout.count()));
-    } catch (const IVDA::SocketConnectionException& err) {
+    } catch (const IVDB::SocketConnectionException& err) {
         throw ConnectionClosedError("Connection to peer " + connectionID_->peerEndpoint.toString() +
                                         " lost during send operation (internal error: " + err.what() + ")",
                                     *connectionID_, __FILE__, __LINE__);
-    } catch (const IVDA::SocketException& err) {
+    } catch (const IVDB::SocketException& err) {
         std::string internalError = mocca::joinString(err.what(), ", ", err.internalError());
         throw NetworkError("Network error in send operation (internal error: " + internalError + ")", __FILE__, __LINE__);
     }
@@ -66,11 +66,11 @@ ByteArray TCPConnection::readFromStream(uint32_t maxSize, std::chrono::milliseco
         auto bytesRead = socket_->ReceiveData((int8_t*)message.data(), maxSize, static_cast<uint32_t>(timeout.count()));
         message.setSize(bytesRead);
         return message;
-    } catch (const IVDA::SocketConnectionException& err) {
+    } catch (const IVDB::SocketConnectionException& err) {
         throw ConnectionClosedError("Connection to peer " + socket_->GetPeerAddress() + " lost during receive operation (internal error: " +
                                         err.what() + ")",
                                     *connectionID(), __FILE__, __LINE__);
-    } catch (const IVDA::SocketException& err) {
+    } catch (const IVDB::SocketException& err) {
         std::string internalError = mocca::joinString(err.what(), ", ", err.internalError());
         throw NetworkError("Network error in receive operation (internal error: " + internalError + ")", __FILE__, __LINE__);
     }

@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef IVDA_SOCKETS
-#define IVDA_SOCKETS
+#ifndef IVDB_SOCKETS
+#define IVDB_SOCKETS
 
 #include <string>
 #include <vector>
@@ -41,7 +41,7 @@
 // use auto/smart pointers when using new and exceptions (see CreateConnectionSocket, AcceptNewConnection in ListenSocket)
 // handle SIG_PIPE signal with signal handler -> done (differently)
 
-namespace IVDA
+namespace IVDB
 {
 	// Maximum transmission unit (MTU) which guarantees no datagram fragmentation from the IP layer
 	// these may be higher for some devices/routers
@@ -91,7 +91,7 @@ typedef int socklen_t;
 typedef int SOCKET;
 #endif
 
-namespace IVDA
+namespace IVDB
 {
 	// general error on a socket (may call Close after this)
 	class SocketException : public mocca::net::NetworkError

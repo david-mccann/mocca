@@ -14,7 +14,7 @@
 #ifdef EXCEPTION_ON_LOWER_VERSION
 #include <sstream>
 #endif
-void IVDA::Socket::StartWinsock(BYTE requestVersion, BYTE requestSubVersion) 
+void IVDB::Socket::StartWinsock(BYTE requestVersion, BYTE requestSubVersion) 
 {
 	WSADATA wsa;
 	int result = WSAStartup(MAKEWORD(requestVersion, requestSubVersion), &wsa);   
@@ -31,7 +31,7 @@ void IVDA::Socket::StartWinsock(BYTE requestVersion, BYTE requestSubVersion)
 	}
 #endif
 }
-void IVDA::Socket::EndWinsock()
+void IVDB::Socket::EndWinsock()
 {
 	WSACleanup();
 }
@@ -69,7 +69,7 @@ void IVDA::Socket::EndWinsock()
 #include <sys/sysctl.h> // to query TCP keepalive parameters
 #endif
 
-namespace IVDA
+namespace IVDB
 {
 	NetworkAddress::NetworkAddress()
 	{

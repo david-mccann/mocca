@@ -22,7 +22,7 @@ public:
     virtual std::shared_ptr<const Endpoint> localEndpoint() const override;
     
 private:
-    IVDA::TCPServer server_;
+    IVDB::TCPServer server_;
     std::shared_ptr<const Endpoint> endpoint_;
 };
 }

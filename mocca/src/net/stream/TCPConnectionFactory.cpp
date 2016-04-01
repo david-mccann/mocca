@@ -17,13 +17,13 @@ using namespace mocca::net;
 
 std::unique_ptr<IStreamConnection> TCPConnectionFactory::connect(const std::string& address) {
     TCPNetworkAddress networkAddress(address);
-    auto socket = std::unique_ptr<IVDA::TCPSocket>(new IVDA::TCPSocket());
+    auto socket = std::unique_ptr<IVDB::TCPSocket>(new IVDB::TCPSocket());
     try {
-        socket->Connect(IVDA::NetworkAddress(networkAddress.ip(), networkAddress.port()));
-    } catch (const IVDA::SocketConnectionException& err) {
+        socket->Connect(IVDB::NetworkAddress(networkAddress.ip(), networkAddress.port()));
+    } catch (const IVDB::SocketConnectionException& err) {
         throw ConnectFailedError("Could not connect to " + networkAddress.toString() + " (internal error: " + err.what() + ")", __FILE__,
                                  __LINE__);
-    } catch (const IVDA::SocketException& err) {
+    } catch (const IVDB::SocketException& err) {
         std::string internalError = mocca::joinString(err.what(), ", ", err.internalError());
         throw NetworkError("Network error in connect operation (internal error: " + internalError + ")", __FILE__, __LINE__);
     }
