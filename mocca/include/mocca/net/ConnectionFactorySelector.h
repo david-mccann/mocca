@@ -32,6 +32,7 @@ public:
     static const std::string& queue();
 
     static const std::string& loopback();
+    static const std::string& newloopback();
     static const std::string& tcpPrefixed();
     static const std::string& tcpWebSocket();
     static const std::string& queuePrefixed();

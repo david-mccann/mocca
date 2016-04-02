@@ -15,6 +15,7 @@
 #include "mocca/net/framing/WebSocketProtocol.h"
 #include "mocca/net/message/FramingConnectionFactory.h"
 #include "mocca/net/message/LoopbackConnectionFactory.h"
+#include "mocca/net/message/NewLoopbackConnectionFactory.h"
 #include "mocca/net/stream/QueueConnectionFactory.h"
 #include "mocca/net/stream/TCPConnectionFactory.h"
 
@@ -97,6 +98,9 @@ void ConnectionFactorySelector::addDefaultFactories() {
 
     // loopback
     addMessageConnectionFactory(mocca::make_unique<LoopbackConnectionFactory>(), loopback());
+
+    // new loopback
+    addMessageConnectionFactory(mocca::make_unique<NewLoopbackConnectionFactory>(), newloopback());
 }
 
 std::unique_ptr<IMessageConnectionAcceptor> ConnectionFactorySelector::bind(const Endpoint& endpoint) {
@@ -121,6 +125,11 @@ const std::string& ConnectionFactorySelector::queue() {
 
 const std::string& ConnectionFactorySelector::loopback() {
     static std::string str = "loopback";
+    return str;
+}
+
+const std::string& ConnectionFactorySelector::newloopback() {
+    static std::string str = "newloopback";
     return str;
 }
 
