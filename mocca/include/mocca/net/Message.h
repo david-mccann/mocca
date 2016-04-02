@@ -9,6 +9,7 @@ class Message {
 public:
     Message() = default;
     Message(std::shared_ptr<const std::vector<uint8_t>> data);
+    Message(Message&& other);
 
     void append(std::unique_ptr<Message> message);
 

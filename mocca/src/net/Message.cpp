@@ -3,7 +3,12 @@
 using namespace mocca::net;
 
 Message::Message(std::shared_ptr<const std::vector<uint8_t>> data)
-    : data_(data), next_(nullptr) {}
+    : data_(data)
+    , next_(nullptr) {}
+
+Message::Message(Message&& other)
+    : data_(other.data_)
+    , next_(std::move(other.next_)) {}
 
 void Message::append(std::unique_ptr<Message> message) {
     next_ = std::move(message);
