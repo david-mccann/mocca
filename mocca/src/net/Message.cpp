@@ -4,30 +4,12 @@
 
 using namespace mocca::net;
 
-Message::Message(std::shared_ptr<const std::vector<uint8_t>> data)
-    : data_(data), next_(nullptr) {}
-
-Message& Message::setNext(std::shared_ptr<const std::vector<uint8_t>> data) {
-    next_ = mocca::make_unique<Message>(data);
-    return *next_;
+MessagePart mocca::net::createMessagePart(const std::string& str) {
+    MessagePart part = std::make_shared<std::vector<uint8_t>>();
+    part->assign(begin(str), end(str));
+    return part;
 }
 
-const Message* Message::next() const {
-    return next_.get();
-}
-
-const uint8_t* Message::data() const {
-    return data_->data();
-}
-
-uint32_t Message::size() const {
-    return data_->size();
-}
-
-bool Message::isEmpty() const {
-    return data_ == nullptr;
-}
-
-std::shared_ptr<const std::vector<uint8_t>> Message::sharedData() const {
-    return data_;
+std::string mocca::net::readMessagePart(const std::vector<uint8_t>& part) {
+    return std::string(reinterpret_cast<const char*>(part.data()), part.size());
 }

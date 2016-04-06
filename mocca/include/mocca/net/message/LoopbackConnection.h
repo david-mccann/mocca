@@ -16,7 +16,7 @@ namespace net {
 class LoopbackConnection : public IMessageConnection {
 public:
     enum class Signal { Disconnect };
-    using MQ = MessageQueue<ByteArray>;
+    using MQ = MessageQueue<Message>;
     using SQ = MessageQueue<Signal>;
 
     LoopbackConnection(std::shared_ptr<MQ> sendQueue, std::shared_ptr<MQ> receiveQueue, std::shared_ptr<SQ> outSignalQueue,
@@ -25,8 +25,8 @@ public:
 
     std::shared_ptr<const ConnectionID> connectionID() const override;
     bool isConnected() const override;
-    void send(ByteArray message) const override;
-    ByteArray receive(std::chrono::milliseconds timeout) const override;
+    void send(Message message) const override;
+    Message receive(std::chrono::milliseconds timeout) const override;
 
 private:
     std::shared_ptr<const ConnectionID> connectionID_;

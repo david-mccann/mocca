@@ -31,10 +31,10 @@ bool FramingConnection::isConnected() const {
     return stream_->isConnected();
 }
 
-void FramingConnection::send(ByteArray message) const {
-    framingStrategy_->writeFrameToStream(*stream_, std::move(message));
+void FramingConnection::send(Message message) const {
+    framingStrategy_->writeMessageToStream(*stream_, std::move(message));
 }
 
-ByteArray FramingConnection::receive(std::chrono::milliseconds timeout) const {
-    return framingStrategy_->readFrameFromStream(*stream_, timeout);
+Message FramingConnection::receive(std::chrono::milliseconds timeout) const {
+    return framingStrategy_->readMessageFromStream(*stream_, timeout);
 }

@@ -51,20 +51,17 @@ TEST_P(ConnectionAggregatorTest, EnqueueDequeue) {
     auto clientConnection1 = this->target->connect(createAddress(GetParam()));
     auto clientConnection2 = this->target->connect(createAddress(GetParam()));
 
-    ByteArray packet1 = mocca::makeFormattedByteArray("Hello 1");
-    ByteArray packet2 = mocca::makeFormattedByteArray("Hello 2");
-
-    clientConnection1->send(std::move(packet1));
-    clientConnection2->send(std::move(packet2));
+    clientConnection1->send(Message{ createMessagePart("Hello 1") });
+    clientConnection2->send(Message{ createMessagePart("Hello 2") });
 
     auto data1 = target.receive(std::chrono::milliseconds(100));
     auto data2 = target.receive(std::chrono::milliseconds(100));
     ASSERT_FALSE(data1.isNull());
     ASSERT_FALSE(data2.isNull());
-    ByteArray recPacket1(data1.release().message);
-    ByteArray recPacket2(data2.release().message);
-    auto recStr1 = std::get<0>(mocca::parseFormattedByteArray<std::string>(recPacket1));
-    auto recStr2 = std::get<0>(mocca::parseFormattedByteArray<std::string>(recPacket2));
+    auto recPacket1(data1.release().message);
+    auto recPacket2(data2.release().message);
+    auto recStr1 = readMessagePart(*recPacket1[0]);
+    auto recStr2 = readMessagePart(*recPacket2[0]);
     ASSERT_TRUE(recStr1 == "Hello 1" && recStr2 == "Hello 2" || recStr1 == "Hello 2" && recStr2 == "Hello 1");
 }
 
@@ -77,20 +74,17 @@ TEST_P(ConnectionAggregatorTest, MultipleAcceptors) {
     auto clientConnection1 = this->target->connect(createAddress(GetParam()));
     auto clientConnection2 = this->target->connect(createAddress(GetParam(), 1));
 
-    ByteArray packet1 = mocca::makeFormattedByteArray("Hello 1");
-    ByteArray packet2 = mocca::makeFormattedByteArray("Hello 2");
-
-    clientConnection1->send(std::move(packet1));
-    clientConnection2->send(std::move(packet2));
+    clientConnection1->send(Message{ createMessagePart("Hello 1") });
+    clientConnection2->send(Message{ createMessagePart("Hello 2") });
 
     auto data1 = target.receive(std::chrono::milliseconds(100));
     auto data2 = target.receive(std::chrono::milliseconds(100));
     ASSERT_FALSE(data1.isNull());
     ASSERT_FALSE(data2.isNull());
-    ByteArray recPacket1(data1.release().message);
-    ByteArray recPacket2(data2.release().message);
-    auto recStr1 = std::get<0>(mocca::parseFormattedByteArray<std::string>(recPacket1));
-    auto recStr2 = std::get<0>(mocca::parseFormattedByteArray<std::string>(recPacket2));
+    auto recPacket1(data1.release().message);
+    auto recPacket2(data2.release().message);
+    auto recStr1 = readMessagePart(*recPacket1[0]);
+    auto recStr2 = readMessagePart(*recPacket2[0]);
     ASSERT_TRUE(recStr1 == "Hello 1" && recStr2 == "Hello 2" || recStr1 == "Hello 2" && recStr2 == "Hello 1");
 }
 
@@ -110,7 +104,7 @@ TEST_P(ConnectionAggregatorTest, SendReceiveParallel) {
 
     auto sendFunction = [](IMessageConnection& connection, const std::vector<std::string>& data) {
         for (auto item : data) {
-            connection.send(mocca::makeFormattedByteArray(item));
+            connection.send(Message{ createMessagePart(item) });
             static int sleepTime = 0;
             sleepTime = (sleepTime + 1) % 3;
             std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
@@ -125,8 +119,8 @@ TEST_P(ConnectionAggregatorTest, SendReceiveParallel) {
             auto envelopeNullable = aggregator.receive(std::chrono::milliseconds(50));
             if (!envelopeNullable.isNull()) {
                 auto envelope = envelopeNullable.release();
-                ByteArray recPacket(std::move(envelope.message));
-                result.push_back(std::get<0>(mocca::parseFormattedByteArray<std::string>(recPacket)));
+                auto recPacket(envelope.message);
+                result.push_back(readMessagePart(*recPacket[0]));
             }
         }
         return result;

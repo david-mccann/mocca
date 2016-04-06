@@ -26,7 +26,16 @@ public:
     virtual bool isConnected() const = 0;
     
     virtual void send(const uint8_t* data, uint32_t size) const = 0;
+    template<typename T> void sendValue(T value) {
+        send(reinterpret_cast<const uint8_t*>(&value), sizeof(T));
+    }
+
     uint32_t receive(uint8_t* buffer, uint32_t maxSize, std::chrono::milliseconds timeout = std::chrono::milliseconds(100)) const;
+    template<typename T> T receiveValue(std::chrono::milliseconds timeout = std::chrono::milliseconds(100)) {
+        T value;
+        receive(reinterpret_cast<uint8_t*>(&value), sizeof(T), timeout);
+        return value;
+    }
 
     void putBack(const uint8_t* data, uint32_t size);
     std::mutex& sendMutex() { return sendMutex_; }

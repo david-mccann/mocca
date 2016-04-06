@@ -14,7 +14,7 @@
 using namespace mocca::net;
 using namespace mocca;
 
-MessageEnvelope::MessageEnvelope(mocca::ByteArray msg, std::shared_ptr<const ConnectionID> id)
+MessageEnvelope::MessageEnvelope(Message msg, std::shared_ptr<const ConnectionID> id)
     : message(std::move(msg))
     , connectionID(id) {}
 
@@ -120,7 +120,7 @@ void ConnectionAggregator::ReceiveThread::run() {
     try {
         while (!isInterrupted()) {
             auto data = connection_.receive();
-            if (!data.isEmpty()) {
+            if (!data.empty()) {
                 MessageEnvelope envelope(std::move(data), connection_.connectionID());
                 receiveQueue_.enqueue(std::move(envelope));
             }

@@ -21,30 +21,26 @@ std::string SizePrefixedProtocol::name() const {
     return "prefixed";
 }
 
-ByteArray SizePrefixedProtocol::readFrameFromStream(IStreamConnection& connection, std::chrono::milliseconds timeout) {
+Message SizePrefixedProtocol::readMessageFromStream(IStreamConnection& connection, std::chrono::milliseconds timeout) {
     std::lock_guard<std::mutex> lock(connection.receiveMutex());
 
-    std::vector<uint8_t> sizeBuffer;
-    if (readExactly(connection, sizeBuffer, sizeof(uint32_t), timeout) == ReadStatus::Incomplete) {
-        connection.putBack(sizeBuffer.data(), sizeBuffer.size());
-        return ByteArray();
-    }
+    auto numParts = connection.receiveValue<uint32_t>(timeout);
 
-    std::vector<uint8_t> buffer;
-    auto frameSize = *reinterpret_cast<uint32_t*>(sizeBuffer.data());
-    if (readExactly(connection, buffer, frameSize, timeout) == ReadStatus::Incomplete) {
-        connection.putBack(buffer.data(), buffer.size());
-        connection.putBack(sizeBuffer.data(), sizeBuffer.size());
-        return ByteArray();
+    Message message;
+    for (uint32_t i = 0; i < numParts; ++i) {
+        uint32_t size = connection.receiveValue<uint32_t>(timeout);
+        auto buffer = std::make_shared<std::vector<uint8_t>>();
+        readExactly(connection, *buffer, size, timeout);
+        message.push_back(buffer);
     }
-    return ByteArray::createFromRaw(buffer.data(), buffer.size());
+    return message;
 }
 
-void SizePrefixedProtocol::writeFrameToStream(IStreamConnection& connection, ByteArray frame) {
-    // fixme: performance loss; implement prepend method for ByteArray
+void SizePrefixedProtocol::writeMessageToStream(IStreamConnection& connection, Message message) {
     std::lock_guard<std::mutex> lock(connection.sendMutex());
-    ByteArray newFrame(frame.size() + sizeof(uint32_t));
-    newFrame << frame.size();
-    newFrame.append(frame);
-    connection.send(newFrame.data(), newFrame.size());
+    connection.sendValue(static_cast<uint32_t>(message.size()));
+    for (const auto& part : message) {
+        connection.sendValue(static_cast<uint32_t>(part->size()));
+        connection.send(part->data(), part->size());
+    }
 }

@@ -23,11 +23,11 @@ namespace net {
 
 struct MessageEnvelope {
     MessageEnvelope() {}
-    MessageEnvelope(mocca::ByteArray msg, std::shared_ptr<const ConnectionID> id);
+    MessageEnvelope(Message msg, std::shared_ptr<const ConnectionID> id);
     MessageEnvelope(MessageEnvelope&& other);
     friend void swap(MessageEnvelope& lhs, MessageEnvelope& rhs);
     MessageEnvelope& operator=(MessageEnvelope other);
-    mocca::ByteArray message;
+    Message message;
     std::shared_ptr<const ConnectionID> connectionID;
 };
 

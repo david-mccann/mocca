@@ -125,14 +125,14 @@ void WebSocketProtocol::sendHandshakeResponse(IStreamConnection& connection) {
 +---------------------------------------------------------------+
 */
 
-ByteArray WebSocketProtocol::readFrameFromStream(IStreamConnection& connection, std::chrono::milliseconds timeout) {
+Message WebSocketProtocol::readMessageFromStream(IStreamConnection& connection, std::chrono::milliseconds timeout) {
     std::lock_guard<std::mutex> lock(connection.receiveMutex());
 
     // read the flags byte
     std::vector<uint8_t> prefixBuffer;
     readExactly(connection, prefixBuffer, 1, timeout);
     if (prefixBuffer.empty()) {
-        return ByteArray(); // no data read from stream
+        return Message(); // no data read from stream
     }
 
 #ifdef MOCCA_RUNTIME_CHECKS
@@ -150,7 +150,7 @@ ByteArray WebSocketProtocol::readFrameFromStream(IStreamConnection& connection, 
     // read the basic payload byte
     if (readExactly(connection, prefixBuffer, 1, timeout) == ReadStatus::Incomplete) {
         connection.putBack(prefixBuffer.data(), prefixBuffer.size());
-        return ByteArray();
+        return Message();
     }
 
     // read additional payload-size bytes and the mask bytes
@@ -182,58 +182,57 @@ ByteArray WebSocketProtocol::readFrameFromStream(IStreamConnection& connection, 
 #endif
     if (status == ReadStatus::Incomplete) {
         connection.putBack(prefixBuffer.data(), prefixBuffer.size());
-        return ByteArray();
+        return Message();
     }
 
     // read and unmask payload data
-    std::vector<uint8_t> payloadBuffer;
-    if (readExactly(connection, payloadBuffer, static_cast<uint32_t>(payloadSize), timeout) == ReadStatus::Incomplete) {
-        connection.putBack(payloadBuffer.data(), payloadBuffer.size());
+    auto payloadBuffer = std::make_shared<std::vector<uint8_t>>();
+    if (readExactly(connection, *payloadBuffer, static_cast<uint32_t>(payloadSize), timeout) == ReadStatus::Incomplete) {
+        connection.putBack(payloadBuffer->data(), payloadBuffer->size());
         connection.putBack(prefixBuffer.data(), prefixBuffer.size());
-        return ByteArray();
+        return Message();
     }
     unsigned char* mask = prefixBuffer.data() + maskOffset;
     for (unsigned long int i = 0; i < payloadSize; ++i) {
-        payloadBuffer[i] ^= mask[i % 4];
+        (*payloadBuffer)[i] ^= mask[i % 4];
     }
-    return ByteArray::createFromRaw(payloadBuffer.data(), payloadBuffer.size());
+    return Message{ payloadBuffer };
 }
 
 
-void WebSocketProtocol::writeFrameToStream(IStreamConnection& connection, ByteArray frame) {
-    auto payloadSize = frame.size();
-    ByteArray sendBuffer(payloadSize + 10); // header size is at most 10 bytes
+void WebSocketProtocol::writeMessageToStream(IStreamConnection& connection, Message message) {
+    std::lock_guard<std::mutex> lock(connection.sendMutex());
+
+    const auto& part = *message[0];
+
+    auto payloadSize = part.size();
 
     // create the flags byte
     unsigned char payloadFlags;
     
     //fixme bad hack for jpeg
-    if(frame.size() > 7 && frame.data()[6] == 'J' && frame.data()[7] == 'F')
+    if(part.size() > 7 && part.data()[6] == 'J' && part.data()[7] == 'F')
         payloadFlags = 0x82;
     else
         payloadFlags = 0x81;
-    
-    sendBuffer.append(&payloadFlags, 1);
+
+    connection.sendValue(payloadFlags);
 
     // create the length bytes
     if (payloadSize <= 125) {
-        char basicSize = payloadSize;
-        sendBuffer.append(&basicSize, 1);
+        char basicSize = static_cast<char>(payloadSize);
+        connection.sendValue(basicSize);
     } else if (payloadSize > 125 && payloadSize <= 65535) {
         char basicSize = 126;
-        sendBuffer.append(&basicSize, 1);
+        connection.sendValue(basicSize);
         uint16_t len = swap_uint16(static_cast<uint16_t>(payloadSize));
-        sendBuffer.append(&len, 2);
+        connection.sendValue(len);
     } else {
         char basicSize = 127;
-        sendBuffer.append(&basicSize, 1);
+        connection.sendValue(basicSize);
         uint64_t len = swap_uint64(static_cast<uint64_t>(payloadSize));
-        sendBuffer.append(&len, 8);
+        connection.sendValue(len);
     }
 
-    // append payload
-    sendBuffer.append(frame);
-
-    std::lock_guard<std::mutex> lock(connection.sendMutex());
-    connection.send(sendBuffer.data(), sendBuffer.size());
+    connection.send(part.data(), part.size());
 }

@@ -47,11 +47,10 @@ protected:
         "Sec-WebSocket-Key: cdsNUQEVKJWSMNeiLaaCbw==\r\n"
         "Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits\r\n\r\n";
 
-    ByteArray createPayloadData(uint32_t size) {
-        ByteArray payload(size);
-        payload.setSize(size);
+    std::vector<uint8_t> createPayloadData(uint32_t size) {
+        std::vector<uint8_t> payload(size);
         for (uint32_t i = 0; i < size; ++i) {
-            payload.data()[i] = ('a' + (i % ('z' - 'a')));
+            payload[i] = ('a' + (i % ('z' - 'a')));
         }
         return payload;
     }
@@ -61,9 +60,8 @@ protected:
     const unsigned char flags = 0x81;
     std::array<unsigned char, 4> mask;
 
-    ByteArray maskData(const ByteArray& data) {
-        ByteArray result(data.size());
-        result.setSize(data.size());
+    std::vector<uint8_t> maskData(const std::vector<uint8_t>& data) {
+        std::vector<uint8_t> result(data.size());
         for (uint32_t i = 0; i < data.size(); ++i) {
             result[i] = data[i] ^ mask[i % 4];
         }
@@ -81,16 +79,19 @@ TEST_F(WebsocketTest, ReceiveSmallPayload) {
     auto wsServerConnection = wsAcceptor->accept();
 
     unsigned char payloadSize = 125;
-    ByteArray data(payloadSize + 6); // 6 bytes header
-    data.append(&flags, 1);
-    data.append(&payloadSize, 1);
-    data.append(&mask, 4);
+    std::vector<uint8_t> data(6); // 6 bytes header
+    data[0] = flags;
+    data[1] = payloadSize;
+    for (int i = 0; i < 4; ++i) {
+        data[i + 2] = mask[i];
+    }
     auto payload = createPayloadData(payloadSize);
-    data.append(maskData(payload));
+    auto masked = maskData(payload);
+    data.insert(end(data), begin(masked), end(masked));
     lbClientConnection->send(data.data(), data.size());
     auto receivedData = wsServerConnection->receive();
-    ASSERT_EQ(payloadSize, receivedData.size());
-    ASSERT_TRUE(std::memcmp(payload.data(), receivedData.data(), payloadSize) == 0);
+    ASSERT_EQ(payloadSize, receivedData[0]->size());
+    ASSERT_TRUE(std::memcmp(payload.data(), receivedData[0]->data(), payloadSize) == 0);
 }
 
 TEST_F(WebsocketTest, ReceiveMediumPayload) {
@@ -102,17 +103,20 @@ TEST_F(WebsocketTest, ReceiveMediumPayload) {
 
     uint16_t payloadSize = 40000;
     uint16_t payloadSizeBE = swap_uint16(payloadSize);
-    ByteArray data(payloadSize + 8); // 8 bytes header
-    data.append(&flags, 1);
-    data.append(&mediumPayload, 1);
-    data.append(&payloadSizeBE, 2);
-    data.append(&mask, 4);
+    std::vector<uint8_t> data(8); // 8 bytes header
+    data[0] = flags;
+    data[1] = mediumPayload;
+    *reinterpret_cast<uint16_t*>(&data[2]) = payloadSizeBE;
+    for (int i = 0; i < 4; ++i) {
+        data[i + 4] = mask[i];
+    }
     auto payload = createPayloadData(payloadSize);
-    data.append(maskData(payload));
+    auto masked = maskData(payload);
+    data.insert(end(data), begin(masked), end(masked));
     lbClientConnection->send(data.data(), data.size());
     auto receivedData = wsServerConnection->receive();
-    ASSERT_EQ(payloadSize, receivedData.size());
-    ASSERT_TRUE(std::memcmp(payload.data(), receivedData.data(), payloadSize) == 0);
+    ASSERT_EQ(payloadSize, receivedData[0]->size());
+    ASSERT_TRUE(std::memcmp(payload.data(), receivedData[0]->data(), payloadSize) == 0);
 }
 
 TEST_F(WebsocketTest, ReceiveBigPayload) {
@@ -124,17 +128,20 @@ TEST_F(WebsocketTest, ReceiveBigPayload) {
 
     uint64_t payloadSize = 70000;
     uint64_t payloadSizeBE = swap_uint64(payloadSize);
-    ByteArray data(static_cast<uint32_t>(payloadSize + 14)); // 14 bytes header
-    data.append(&flags, 1);
-    data.append(&bigPayload, 1);
-    data.append(&payloadSizeBE, 8);
-    data.append(&mask, 4);
+    std::vector<uint8_t> data(14); // 14 bytes header
+    data[0] = flags;
+    data[1] = bigPayload;
+    *reinterpret_cast<uint64_t*>(&data[2]) = payloadSizeBE;
+    for (int i = 0; i < 4; ++i) {
+        data[i + 10] = mask[i];
+    }
     auto payload = createPayloadData(static_cast<uint32_t>(payloadSize));
-    data.append(maskData(payload));
+    auto masked = maskData(payload);
+    data.insert(end(data), begin(masked), end(masked));
     lbClientConnection->send(data.data(), data.size());
     auto receivedData = wsServerConnection->receive();
-    ASSERT_EQ(payloadSize, receivedData.size());
-    ASSERT_TRUE(std::memcmp(payload.data(), receivedData.data(), static_cast<uint32_t>(payloadSize)) == 0);
+    ASSERT_EQ(payloadSize, receivedData[0]->size());
+    ASSERT_TRUE(std::memcmp(payload.data(), receivedData[0]->data(), static_cast<uint32_t>(payloadSize)) == 0);
 }
 
 TEST_F(WebsocketTest, SendSmallPayload) {
@@ -148,12 +155,12 @@ TEST_F(WebsocketTest, SendSmallPayload) {
 
     unsigned char payloadSize = 125;
     auto payload = createPayloadData(payloadSize);
-    wsServerConnection->send(payload.clone());
+    wsServerConnection->send(Message{ std::make_shared<std::vector<uint8_t>>(payload) });
 
-    ByteArray expectedData(payloadSize + 2); // 2 bytes header
-    expectedData.append(&flags, 1);
-    expectedData.append(&payloadSize, 1);
-    expectedData.append(payload);
+    std::vector<uint8_t> expectedData(2); // 2 bytes header
+    expectedData[0] = flags;
+    expectedData[1] = payloadSize;
+    expectedData.insert(end(expectedData), begin(payload), end(payload));
 
     std::vector<uint8_t> receivedData(expectedData.size());
     auto bytesReceived = lbClientConnection->receive(receivedData.data(), 200);
@@ -173,13 +180,13 @@ TEST_F(WebsocketTest, SendMediumPayload) {
     uint16_t payloadSize = 40000;
     uint16_t payloadSizeBE = swap_uint16(payloadSize);
     auto payload = createPayloadData(payloadSize);
-    wsServerConnection->send(payload.clone());
+    wsServerConnection->send(Message{ std::make_shared<std::vector<uint8_t>>(payload) });
 
-    ByteArray expectedData(payloadSize + 4); // 4 bytes header
-    expectedData.append(&flags, 1);
-    expectedData.append(&mediumPayload, 1);
-    expectedData.append(&payloadSizeBE, 2);
-    expectedData.append(payload);
+    std::vector<uint8_t> expectedData(4); // 4 bytes header
+    expectedData[0] = flags;
+    expectedData[1] = mediumPayload;
+    *reinterpret_cast<uint16_t*>(&expectedData[2]) = payloadSizeBE;
+    expectedData.insert(end(expectedData), begin(payload), end(payload));
 
     std::vector<uint8_t> receivedData(expectedData.size());
     auto bytesReceived = lbClientConnection->receive(receivedData.data(), 41000);
@@ -199,13 +206,13 @@ TEST_F(WebsocketTest, SendBigPayload) {
     uint64_t payloadSize = 70000;
     uint64_t payloadSizeBE = swap_uint64(payloadSize);
     auto payload = createPayloadData(static_cast<uint32_t>(payloadSize));
-    wsServerConnection->send(payload.clone());
+    wsServerConnection->send(Message{ std::make_shared<std::vector<uint8_t>>(payload) });
 
-    ByteArray expectedData(static_cast<uint32_t>(payloadSize) + 12); // 12 bytes header
-    expectedData.append(&flags, 1);
-    expectedData.append(&bigPayload, 1);
-    expectedData.append(&payloadSizeBE, 8);
-    expectedData.append(payload);
+    std::vector<uint8_t> expectedData(10); // 10 bytes header
+    expectedData[0] = flags;
+    expectedData[1] = bigPayload;
+    *reinterpret_cast<uint64_t*>(&expectedData[2]) = payloadSizeBE;
+    expectedData.insert(end(expectedData), begin(payload), end(payload));
 
     std::vector<uint8_t> receivedData(expectedData.size());
     auto bytesReceived = lbClientConnection->receive(receivedData.data(), 71000);
