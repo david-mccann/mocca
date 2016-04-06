@@ -37,57 +37,61 @@ protected:
 
 TEST_F(StreamConnectionTest, PutBack_1) {
     createFilledStream('a', 'e');
-    auto received = target->receive(5);
-    ASSERT_EQ(5, received.size());
-    target->putBack(received);
+    std::vector<uint8_t> buffer(7);
+    auto received = target->receive(buffer.data(), 5);
+    ASSERT_EQ(5, received);
+    target->putBack(buffer.data(), 5);
     receiveQueue->enqueue('f');
     receiveQueue->enqueue('g');
-    received = target->receive(7);
-    ASSERT_EQ(7, received.size());
-    ASSERT_EQ('a', received[0]);
-    ASSERT_EQ('g', received[6]);
+    received = target->receive(buffer.data(), 7);
+    ASSERT_EQ(7, received);
+    ASSERT_EQ('a', buffer[0]);
+    ASSERT_EQ('g', buffer[6]);
 }
 
 TEST_F(StreamConnectionTest, PutBack_2) {
     createFilledStream('a', 'e');
-    auto received = target->receive(3);
-    ASSERT_EQ(3, received.size());
-    target->putBack(received);
+    std::vector<uint8_t> buffer(7);
+    auto received = target->receive(buffer.data(), 3);
+    ASSERT_EQ(3, received);
+    target->putBack(buffer.data(), 3);
     receiveQueue->enqueue('f');
     receiveQueue->enqueue('g');
-    received = target->receive(7);
-    ASSERT_EQ(7, received.size());
-    ASSERT_EQ('a', received[0]);
-    ASSERT_EQ('g', received[6]);
+    received = target->receive(buffer.data(), 7);
+    ASSERT_EQ(7, received);
+    ASSERT_EQ('a', buffer[0]);
+    ASSERT_EQ('g', buffer[6]);
 }
 
 TEST_F(StreamConnectionTest, PutBack_3) {
     createFilledStream('a', 'e');
-    auto received = target->receive(3);
-    ASSERT_EQ(3, received.size());
-    target->putBack(received);
-    received = target->receive(3);
-    target->putBack(received);
+    std::vector<uint8_t> buffer(7);
+    auto received = target->receive(buffer.data(), 3);
+    ASSERT_EQ(3, received);
+    target->putBack(buffer.data(), 3);
+    received = target->receive(buffer.data(), 3);
+    target->putBack(buffer.data(), 3);
     receiveQueue->enqueue('f');
     receiveQueue->enqueue('g');
-    received = target->receive(7);
-    ASSERT_EQ(7, received.size());
-    ASSERT_EQ('a', received[0]);
-    ASSERT_EQ('g', received[6]);
+    received = target->receive(buffer.data(), 7);
+    ASSERT_EQ(7, received);
+    ASSERT_EQ('a', buffer[0]);
+    ASSERT_EQ('g', buffer[6]);
 }
 
 TEST_F(StreamConnectionTest, PutBack_4) {
     createFilledStream('a', 'e');
-    auto received = target->receive(2);
-    ASSERT_EQ(2, received.size());
-    received = target->receive(3);
-    ASSERT_EQ(3, received.size());
-    ASSERT_EQ('c', received[0]);
-    ASSERT_EQ('e', received[2]);
+    std::vector<uint8_t> buffer(7);
+    auto received = target->receive(buffer.data(), 2);
+    ASSERT_EQ(2, received);
+    received = target->receive(buffer.data(), 3);
+    ASSERT_EQ(3, received);
+    ASSERT_EQ('c', buffer[0]);
+    ASSERT_EQ('e', buffer[2]);
     receiveQueue->enqueue('f');
     receiveQueue->enqueue('g');
-    received = target->receive(2);
-    ASSERT_EQ(2, received.size());
-    ASSERT_EQ('f', received[0]);
-    ASSERT_EQ('g', received[1]);
+    received = target->receive(buffer.data(), 2);
+    ASSERT_EQ(2, received);
+    ASSERT_EQ('f', buffer[0]);
+    ASSERT_EQ('g', buffer[1]);
 }

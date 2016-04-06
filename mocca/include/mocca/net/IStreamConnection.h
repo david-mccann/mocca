@@ -14,6 +14,7 @@
 #include <chrono>
 #include <mutex>
 #include <string>
+#include <vector>
 
 namespace mocca {
 namespace net {
@@ -24,18 +25,19 @@ public:
 
     virtual std::shared_ptr<const ConnectionID> connectionID() const = 0;
     virtual bool isConnected() const = 0;
-    virtual void send(ByteArray message) const = 0;
-    ByteArray receive(uint32_t maxSize, std::chrono::milliseconds timeout = std::chrono::milliseconds(100)) const;
+    
+    virtual void send(const uint8_t* data, uint32_t size) const = 0;
+    uint32_t receive(uint8_t* buffer, uint32_t maxSize, std::chrono::milliseconds timeout = std::chrono::milliseconds(100)) const;
 
-    void putBack(const ByteArray& data);
+    void putBack(const uint8_t* data, uint32_t size);
     std::mutex& sendMutex() { return sendMutex_; }
     std::mutex& receiveMutex() { return receiveMutex_; }
 
 protected:
-    virtual ByteArray readFromStream(uint32_t maxSize, std::chrono::milliseconds timeout = std::chrono::milliseconds(100)) const = 0;
+    virtual uint32_t readFromStream(uint8_t* buffer, uint32_t maxSize, std::chrono::milliseconds timeout = std::chrono::milliseconds(100)) const = 0;
 
 private:
-    mutable ByteArray putBackData_;
+    mutable std::vector<uint8_t> putBackData_;
     mutable uint32_t putBackReadPos_;
     std::mutex sendMutex_;
     std::mutex receiveMutex_;

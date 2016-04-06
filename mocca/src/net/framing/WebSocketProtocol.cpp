@@ -36,7 +36,7 @@ void mocca::net::WebSocketProtocol::receiveHandshake(IStreamConnection& connecti
     {
         std::lock_guard<std::mutex> lock(connection.receiveMutex());
         if (readUntil(connection, headerBuffer, "\r\n\r\n") == ReadStatus::Incomplete) {
-            connection.putBack(headerBuffer);
+            connection.putBack(headerBuffer.data(), headerBuffer.size());
             throw NetworkError("Timeout while trying to receive WebSocket handshake", __FILE__, __LINE__);
         }
     }
@@ -101,7 +101,7 @@ void WebSocketProtocol::sendHandshakeResponse(IStreamConnection& connection) {
     stream << "\r\n";
     auto responseStr = stream.str();
     std::lock_guard<std::mutex> lock(connection.sendMutex());
-    connection.send(ByteArray::createFromRaw(responseStr.c_str(), static_cast<uint32_t>(responseStr.size())));
+    connection.send(reinterpret_cast<const uint8_t*>(responseStr.data()), static_cast<uint32_t>(responseStr.size()));
 }
 
 /*
@@ -149,7 +149,7 @@ ByteArray WebSocketProtocol::readFrameFromStream(IStreamConnection& connection, 
 
     // read the basic payload byte
     if (readExactly(connection, prefixBuffer, 1, timeout) == ReadStatus::Incomplete) {
-        connection.putBack(prefixBuffer);
+        connection.putBack(prefixBuffer.data(), prefixBuffer.size());
         return ByteArray();
     }
 
@@ -181,15 +181,15 @@ ByteArray WebSocketProtocol::readFrameFromStream(IStreamConnection& connection, 
     }
 #endif
     if (status == ReadStatus::Incomplete) {
-        connection.putBack(prefixBuffer);
+        connection.putBack(prefixBuffer.data(), prefixBuffer.size());
         return ByteArray();
     }
 
     // read and unmask payload data
     ByteArray payloadBuffer;
     if (readExactly(connection, payloadBuffer, static_cast<uint32_t>(payloadSize), timeout) == ReadStatus::Incomplete) {
-        connection.putBack(payloadBuffer);
-        connection.putBack(prefixBuffer);
+        connection.putBack(payloadBuffer.data(), payloadBuffer.size());
+        connection.putBack(prefixBuffer.data(), prefixBuffer.size());
         return ByteArray();
     }
     unsigned char* mask = prefixBuffer.data() + maskOffset;
@@ -235,5 +235,5 @@ void WebSocketProtocol::writeFrameToStream(IStreamConnection& connection, ByteAr
     sendBuffer.append(frame);
 
     std::lock_guard<std::mutex> lock(connection.sendMutex());
-    connection.send(std::move(sendBuffer));
+    connection.send(sendBuffer.data(), sendBuffer.size());
 }

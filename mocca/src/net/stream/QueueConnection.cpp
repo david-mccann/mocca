@@ -39,30 +39,30 @@ bool QueueConnection::isConnected() const {
     return connected_;
 }
 
-void QueueConnection::send(ByteArray message) const {
+void QueueConnection::send(const uint8_t* data, uint32_t size) const {
     if (!isConnected()) {
         throw ConnectionClosedError("Connection to peer has been closed", *connectionID_, __FILE__, __LINE__);
     }
-    auto messageData = message.data();
-    auto messageDataEnd = message.data() + message.size();
-    while (messageData != messageDataEnd) {
-        sendQueue_->enqueue(*messageData);
-        ++messageData;
+    auto dataIt = data;
+    auto dataEnd = data + size;
+    while (dataIt != dataEnd) {
+        sendQueue_->enqueue(*dataIt);
+        ++dataIt;
     }
 }
 
-ByteArray QueueConnection::readFromStream(uint32_t maxSize, std::chrono::milliseconds timeout) const {
+uint32_t QueueConnection::readFromStream(uint8_t* buffer, uint32_t maxSize, std::chrono::milliseconds timeout) const {
     if (!isConnected()) {
         throw ConnectionClosedError("Connection to peer has been closed", *connectionID_, __FILE__, __LINE__);
     }
     ByteArray result;
-    while (result.size() < maxSize) {
+    for (uint32_t i = 0; i < maxSize; ++i) {
         auto dataNullable = receiveQueue_->dequeue(timeout);
         if (dataNullable.isNull()) {
-            return result;
+            return i;
         }
         auto data = dataNullable.get();
-        result.append(&data, sizeof(unsigned char));
+        buffer[i] = data;
     }
-    return result;
+    return maxSize;
 }

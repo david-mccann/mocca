@@ -26,15 +26,15 @@ ByteArray SizePrefixedProtocol::readFrameFromStream(IStreamConnection& connectio
 
     ByteArray sizeBuffer;
     if (readExactly(connection, sizeBuffer, sizeof(uint32_t), timeout) == ReadStatus::Incomplete) {
-        connection.putBack(sizeBuffer);
+        connection.putBack(sizeBuffer.data(), sizeBuffer.size());
         return ByteArray();
     }
 
     ByteArray buffer;
     auto frameSize = sizeBuffer.read<uint32_t>();
     if (readExactly(connection, buffer, frameSize, timeout) == ReadStatus::Incomplete) {
-        connection.putBack(buffer);
-        connection.putBack(sizeBuffer);
+        connection.putBack(buffer.data(), buffer.size());
+        connection.putBack(sizeBuffer.data(), sizeBuffer.size());
         return ByteArray();
     }
     return buffer;
@@ -46,5 +46,5 @@ void SizePrefixedProtocol::writeFrameToStream(IStreamConnection& connection, Byt
     ByteArray newFrame(frame.size() + sizeof(uint32_t));
     newFrame << frame.size();
     newFrame.append(frame);
-    connection.send(std::move(newFrame));
+    connection.send(newFrame.data(), newFrame.size());
 }

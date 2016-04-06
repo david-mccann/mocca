@@ -103,7 +103,7 @@ void ConnectionAggregator::run() {
 }
 
 bool ConnectionAggregator::isLocalMachine(const std::string& machine) const {
-    return localMachineIDs_.count(machine);
+    return localMachineIDs_.count(machine) != 0;
 }
 
 ConnectionAggregator::ReceiveThread::ReceiveThread(IMessageConnection& connection, EnvelopeQueue& receiveQueue)

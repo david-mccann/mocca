@@ -77,7 +77,7 @@ TEST_F(WebsocketTest, ReceiveSmallPayload) {
     auto wsAcceptor = factory->bind("local", "mq");
     auto& lbService = factory->streamConnectionFactory();
     auto lbClientConnection = lbService.connect("local:mq");
-    lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
+    lbClientConnection->send((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size());
     auto wsServerConnection = wsAcceptor->accept();
 
     unsigned char payloadSize = 125;
@@ -87,7 +87,7 @@ TEST_F(WebsocketTest, ReceiveSmallPayload) {
     data.append(&mask, 4);
     auto payload = createPayloadData(payloadSize);
     data.append(maskData(payload));
-    lbClientConnection->send(std::move(data));
+    lbClientConnection->send(data.data(), data.size());
     auto receivedData = wsServerConnection->receive();
     ASSERT_EQ(payloadSize, receivedData.size());
     ASSERT_TRUE(std::memcmp(payload.data(), receivedData.data(), payloadSize) == 0);
@@ -97,7 +97,7 @@ TEST_F(WebsocketTest, ReceiveMediumPayload) {
     auto wsAcceptor = factory->bind("local", "mq");
     auto& lbService = factory->streamConnectionFactory();
     auto lbClientConnection = lbService.connect("local:mq");
-    lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
+    lbClientConnection->send((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size());
     auto wsServerConnection = wsAcceptor->accept();
 
     uint16_t payloadSize = 40000;
@@ -109,7 +109,7 @@ TEST_F(WebsocketTest, ReceiveMediumPayload) {
     data.append(&mask, 4);
     auto payload = createPayloadData(payloadSize);
     data.append(maskData(payload));
-    lbClientConnection->send(std::move(data));
+    lbClientConnection->send(data.data(), data.size());
     auto receivedData = wsServerConnection->receive();
     ASSERT_EQ(payloadSize, receivedData.size());
     ASSERT_TRUE(std::memcmp(payload.data(), receivedData.data(), payloadSize) == 0);
@@ -119,7 +119,7 @@ TEST_F(WebsocketTest, ReceiveBigPayload) {
     auto wsAcceptor = factory->bind("local", "mq");
     auto& lbService = factory->streamConnectionFactory();
     auto lbClientConnection = lbService.connect("local:mq");
-    lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
+    lbClientConnection->send((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size());
     auto wsServerConnection = wsAcceptor->accept();
 
     uint64_t payloadSize = 70000;
@@ -131,7 +131,7 @@ TEST_F(WebsocketTest, ReceiveBigPayload) {
     data.append(&mask, 4);
     auto payload = createPayloadData(static_cast<uint32_t>(payloadSize));
     data.append(maskData(payload));
-    lbClientConnection->send(std::move(data));
+    lbClientConnection->send(data.data(), data.size());
     auto receivedData = wsServerConnection->receive();
     ASSERT_EQ(payloadSize, receivedData.size());
     ASSERT_TRUE(std::memcmp(payload.data(), receivedData.data(), static_cast<uint32_t>(payloadSize)) == 0);
@@ -141,7 +141,7 @@ TEST_F(WebsocketTest, SendSmallPayload) {
     auto wsAcceptor = factory->bind("local", "mq");
     auto& lbService = factory->streamConnectionFactory();
     auto lbClientConnection = lbService.connect("local:mq");
-    lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
+    lbClientConnection->send((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size());
     auto wsServerConnection = wsAcceptor->accept();
     ByteArray tmp;
     readUntil(*lbClientConnection, tmp, "\r\n\r\n"); // remove hanshake response from client buffer
@@ -155,8 +155,9 @@ TEST_F(WebsocketTest, SendSmallPayload) {
     expectedData.append(&payloadSize, 1);
     expectedData.append(payload);
 
-    auto receivedData = lbClientConnection->receive(200);
-    ASSERT_EQ(expectedData.size(), receivedData.size());
+    std::vector<uint8_t> receivedData(expectedData.size());
+    auto bytesReceived = lbClientConnection->receive(receivedData.data(), 200);
+    ASSERT_EQ(expectedData.size(), bytesReceived);
     ASSERT_TRUE(std::memcmp(expectedData.data(), receivedData.data(), expectedData.size()) == 0);
 }
 
@@ -164,7 +165,7 @@ TEST_F(WebsocketTest, SendMediumPayload) {
     auto wsAcceptor = factory->bind("local", "mq");
     auto& lbService = factory->streamConnectionFactory();
     auto lbClientConnection = lbService.connect("local:mq");
-    lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
+    lbClientConnection->send((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size());
     auto wsServerConnection = wsAcceptor->accept();
     ByteArray tmp;
     readUntil(*lbClientConnection, tmp, "\r\n\r\n"); // remove hanshake response from client buffer
@@ -180,8 +181,9 @@ TEST_F(WebsocketTest, SendMediumPayload) {
     expectedData.append(&payloadSizeBE, 2);
     expectedData.append(payload);
 
-    auto receivedData = lbClientConnection->receive(41000);
-    ASSERT_EQ(expectedData.size(), receivedData.size());
+    std::vector<uint8_t> receivedData(expectedData.size());
+    auto bytesReceived = lbClientConnection->receive(receivedData.data(), 41000);
+    ASSERT_EQ(expectedData.size(), bytesReceived);
     ASSERT_TRUE(std::memcmp(expectedData.data(), receivedData.data(), expectedData.size()) == 0);
 }
 
@@ -189,7 +191,7 @@ TEST_F(WebsocketTest, SendBigPayload) {
     auto wsAcceptor = factory->bind("local", "mq");
     auto& lbService = factory->streamConnectionFactory();
     auto lbClientConnection = lbService.connect("local:mq");
-    lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
+    lbClientConnection->send((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size());
     auto wsServerConnection = wsAcceptor->accept();
     ByteArray tmp;
     readUntil(*lbClientConnection, tmp, "\r\n\r\n"); // remove hanshake response from client buffer
@@ -205,8 +207,9 @@ TEST_F(WebsocketTest, SendBigPayload) {
     expectedData.append(&payloadSizeBE, 8);
     expectedData.append(payload);
 
-    auto receivedData = lbClientConnection->receive(71000);
-    ASSERT_EQ(expectedData.size(), receivedData.size());
+    std::vector<uint8_t> receivedData(expectedData.size());
+    auto bytesReceived = lbClientConnection->receive(receivedData.data(), 71000);
+    ASSERT_EQ(expectedData.size(), bytesReceived);
     ASSERT_TRUE(std::memcmp(expectedData.data(), receivedData.data(), expectedData.size()) == 0);
 }
 
@@ -214,9 +217,9 @@ TEST_F(WebsocketTest, CloseConnection) {
     auto wsAcceptor = factory->bind("local", "mq");
     auto& lbService = factory->streamConnectionFactory();
     auto lbClientConnection = lbService.connect("local:mq");
-    lbClientConnection->send(ByteArray::createFromRaw((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size()));
+    lbClientConnection->send((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size());
     auto wsServerConnection = wsAcceptor->accept();
     const unsigned char closeData[] = {0x88};
-    lbClientConnection->send(ByteArray::createFromRaw(&closeData, 1));
+    lbClientConnection->send(closeData, 1);
     ASSERT_THROW(wsServerConnection->receive(), ConnectionClosedError);
 }
