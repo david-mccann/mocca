@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "mocca/base/ByteArray.h"
 #include "mocca/net/ConnectionID.h"
 
 #include <chrono>

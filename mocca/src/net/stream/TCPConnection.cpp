@@ -62,7 +62,6 @@ void TCPConnection::send(const uint8_t* data, uint32_t size) const {
 
 uint32_t TCPConnection::readFromStream(uint8_t* buffer, uint32_t maxSize, std::chrono::milliseconds timeout) const {
     try {
-        ByteArray message(maxSize);
         return socket_->ReceiveData(reinterpret_cast<int8_t*>(buffer), maxSize, static_cast<uint32_t>(timeout.count()));
     } catch (const IVDB::SocketConnectionException& err) {
         throw ConnectionClosedError("Connection to peer " + socket_->GetPeerAddress() + " lost during receive operation (internal error: " +

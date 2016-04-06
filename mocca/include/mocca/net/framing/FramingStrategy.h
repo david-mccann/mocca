@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "mocca/base/ByteArray.h"
 #include "mocca/net/IStreamConnection.h"
 
 #include <memory>

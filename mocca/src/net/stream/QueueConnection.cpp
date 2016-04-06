@@ -55,7 +55,6 @@ uint32_t QueueConnection::readFromStream(uint8_t* buffer, uint32_t maxSize, std:
     if (!isConnected()) {
         throw ConnectionClosedError("Connection to peer has been closed", *connectionID_, __FILE__, __LINE__);
     }
-    ByteArray result;
     for (uint32_t i = 0; i < maxSize; ++i) {
         auto dataNullable = receiveQueue_->dequeue(timeout);
         if (dataNullable.isNull()) {

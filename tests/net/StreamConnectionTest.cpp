@@ -8,7 +8,6 @@
 
 #include "gtest/gtest.h"
 
-#include "mocca/base/ByteArray.h"
 #include "mocca/net/stream/QueueConnection.h"
 #include "mocca/testing/NetworkTesting.h"
 
