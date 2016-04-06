@@ -4,41 +4,30 @@
 
 using namespace mocca::net;
 
-void Message::append(std::unique_ptr<Message> next) {
-    next_ = std::move(next);
+Message::Message(std::shared_ptr<const std::vector<uint8_t>> data)
+    : data_(data), next_(nullptr) {}
+
+Message& Message::setNext(std::shared_ptr<const std::vector<uint8_t>> data) {
+    next_ = mocca::make_unique<Message>(data);
+    return *next_;
 }
 
-MessageShared::MessageShared(std::shared_ptr<const std::vector<uint8_t>> data)
-    : data_(data) {}
+const Message* Message::next() const {
+    return next_.get();
+}
 
-const uint8_t* MessageShared::data() const {
+const uint8_t* Message::data() const {
     return data_->data();
 }
 
-uint32_t MessageShared::size() const {
+uint32_t Message::size() const {
     return data_->size();
 }
 
-bool MessageShared::isEmpty() const {
+bool Message::isEmpty() const {
     return data_ == nullptr;
 }
 
-std::shared_ptr<const std::vector<uint8_t>> MessageShared::sharedData() const {
+std::shared_ptr<const std::vector<uint8_t>> Message::sharedData() const {
     return data_;
-}
-
-
-MessageUnique::MessageUnique(std::vector<uint8_t> data)
-    : data_(std::move(data)) {}
-
-const uint8_t* MessageUnique::data() const {
-    return data_.data();
-}
-
-uint32_t MessageUnique::size() const {
-    return data_.size();
-}
-
-bool MessageUnique::isEmpty() const {
-    return data_.empty();
 }

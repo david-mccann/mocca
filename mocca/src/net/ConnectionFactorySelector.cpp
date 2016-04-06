@@ -124,11 +124,6 @@ const std::string& ConnectionFactorySelector::loopback() {
     return str;
 }
 
-const std::string& ConnectionFactorySelector::newloopback() {
-    static std::string str = "newloopback";
-    return str;
-}
-
 const std::string& ConnectionFactorySelector::tcpPrefixed() {
     static std::string str = "tcp.prefixed";
     return str;
