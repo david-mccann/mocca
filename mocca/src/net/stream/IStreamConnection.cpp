@@ -37,7 +37,7 @@ uint32_t IStreamConnection::receive(uint8_t* buffer, uint32_t maxSize, std::chro
 void IStreamConnection::putBack(const uint8_t* data, uint32_t size) {
     std::vector<uint8_t> newPutBackData;
     newPutBackData.reserve(putBackData_.size() - putBackReadPos_ + size);
-    newPutBackData.insert(end(newPutBackData), data, data + size);
+    newPutBackData.assign(data, data + size);
     newPutBackData.insert(end(newPutBackData), begin(putBackData_) + putBackReadPos_, end(putBackData_));
     putBackData_ = std::move(newPutBackData);
     putBackReadPos_ = 0;

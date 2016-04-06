@@ -32,7 +32,7 @@ void WebSocketProtocol::performHandshake(IStreamConnection& connection, std::chr
 }
 
 void mocca::net::WebSocketProtocol::receiveHandshake(IStreamConnection& connection, std::chrono::milliseconds timeout) {
-    ByteArray headerBuffer;
+    std::vector<uint8_t> headerBuffer;
     {
         std::lock_guard<std::mutex> lock(connection.receiveMutex());
         if (readUntil(connection, headerBuffer, "\r\n\r\n") == ReadStatus::Incomplete) {
@@ -129,9 +129,9 @@ ByteArray WebSocketProtocol::readFrameFromStream(IStreamConnection& connection, 
     std::lock_guard<std::mutex> lock(connection.receiveMutex());
 
     // read the flags byte
-    ByteArray prefixBuffer(14);
+    std::vector<uint8_t> prefixBuffer;
     readExactly(connection, prefixBuffer, 1, timeout);
-    if (prefixBuffer.isEmpty()) {
+    if (prefixBuffer.empty()) {
         return ByteArray(); // no data read from stream
     }
 
@@ -186,7 +186,7 @@ ByteArray WebSocketProtocol::readFrameFromStream(IStreamConnection& connection, 
     }
 
     // read and unmask payload data
-    ByteArray payloadBuffer;
+    std::vector<uint8_t> payloadBuffer;
     if (readExactly(connection, payloadBuffer, static_cast<uint32_t>(payloadSize), timeout) == ReadStatus::Incomplete) {
         connection.putBack(payloadBuffer.data(), payloadBuffer.size());
         connection.putBack(prefixBuffer.data(), prefixBuffer.size());
@@ -196,7 +196,7 @@ ByteArray WebSocketProtocol::readFrameFromStream(IStreamConnection& connection, 
     for (unsigned long int i = 0; i < payloadSize; ++i) {
         payloadBuffer[i] ^= mask[i % 4];
     }
-    return payloadBuffer;
+    return ByteArray::createFromRaw(payloadBuffer.data(), payloadBuffer.size());
 }
 
 

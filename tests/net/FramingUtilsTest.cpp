@@ -33,22 +33,22 @@ protected:
         return stream;
     }
 
-    ByteArray readExactlyHelper(IStreamConnection& stream, uint32_t size) {
-        ByteArray result;
+    std::vector<uint8_t> readExactlyHelper(IStreamConnection& stream, uint32_t size) {
+        std::vector<uint8_t> result;
         readExactly(stream, result, size, std::chrono::milliseconds(1));
         return result;
     }
 
-    ByteArray readUntilHelper(IStreamConnection& stream, const std::string& delim, uint32_t chunkSize = 2) {
-        ByteArray result;
-        readUntil(stream, result, delim, std::chrono::milliseconds(1), chunkSize);
+    std::vector<uint8_t> readUntilHelper(IStreamConnection& stream, const std::string& delim) {
+        std::vector<uint8_t> result;
+        readUntil(stream, result, delim, std::chrono::milliseconds(1));
         return result;
     }
 };
 
 TEST_F(FramingUtilsTest, ReceiveExactly_SufficientData) {
     auto stream = createFilledStream('a', 'e');
-    ByteArray result;
+    std::vector<uint8_t> result;
     auto status = readExactly(*stream, result, 3);
     ASSERT_EQ(ReadStatus::Complete, status);
     ASSERT_EQ(3, result.size());
@@ -59,7 +59,7 @@ TEST_F(FramingUtilsTest, ReceiveExactly_SufficientData) {
 
 TEST_F(FramingUtilsTest, ReceiveExactly_InsufficientData) {
     auto stream = createFilledStream('a', 'e');
-    ByteArray result;
+    std::vector<uint8_t> result;
     auto status = readExactly(*stream, result, 7);
     ASSERT_EQ(ReadStatus::Incomplete, status);
     ASSERT_EQ(5, result.size());
@@ -107,7 +107,7 @@ TEST_F(FramingUtilsTest, ReceiveUntil_DelimAtEndOfSecondChunk) {
 
 TEST_F(FramingUtilsTest, ReceiveUntil_DelimInMiddleOfSecondChunk) {
     auto stream = createFilledStream('a', 'f');
-    auto result = readUntilHelper(*stream, "e", 3);
+    auto result = readUntilHelper(*stream, "e");
     ASSERT_EQ(5, result.size());
     ASSERT_EQ('a', result.data()[0]);
     ASSERT_EQ('e', result.data()[4]);
@@ -131,7 +131,7 @@ TEST_F(FramingUtilsTest, ReceiveUntil_DelimOnBorderOfChunk) {
 
 TEST_F(FramingUtilsTest, ReceiveUntil_DelimNotFound) {
     auto stream = createFilledStream('a', 'e');
-    ByteArray result;
+    std::vector<uint8_t> result;
     ReadStatus status = readUntil(*stream, result, "x");
     ASSERT_EQ(ReadStatus::Incomplete, status);
     ASSERT_EQ(5, result.size());

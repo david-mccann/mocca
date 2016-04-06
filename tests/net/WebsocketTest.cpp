@@ -143,7 +143,7 @@ TEST_F(WebsocketTest, SendSmallPayload) {
     auto lbClientConnection = lbService.connect("local:mq");
     lbClientConnection->send((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size());
     auto wsServerConnection = wsAcceptor->accept();
-    ByteArray tmp;
+    std::vector<uint8_t> tmp;
     readUntil(*lbClientConnection, tmp, "\r\n\r\n"); // remove hanshake response from client buffer
 
     unsigned char payloadSize = 125;
@@ -167,7 +167,7 @@ TEST_F(WebsocketTest, SendMediumPayload) {
     auto lbClientConnection = lbService.connect("local:mq");
     lbClientConnection->send((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size());
     auto wsServerConnection = wsAcceptor->accept();
-    ByteArray tmp;
+    std::vector<uint8_t> tmp;
     readUntil(*lbClientConnection, tmp, "\r\n\r\n"); // remove hanshake response from client buffer
 
     uint16_t payloadSize = 40000;
@@ -193,7 +193,7 @@ TEST_F(WebsocketTest, SendBigPayload) {
     auto lbClientConnection = lbService.connect("local:mq");
     lbClientConnection->send((unsigned char*)clientHandshakeStr.c_str(), clientHandshakeStr.size());
     auto wsServerConnection = wsAcceptor->accept();
-    ByteArray tmp;
+    std::vector<uint8_t> tmp;
     readUntil(*lbClientConnection, tmp, "\r\n\r\n"); // remove hanshake response from client buffer
 
     uint64_t payloadSize = 70000;

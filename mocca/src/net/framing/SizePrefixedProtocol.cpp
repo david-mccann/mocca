@@ -24,20 +24,20 @@ std::string SizePrefixedProtocol::name() const {
 ByteArray SizePrefixedProtocol::readFrameFromStream(IStreamConnection& connection, std::chrono::milliseconds timeout) {
     std::lock_guard<std::mutex> lock(connection.receiveMutex());
 
-    ByteArray sizeBuffer;
+    std::vector<uint8_t> sizeBuffer;
     if (readExactly(connection, sizeBuffer, sizeof(uint32_t), timeout) == ReadStatus::Incomplete) {
         connection.putBack(sizeBuffer.data(), sizeBuffer.size());
         return ByteArray();
     }
 
-    ByteArray buffer;
-    auto frameSize = sizeBuffer.read<uint32_t>();
+    std::vector<uint8_t> buffer;
+    auto frameSize = *reinterpret_cast<uint32_t*>(sizeBuffer.data());
     if (readExactly(connection, buffer, frameSize, timeout) == ReadStatus::Incomplete) {
         connection.putBack(buffer.data(), buffer.size());
         connection.putBack(sizeBuffer.data(), sizeBuffer.size());
         return ByteArray();
     }
-    return buffer;
+    return ByteArray::createFromRaw(buffer.data(), buffer.size());
 }
 
 void SizePrefixedProtocol::writeFrameToStream(IStreamConnection& connection, ByteArray frame) {
