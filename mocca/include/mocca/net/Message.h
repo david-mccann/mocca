@@ -5,22 +5,45 @@
 
 namespace mocca {
 namespace net {
+
 class Message {
 public:
-    Message() = default;
-    Message(std::shared_ptr<const std::vector<uint8_t>> data);
-    Message(Message&& other);
+    virtual const uint8_t* data() const = 0;
+    virtual uint32_t size() const = 0;
+    virtual bool isEmpty() const = 0;
 
-    void append(std::unique_ptr<Message> message);
+    void append(std::unique_ptr<Message> next);
 
-    std::shared_ptr<const std::vector<uint8_t>> data() const;
-    const Message* next() const;
+private:
+    std::unique_ptr<Message> next_;
+};
 
-    bool isEmpty() const;
+class MessageShared : public Message {
+public:
+    MessageShared() = default;
+    MessageShared(std::shared_ptr<const std::vector<uint8_t>> data);
+
+    const uint8_t* data() const override;
+    uint32_t size() const override;
+    bool isEmpty() const override;
+
+    std::shared_ptr<const std::vector<uint8_t>> sharedData() const;
 
 private:
     std::shared_ptr<const std::vector<uint8_t>> data_;
-    std::unique_ptr<Message> next_;
+};
+
+class MessageUnique : public Message {
+public:
+    MessageUnique() = default;
+    MessageUnique(std::vector<uint8_t> data);
+
+    const uint8_t* data() const override;
+    uint32_t size() const override;
+    bool isEmpty() const override;
+
+private:
+    std::vector<uint8_t> data_;
 };
 }
 }
