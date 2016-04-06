@@ -8,7 +8,6 @@
 
 #include "gtest/gtest.h"
 
-#include "mocca/base/ByteArray.h"
 #include "mocca/base/Error.h"
 #include "mocca/base/Thread.h"
 #include "mocca/net/ConnectionFactorySelector.h"

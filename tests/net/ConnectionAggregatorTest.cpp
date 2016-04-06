@@ -8,7 +8,6 @@
 
 #include "gtest/gtest.h"
 
-#include "mocca/base/ByteArray.h"
 #include "mocca/base/ContainerTools.h"
 #include "mocca/base/Error.h"
 #include "mocca/base/Thread.h"
