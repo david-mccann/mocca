@@ -8,6 +8,8 @@
 
 #include "mocca/net/IStreamConnection.h"
 
+#include <cstring>
+
 using namespace mocca;
 using namespace mocca::net;
 
