@@ -24,13 +24,31 @@ std::string SizePrefixedProtocol::name() const {
 Message SizePrefixedProtocol::readMessageFromStream(IStreamConnection& connection, std::chrono::milliseconds timeout) {
     std::lock_guard<std::mutex> lock(connection.receiveMutex());
 
-    auto numParts = connection.receiveValue<uint32_t>(timeout);
+    bool ok;
+    auto numParts = connection.receiveValue<uint32_t>(ok, timeout);
+    if (!ok) {
+        return Message();
+    }
 
     Message message;
     for (uint32_t i = 0; i < numParts; ++i) {
-        uint32_t size = connection.receiveValue<uint32_t>(timeout);
+        uint32_t size = connection.receiveValue<uint32_t>(ok, timeout);
+        if (!ok) {
+            return Message();
+        }
         auto buffer = std::make_shared<std::vector<uint8_t>>();
-        readExactly(connection, *buffer, size, timeout);
+        if (readExactly(connection, *buffer, size, timeout) == ReadStatus::Incomplete) 
+        {
+            connection.putBack(reinterpret_cast<uint8_t*>(&numParts), sizeof(uint32_t));
+            for (auto m : message) {
+                uint32_t s = m->size();
+                connection.putBack(reinterpret_cast<uint8_t*>(&s), sizeof(uint32_t));
+                connection.putBack(m->data(), s);
+            }
+            connection.putBack(reinterpret_cast<uint8_t*>(&size), sizeof(uint32_t));
+            connection.putBack(buffer->data(), buffer->size());
+            return Message();
+        }
         message.push_back(buffer);
     }
     return message;

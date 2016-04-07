@@ -31,9 +31,10 @@ public:
     }
 
     uint32_t receive(uint8_t* buffer, uint32_t maxSize, std::chrono::milliseconds timeout = std::chrono::milliseconds(100)) const;
-    template<typename T> T receiveValue(std::chrono::milliseconds timeout = std::chrono::milliseconds(100)) {
+    template<typename T> T receiveValue(bool& ok, std::chrono::milliseconds timeout = std::chrono::milliseconds(100)) {
         T value;
-        receive(reinterpret_cast<uint8_t*>(&value), sizeof(T), timeout);
+        auto bytesReceived = receive(reinterpret_cast<uint8_t*>(&value), sizeof(T), timeout);
+        ok = (bytesReceived == sizeof(T));
         return value;
     }
 
