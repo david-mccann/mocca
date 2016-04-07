@@ -21,7 +21,7 @@ ReadStatus mocca::net::readUntil(IStreamConnection& stream, std::vector<uint8_t>
         if (bytesReceived == 0) {
             return ReadStatus::Incomplete;
         }
-        auto offset = buffer.size() - std::min(static_cast<uint32_t>(delim.size()), buffer.size());
+        auto offset = buffer.size() - std::min(static_cast<uint32_t>(delim.size()), static_cast<uint32_t>(buffer.size()));
         buffer.push_back(byte);
         auto searchBegin = buffer.data() + offset;
         auto searchEnd = buffer.data() + buffer.size();
