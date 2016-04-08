@@ -41,10 +41,10 @@ public:
 
     static bool isThisInterrupted() { return this_thread_interrupt_flag.load(); }
 
-    bool joinable() const noexcept;
+    bool joinable() const;
     void join();
 
-    std::thread::id id() const noexcept;
+    std::thread::id id() const;
 
 private:
     std::thread thread_;

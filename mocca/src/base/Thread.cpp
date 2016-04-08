@@ -12,7 +12,7 @@
 
 thread_local std::atomic<bool> mocca::this_thread_interrupt_flag{false};
 
-bool mocca::Thread::joinable() const noexcept {
+bool mocca::Thread::joinable() const {
     return thread_.joinable();
 }
 
@@ -20,7 +20,7 @@ void mocca::Thread::join() {
     thread_.join();
 }
 
-std::thread::id mocca::Thread::id() const noexcept {
+std::thread::id mocca::Thread::id() const {
     return thread_.get_id();
 }
 
