@@ -64,7 +64,7 @@ void ConnectionAggregator::send(MessageEnvelope envelope) {
 }
 
 void ConnectionAggregator::run() {
-    while (!isInterrupted()) {
+    while (!Thread::isThisInterrupted()) {
         try {
             for (auto& acceptor : connectionAcceptors_) {
                 auto connection = acceptor->accept(std::chrono::milliseconds(100));
@@ -118,7 +118,7 @@ ConnectionAggregator::ReceiveThread::~ReceiveThread() {
 
 void ConnectionAggregator::ReceiveThread::run() {
     try {
-        while (!isInterrupted()) {
+        while (!Thread::isThisInterrupted()) {
             auto data = connection_.receive();
             if (!data.empty()) {
                 MessageEnvelope envelope(std::move(data), connection_.connectionID());
@@ -143,7 +143,7 @@ mocca::net::ConnectionAggregator::SendThread::~SendThread() {
 
 void ConnectionAggregator::SendThread::run() {
     try {
-        while (!isInterrupted()) {
+        while (!Thread::isThisInterrupted()) {
             auto connectionID = connection_.connectionID();
             auto dataNullable = sendQueue_.dequeueFiltered(
                 [&connectionID](const MessageEnvelope& envelope) { return envelope.connectionID == connectionID; },

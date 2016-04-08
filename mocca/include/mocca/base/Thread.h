@@ -9,12 +9,48 @@
 #pragma once
 
 #include <atomic>
+#include <future>
 #include <memory>
 #include <mutex>
 #include <thread>
 #include <vector>
 
 namespace mocca {
+
+extern thread_local std::atomic<bool> this_thread_interrupt_flag;
+
+/* Cf. Anthony Williams, C++ Concurrency in Action, pp. 289 */
+class Thread {
+public:
+    Thread() = default;
+
+    template <typename FunctionType> Thread(FunctionType f) {
+        std::promise<std::atomic<bool>*> p;
+        thread_ = std::thread([f, &p] {
+            p.set_value(&this_thread_interrupt_flag);
+            f();
+        });
+        interruptedRef_ = p.get_future().get();
+    }
+
+    void interrupt() {
+        if (interruptedRef_ != nullptr) {
+            interruptedRef_->store(true);
+        }
+    }
+
+    static bool isThisInterrupted() { return this_thread_interrupt_flag.load(); }
+
+    bool joinable() const noexcept;
+    void join();
+
+    std::thread::id id() const noexcept;
+
+private:
+    std::thread thread_;
+    std::atomic<bool>* interruptedRef_;
+};
+
 class AutoJoinThread {
 public:
     template <class F, class... Args>
@@ -34,7 +70,6 @@ public:
     void start();
 
     virtual void interrupt();
-    bool isInterrupted() const;
     void join();
 
     void setException(const std::exception_ptr& exception);
@@ -43,10 +78,9 @@ public:
     std::thread::id id() const;
 
 private:
-    std::atomic<bool> interrupted_;
     std::mutex exceptionMx_;
     std::exception_ptr exception_;
-    std::thread thread_;
+    Thread thread_;
 };
 
 class RunnableGroup {

@@ -38,7 +38,7 @@ TEST_F(ThreadTest, Runnable_Interrupt) {
     struct TestRunnable : public Runnable {
         TestRunnable(bool& done) : done_(done) {}
         void run() override {
-            while (!isInterrupted()) {}
+            while (!Thread::isThisInterrupted()) {}
             done_ = true;
         }
         bool& done_;

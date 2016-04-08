@@ -10,28 +10,37 @@
 
 #include <algorithm>
 
+thread_local std::atomic<bool> mocca::this_thread_interrupt_flag{false};
+
+bool mocca::Thread::joinable() const noexcept {
+    return thread_.joinable();
+}
+
+void mocca::Thread::join() {
+    thread_.join();
+}
+
+std::thread::id mocca::Thread::id() const noexcept {
+    return thread_.get_id();
+}
+
 void mocca::Runnable::start() {
-    interrupted_ = false;
-    thread_ = std::thread(&Runnable::run, this);
+    thread_ = Thread(std::bind(&Runnable::run, this));
 }
 
 void mocca::Runnable::join() {
-    interrupted_ = true;
+    thread_.interrupt();
     if (thread_.joinable()) {
         thread_.join();
     }
 }
 
-bool mocca::Runnable::isInterrupted() const {
-    return interrupted_;
-}
-
 void mocca::Runnable::interrupt() {
-    interrupted_ = true;
+    thread_.interrupt();
 }
 
 std::thread::id mocca::Runnable::id() const {
-    return thread_.get_id();
+    return thread_.id();
 }
 
 void mocca::Runnable::setException(const std::exception_ptr& exception) {
