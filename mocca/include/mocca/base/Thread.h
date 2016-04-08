@@ -48,7 +48,7 @@ public:
 
 private:
     std::thread thread_;
-    std::atomic<bool>* interruptedRef_;
+    std::atomic<bool>* interruptedRef_ = nullptr;
 };
 
 class AutoJoinThread {
