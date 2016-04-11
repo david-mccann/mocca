@@ -21,34 +21,14 @@ std::string SizePrefixedProtocol::name() const {
     return "prefixed";
 }
 
-Message SizePrefixedProtocol::readMessageFromStream(IStreamConnection& connection, std::chrono::milliseconds timeout) {
+Message SizePrefixedProtocol::readMessageFromStream(IStreamConnection& connection) {
     std::lock_guard<std::mutex> lock(connection.receiveMutex());
-
-    bool ok;
-    auto numParts = connection.receiveValue<uint32_t>(ok, timeout);
-    if (!ok) {
-        return Message();
-    }
-
+    auto numParts = readValue<uint32_t>(connection);
     Message message;
     for (uint32_t i = 0; i < numParts; ++i) {
-        uint32_t size = connection.receiveValue<uint32_t>(ok, timeout);
-        if (!ok) {
-            return Message();
-        }
+        auto size = readValue<uint32_t>(connection);
         auto buffer = std::make_shared<std::vector<uint8_t>>();
-        if (readExactly(connection, *buffer, size, timeout) == ReadStatus::Incomplete) 
-        {
-            connection.putBack(reinterpret_cast<uint8_t*>(&numParts), sizeof(uint32_t));
-            for (auto m : message) {
-                uint32_t s = m->size();
-                connection.putBack(reinterpret_cast<uint8_t*>(&s), sizeof(uint32_t));
-                connection.putBack(m->data(), s);
-            }
-            connection.putBack(reinterpret_cast<uint8_t*>(&size), sizeof(uint32_t));
-            connection.putBack(buffer->data(), buffer->size());
-            return Message();
-        }
+        readExactly(connection, *buffer, size);
         message.push_back(buffer);
     }
     return message;
@@ -56,9 +36,9 @@ Message SizePrefixedProtocol::readMessageFromStream(IStreamConnection& connectio
 
 void SizePrefixedProtocol::writeMessageToStream(IStreamConnection& connection, Message message) {
     std::lock_guard<std::mutex> lock(connection.sendMutex());
-    connection.sendValue(static_cast<uint32_t>(message.size()));
+    sendValue(connection, static_cast<uint32_t>(message.size()));
     for (const auto& part : message) {
-        connection.sendValue(static_cast<uint32_t>(part->size()));
-        connection.send(part->data(), part->size());
+        sendValue(connection, static_cast<uint32_t>(part->size()));
+        sendAll(connection, part->data(), part->size());
     }
 }

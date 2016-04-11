@@ -26,19 +26,16 @@ std::string WebSocketProtocol::name() const {
     return "ws";
 }
 
-void WebSocketProtocol::performHandshake(IStreamConnection& connection, std::chrono::milliseconds timeout) {
-    receiveHandshake(connection, timeout);
+void WebSocketProtocol::performHandshake(IStreamConnection& connection) {
+    receiveHandshake(connection);
     sendHandshakeResponse(connection);
 }
 
-void mocca::net::WebSocketProtocol::receiveHandshake(IStreamConnection& connection, std::chrono::milliseconds timeout) {
+void mocca::net::WebSocketProtocol::receiveHandshake(IStreamConnection& connection) {
     std::vector<uint8_t> headerBuffer;
     {
         std::lock_guard<std::mutex> lock(connection.receiveMutex());
-        if (readUntil(connection, headerBuffer, "\r\n\r\n") == ReadStatus::Incomplete) {
-            connection.putBack(headerBuffer.data(), headerBuffer.size());
-            throw NetworkError("Timeout while trying to receive WebSocket handshake", __FILE__, __LINE__);
-        }
+        mocca::net::readUntil(connection, headerBuffer, "\r\n\r\n");
     }
     std::string handshakeStr((char*)headerBuffer.data(), headerBuffer.size());
     std::stringstream stream(handshakeStr);
@@ -101,7 +98,7 @@ void WebSocketProtocol::sendHandshakeResponse(IStreamConnection& connection) {
     stream << "\r\n";
     auto responseStr = stream.str();
     std::lock_guard<std::mutex> lock(connection.sendMutex());
-    connection.send(reinterpret_cast<const uint8_t*>(responseStr.data()), static_cast<uint32_t>(responseStr.size()));
+    sendAll(connection, reinterpret_cast<const uint8_t*>(responseStr.data()), static_cast<uint32_t>(responseStr.size()));
 }
 
 /*
@@ -125,12 +122,12 @@ void WebSocketProtocol::sendHandshakeResponse(IStreamConnection& connection) {
 +---------------------------------------------------------------+
 */
 
-Message WebSocketProtocol::readMessageFromStream(IStreamConnection& connection, std::chrono::milliseconds timeout) {
+Message WebSocketProtocol::readMessageFromStream(IStreamConnection& connection) {
     std::lock_guard<std::mutex> lock(connection.receiveMutex());
 
     // read the flags byte
     std::vector<uint8_t> prefixBuffer;
-    readExactly(connection, prefixBuffer, 1, timeout);
+    readExactly(connection, prefixBuffer, 1);
     if (prefixBuffer.empty()) {
         return Message(); // no data read from stream
     }
@@ -148,25 +145,21 @@ Message WebSocketProtocol::readMessageFromStream(IStreamConnection& connection, 
     }
 
     // read the basic payload byte
-    if (readExactly(connection, prefixBuffer, 1, timeout) == ReadStatus::Incomplete) {
-        connection.putBack(prefixBuffer.data(), prefixBuffer.size());
-        return Message();
-    }
+    readExactly(connection, prefixBuffer, 1);
 
     // read additional payload-size bytes and the mask bytes
     unsigned char basicSize = prefixBuffer[1] & 0x7F;
     uint64_t payloadSize = 0;
     int maskOffset = 2;
-    ReadStatus status;
     if (basicSize <= 125) {
         payloadSize = basicSize;
-        status = readExactly(connection, prefixBuffer, 4, timeout); // 4 bytes mask
+        readExactly(connection, prefixBuffer, 4); // 4 bytes mask
     } else if (basicSize == 126) {
-        status = readExactly(connection, prefixBuffer, 6, timeout); // 2 bytes payload length + 4 bytes mask
+        readExactly(connection, prefixBuffer, 6); // 2 bytes payload length + 4 bytes mask
         payloadSize = swap_uint16(*reinterpret_cast<uint16_t*>(prefixBuffer.data() + 2));
         maskOffset = 4;
     } else if (basicSize == 127) {
-        status = readExactly(connection, prefixBuffer, 12, timeout); // 8 bytes payload length + 4 bytes mask
+        readExactly(connection, prefixBuffer, 12); // 8 bytes payload length + 4 bytes mask
         payloadSize = swap_uint64(*reinterpret_cast<uint64_t*>(prefixBuffer.data() + 2));
 #ifdef MOCCA_RUNTIME_CHECKS
         if (payloadSize > std::numeric_limits<uint32_t>::max()) {
@@ -180,18 +173,10 @@ Message WebSocketProtocol::readMessageFromStream(IStreamConnection& connection, 
         throw Error("Invalid WebSocket frame: malformed payload-size", __FILE__, __LINE__);
     }
 #endif
-    if (status == ReadStatus::Incomplete) {
-        connection.putBack(prefixBuffer.data(), prefixBuffer.size());
-        return Message();
-    }
 
     // read and unmask payload data
     auto payloadBuffer = std::make_shared<std::vector<uint8_t>>();
-    if (readExactly(connection, *payloadBuffer, static_cast<uint32_t>(payloadSize), timeout) == ReadStatus::Incomplete) {
-        connection.putBack(payloadBuffer->data(), payloadBuffer->size());
-        connection.putBack(prefixBuffer.data(), prefixBuffer.size());
-        return Message();
-    }
+    readExactly(connection, *payloadBuffer, static_cast<uint32_t>(payloadSize));
     unsigned char* mask = prefixBuffer.data() + maskOffset;
     for (unsigned long int i = 0; i < payloadSize; ++i) {
         (*payloadBuffer)[i] ^= mask[i % 4];
@@ -216,23 +201,23 @@ void WebSocketProtocol::writeMessageToStream(IStreamConnection& connection, Mess
     else
         payloadFlags = 0x81;
 
-    connection.sendValue(payloadFlags);
+    sendValue(connection, payloadFlags);
 
     // create the length bytes
     if (payloadSize <= 125) {
         char basicSize = static_cast<char>(payloadSize);
-        connection.sendValue(basicSize);
+        sendValue(connection, basicSize);
     } else if (payloadSize > 125 && payloadSize <= 65535) {
         char basicSize = 126;
-        connection.sendValue(basicSize);
+        sendValue(connection, basicSize);
         uint16_t len = swap_uint16(static_cast<uint16_t>(payloadSize));
-        connection.sendValue(len);
+        sendValue(connection, len);
     } else {
         char basicSize = 127;
-        connection.sendValue(basicSize);
+        sendValue(connection, basicSize);
         uint64_t len = swap_uint64(static_cast<uint64_t>(payloadSize));
-        connection.sendValue(len);
+        sendValue(connection, len);
     }
 
-    connection.send(part.data(), part.size());
+    sendAll(connection, part.data(), part.size());
 }

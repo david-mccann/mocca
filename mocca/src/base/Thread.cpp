@@ -10,6 +10,20 @@
 
 #include <algorithm>
 
+std::vector<mocca::Runnable*> mocca::Runnable::active_;
+std::mutex mocca::Runnable::activeMx_;
+
+mocca::Runnable::Runnable() {
+std::lock_guard<std::mutex> lock(activeMx_);
+    active_.push_back(this);
+}
+
+mocca::Runnable::~Runnable() {
+    join();
+    std::lock_guard<std::mutex> lock(activeMx_);
+    active_.erase(std::remove(begin(active_), end(active_), this), end(active_));
+}
+
 void mocca::Runnable::start() {
     interrupted_ = false;
     thread_ = std::thread(&Runnable::run, this);
@@ -46,6 +60,12 @@ void mocca::Runnable::rethrowException() {
         exception_ = nullptr;
         std::rethrow_exception(copy);
     }
+}
+
+bool mocca::Runnable::isCurrentInterrupted() {
+    std::lock_guard<std::mutex> lock(activeMx_);
+    auto it = std::find_if(begin(active_), end(active_), [](const Runnable* ptr) { return ptr->id() == std::this_thread::get_id(); });
+    return it != end(active_) && (*it)->isInterrupted();
 }
 
 mocca::RunnableGroup::~RunnableGroup() {

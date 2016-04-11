@@ -17,7 +17,7 @@ class SizePrefixedProtocol : public FramingStrategy {
 public:
     std::unique_ptr<FramingStrategy> clone() const override;
     std::string name() const override;
-    Message readMessageFromStream(IStreamConnection& connection, std::chrono::milliseconds timeout) override;
+    Message readMessageFromStream(IStreamConnection& connection) override;
     void writeMessageToStream(IStreamConnection& connection, Message frame) override;
 };
 }

@@ -39,7 +39,7 @@ bool QueueConnection::isConnected() const {
     return connected_;
 }
 
-void QueueConnection::send(const uint8_t* data, uint32_t size) const {
+uint32_t QueueConnection::send(const uint8_t* data, uint32_t size, std::chrono::milliseconds timeout) const {
     if (!isConnected()) {
         throw ConnectionClosedError("Connection to peer has been closed", *connectionID_, __FILE__, __LINE__);
     }
@@ -49,9 +49,10 @@ void QueueConnection::send(const uint8_t* data, uint32_t size) const {
         sendQueue_->enqueue(*dataIt);
         ++dataIt;
     }
+    return size;
 }
 
-uint32_t QueueConnection::readFromStream(uint8_t* buffer, uint32_t maxSize, std::chrono::milliseconds timeout) const {
+uint32_t QueueConnection::receive(uint8_t* buffer, uint32_t maxSize, std::chrono::milliseconds timeout) const {
     if (!isConnected()) {
         throw ConnectionClosedError("Connection to peer has been closed", *connectionID_, __FILE__, __LINE__);
     }

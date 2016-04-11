@@ -6,6 +6,7 @@
 *
 ****************************************************************/
 
+#include "mocca/base/Thread.h"
 #include "mocca/net/message/FramingConnection.h"
 
 using namespace mocca;
@@ -32,9 +33,16 @@ bool FramingConnection::isConnected() const {
 }
 
 void FramingConnection::send(Message message) const {
-    framingStrategy_->writeMessageToStream(*stream_, std::move(message));
+    try {
+        framingStrategy_->writeMessageToStream(*stream_, std::move(message));
+    } catch (const ThreadInterrupt&) {
+    }
 }
 
-Message FramingConnection::receive(std::chrono::milliseconds timeout) const {
-    return framingStrategy_->readMessageFromStream(*stream_, timeout);
+Message FramingConnection::receive() const {
+    try {
+        return framingStrategy_->readMessageFromStream(*stream_);
+    } catch (const ThreadInterrupt&) {
+        return Message();
+    }
 }

@@ -46,10 +46,9 @@ bool TCPConnection::isConnected() const {
     return socket_->IsConnected();
 }
 
-void TCPConnection::send(const uint8_t* data, uint32_t size) const {
+uint32_t TCPConnection::send(const uint8_t* data, uint32_t size, std::chrono::milliseconds timeout) const {
     try {
-	std::chrono::milliseconds timeout(1000 * 5);
-        socket_->SendData(reinterpret_cast<const int8_t*>(data), size, static_cast<uint32_t>(timeout.count()));
+        return socket_->SendData(reinterpret_cast<const int8_t*>(data), size, static_cast<uint32_t>(timeout.count()));
     } catch (const IVDB::SocketConnectionException& err) {
         throw ConnectionClosedError("Connection to peer " + connectionID_->peerEndpoint.toString() +
                                         " lost during send operation (internal error: " + err.what() + ")",
@@ -60,7 +59,7 @@ void TCPConnection::send(const uint8_t* data, uint32_t size) const {
     }
 }
 
-uint32_t TCPConnection::readFromStream(uint8_t* buffer, uint32_t maxSize, std::chrono::milliseconds timeout) const {
+uint32_t TCPConnection::receive(uint8_t* buffer, uint32_t maxSize, std::chrono::milliseconds timeout) const {
     try {
         return socket_->ReceiveData(reinterpret_cast<int8_t*>(buffer), maxSize, static_cast<uint32_t>(timeout.count()));
     } catch (const IVDB::SocketConnectionException& err) {

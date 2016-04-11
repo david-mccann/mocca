@@ -22,10 +22,8 @@ public:
 
     std::shared_ptr<const ConnectionID> connectionID() const override;
     bool isConnected() const override;
-    void send(const uint8_t* data, uint32_t size) const override;
-
-private:
-    uint32_t readFromStream(uint8_t* buffer, uint32_t maxSize, std::chrono::milliseconds timeout) const override;
+    uint32_t send(const uint8_t* data, uint32_t size, std::chrono::milliseconds timeout) const override;
+    uint32_t receive(uint8_t* buffer, uint32_t maxSize, std::chrono::milliseconds timeout) const override;
 
 private:
     std::unique_ptr<IVDB::ConnectionSocket> socket_;

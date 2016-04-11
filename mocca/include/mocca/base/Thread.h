@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "mocca/base/Error.h"
+
 #include <atomic>
 #include <memory>
 #include <mutex>
@@ -26,9 +28,17 @@ private:
     std::thread thread_;
 };
 
+class ThreadInterrupt : public Error {
+public:
+    ThreadInterrupt(const std::string& file, int line)
+        : Error("Thread has been interuppted", file, line) {}
+};
+
+
 class Runnable {
 public:
-    virtual ~Runnable() { join(); }
+    Runnable();
+    virtual ~Runnable();
 
     virtual void run() = 0;
     void start();
@@ -42,11 +52,16 @@ public:
 
     std::thread::id id() const;
 
+    static bool isCurrentInterrupted();
+
 private:
     std::atomic<bool> interrupted_;
     std::mutex exceptionMx_;
     std::exception_ptr exception_;
     std::thread thread_;
+
+    static std::mutex activeMx_;
+    static std::vector<Runnable*> active_;
 };
 
 class RunnableGroup {

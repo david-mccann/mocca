@@ -25,12 +25,12 @@ public:
 
     std::unique_ptr<FramingStrategy> clone() const override;
     std::string name() const override;
-    Message readMessageFromStream(IStreamConnection& connection, std::chrono::milliseconds timeout) override;
+    Message readMessageFromStream(IStreamConnection& connection) override;
     void writeMessageToStream(IStreamConnection& connection, Message frame) override;
-    void performHandshake(IStreamConnection& connection, std::chrono::milliseconds timeout) override;
+    void performHandshake(IStreamConnection& connection) override;
 
 private:
-    void receiveHandshake(IStreamConnection& connection, std::chrono::milliseconds timeout);
+    void receiveHandshake(IStreamConnection& connection);
     void sendHandshakeResponse(IStreamConnection& connection);
 
 private:

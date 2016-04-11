@@ -46,11 +46,11 @@ void LoopbackConnection::send(Message message) const {
     sendQueue_->enqueue(std::move(message));
 }
 
-Message LoopbackConnection::receive(std::chrono::milliseconds timeout) const {
+Message LoopbackConnection::receive() const {
     if (!isConnected()) {
         throw ConnectionClosedError("Connection to peer " + connectionID_->peerEndpoint.toString() + " has been closed", *connectionID_,
                                     __FILE__, __LINE__);
     }
-    auto data = receiveQueue_->dequeue(timeout);
+    auto data = receiveQueue_->dequeue(std::chrono::milliseconds(100));
     return data.isNull() ? Message() : data.release();
 }

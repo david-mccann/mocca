@@ -21,7 +21,7 @@ public:
     std::shared_ptr<const ConnectionID> connectionID() const override;
     bool isConnected() const override;
     void send(Message message) const override;
-    Message receive(std::chrono::milliseconds timeout) const override;
+    Message receive() const override;
 
 private:
     std::unique_ptr<IStreamConnection> stream_;
