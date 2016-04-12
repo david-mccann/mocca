@@ -35,13 +35,13 @@ protected:
 
     std::vector<uint8_t> readExactlyHelper(IStreamConnection& stream, uint32_t size) {
         std::vector<uint8_t> result;
-        readExactly(stream, result, size, std::chrono::milliseconds(1));
+        readExactly(stream, result, size);
         return result;
     }
 
     std::vector<uint8_t> readUntilHelper(IStreamConnection& stream, const std::string& delim) {
         std::vector<uint8_t> result;
-        readUntil(stream, result, delim, std::chrono::milliseconds(1));
+        readUntil(stream, result, delim);
         return result;
     }
 };
@@ -49,20 +49,11 @@ protected:
 TEST_F(FramingUtilsTest, ReceiveExactly_SufficientData) {
     auto stream = createFilledStream('a', 'e');
     std::vector<uint8_t> result;
-    auto status = readExactly(*stream, result, 3);
-    ASSERT_EQ(ReadStatus::Complete, status);
+    readExactly(*stream, result, 3);
     ASSERT_EQ(3, result.size());
     ASSERT_EQ('a', result.data()[0]);
     ASSERT_EQ('b', result.data()[1]);
     ASSERT_EQ('c', result.data()[2]);
-}
-
-TEST_F(FramingUtilsTest, ReceiveExactly_InsufficientData) {
-    auto stream = createFilledStream('a', 'e');
-    std::vector<uint8_t> result;
-    auto status = readExactly(*stream, result, 7);
-    ASSERT_EQ(ReadStatus::Incomplete, status);
-    ASSERT_EQ(5, result.size());
 }
 
 TEST_F(FramingUtilsTest, ReceiveUntil_OneCharDelimAtEnd) {
@@ -127,12 +118,4 @@ TEST_F(FramingUtilsTest, ReceiveUntil_DelimOnBorderOfChunk) {
     ASSERT_EQ(3, result.size());
     ASSERT_EQ('a', result.data()[0]);
     ASSERT_EQ('c', result.data()[2]);
-}
-
-TEST_F(FramingUtilsTest, ReceiveUntil_DelimNotFound) {
-    auto stream = createFilledStream('a', 'e');
-    std::vector<uint8_t> result;
-    ReadStatus status = readUntil(*stream, result, "x");
-    ASSERT_EQ(ReadStatus::Incomplete, status);
-    ASSERT_EQ(5, result.size());
 }

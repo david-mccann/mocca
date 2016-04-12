@@ -156,28 +156,6 @@ TEST_P(MessageConnectionTest, SendAndReceive) {
     }
 }
 
-TEST_P(MessageConnectionTest, ReceiveTimeout) {
-    auto machine = createBindingMachine(GetParam());
-    auto port = createBindingPort(GetParam());
-    auto acceptor = this->target->bind(machine, port);
-    auto clientConnection = this->target->connect(createAddress(GetParam()));
-    auto serverConnection = acceptor->accept();
-    ASSERT_FALSE(serverConnection == nullptr);
-    auto recMessage = serverConnection->receive(std::chrono::milliseconds(10));
-    ASSERT_TRUE(recMessage.empty());
-}
-
-TEST_P(MessageConnectionTest, ReceiveTimeoutClient) {
-    auto machine = createBindingMachine(GetParam());
-    auto port = createBindingPort(GetParam());
-    auto acceptor = this->target->bind(machine, port);
-    auto clientConnection = this->target->connect(createAddress(GetParam()));
-    auto serverConnection = acceptor->accept();
-    ASSERT_FALSE(serverConnection == nullptr);
-    auto recMessage = clientConnection->receive(std::chrono::milliseconds(10));
-    ASSERT_TRUE(recMessage.empty());
-}
-
 TEST_P(MessageConnectionTest, MultiPartMessage) {
     auto machine = createBindingMachine(GetParam());
     auto port = createBindingPort(GetParam());

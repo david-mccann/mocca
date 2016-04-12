@@ -37,6 +37,14 @@ protected:
     }
 
     IMessageConnectionFactory* target;
+
+    Message receiveLoop(ConnectionAggregator& aggregator) {
+        mocca::Nullable<MessageEnvelope> envelope;
+        while (envelope.isNull()) {
+            envelope = aggregator.receive(std::chrono::milliseconds(100));
+        }
+        return envelope.release().message;
+    }
 };
 
 INSTANTIATE_TEST_CASE_P(InstantiationName, ConnectionAggregatorTest, ::testing::Values(ConnectionFactorySelector::queuePrefixed().c_str(),
@@ -53,14 +61,10 @@ TEST_P(ConnectionAggregatorTest, EnqueueDequeue) {
     clientConnection1->send(Message{ createMessagePart("Hello 1") });
     clientConnection2->send(Message{ createMessagePart("Hello 2") });
 
-    auto data1 = target.receive(std::chrono::milliseconds(100));
-    auto data2 = target.receive(std::chrono::milliseconds(100));
-    ASSERT_FALSE(data1.isNull());
-    ASSERT_FALSE(data2.isNull());
-    auto recPacket1(data1.release().message);
-    auto recPacket2(data2.release().message);
-    auto recStr1 = readMessagePart(*recPacket1[0]);
-    auto recStr2 = readMessagePart(*recPacket2[0]);
+    auto data1 = receiveLoop(target);
+    auto data2 = receiveLoop(target);
+    auto recStr1 = readMessagePart(*data1[0]);
+    auto recStr2 = readMessagePart(*data2[0]);
     ASSERT_TRUE(recStr1 == "Hello 1" && recStr2 == "Hello 2" || recStr1 == "Hello 2" && recStr2 == "Hello 1");
 }
 
@@ -76,14 +80,10 @@ TEST_P(ConnectionAggregatorTest, MultipleAcceptors) {
     clientConnection1->send(Message{ createMessagePart("Hello 1") });
     clientConnection2->send(Message{ createMessagePart("Hello 2") });
 
-    auto data1 = target.receive(std::chrono::milliseconds(100));
-    auto data2 = target.receive(std::chrono::milliseconds(100));
-    ASSERT_FALSE(data1.isNull());
-    ASSERT_FALSE(data2.isNull());
-    auto recPacket1(data1.release().message);
-    auto recPacket2(data2.release().message);
-    auto recStr1 = readMessagePart(*recPacket1[0]);
-    auto recStr2 = readMessagePart(*recPacket2[0]);
+    auto data1 = receiveLoop(target);
+    auto data2 = receiveLoop(target);
+    auto recStr1 = readMessagePart(*data1[0]);
+    auto recStr2 = readMessagePart(*data2[0]);
     ASSERT_TRUE(recStr1 == "Hello 1" && recStr2 == "Hello 2" || recStr1 == "Hello 2" && recStr2 == "Hello 1");
 }
 
