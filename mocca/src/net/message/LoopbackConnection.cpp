@@ -51,6 +51,6 @@ Message LoopbackConnection::receive() const {
         throw ConnectionClosedError("Connection to peer " + connectionID_->peerEndpoint.toString() + " has been closed", *connectionID_,
                                     __FILE__, __LINE__);
     }
-    auto data = receiveQueue_->dequeue(std::chrono::milliseconds(100));
+    auto data = receiveQueue_->dequeue(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::seconds(30)));
     return data.isNull() ? Message() : data.release();
 }
