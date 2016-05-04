@@ -1,7 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.4)
 PROJECT(mocca)
 
-INCLUDE(PlatformSpecific)
 INCLUDE(Macros)
 
 OPTION(MOCCA_RUNTIME_CHECKS "Enable runtime checks (slows down execution)" ON)
