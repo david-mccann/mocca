@@ -60,9 +60,9 @@ template <typename Iter> std::string makeString(Iter it, Iter itEnd, const std::
 }
 
 // join a number of items to a string, e.g., join("Hello ", 42) -> "Hello 42"
-template <typename T> std::string joinString(const T& value) {
+template <typename T> std::string joinString(const T& value, const std::string& separator = "") {
     std::ostringstream oss;
-    oss << value;
+    oss << value << separator;
     return oss.str();
 }
 template <typename T, typename... Args> std::string joinString(const T& value, const Args&... args) {
