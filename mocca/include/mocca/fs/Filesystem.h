@@ -11,6 +11,7 @@
 #include "mocca/fs/Path.h"
 
 #include <vector>
+#include <memory>
 
 namespace mocca {
 namespace fs {
@@ -20,5 +21,6 @@ bool isDirectory(const Path& path);
 void createDirectories(const Path& path);
 std::vector<Path> directoryContents(const Path& path);
 std::string readTextFile(const Path& path);
+std::unique_ptr<std::vector<uint8_t>> readBinaryFile(const Path& path);
 }
 }
