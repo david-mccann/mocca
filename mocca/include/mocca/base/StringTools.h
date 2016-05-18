@@ -60,29 +60,24 @@ template <typename Iter> std::string makeString(Iter it, Iter itEnd, const std::
 }
 
 // join a number of items to a string, e.g., join("Hello ", 42) -> "Hello 42"
-template <typename T> std::string joinString(const T& value, const std::string& separator = "") {
+template <typename T> std::string joinString(const T& value) {
     std::ostringstream oss;
-    oss << value << separator;
+    oss << value;
     return oss.str();
 }
 template <typename T, typename... Args> std::string joinString(const T& value, const Args&... args) {
     return joinString(value) + joinString(args...);
 }
 
-// replace all occurrence of a search string in a target string with another string
-void replaceAll(std::string& target, const std::string& search, const std::string& replace);
+// join a collection of items to a string
+template <typename Iter> std::string joinCollection(Iter it, Iter itEnd, const std::string& separator = "") {
+    std::ostringstream oss;
+    for (; it != itEnd; ++it) {
+        oss << *it << separator;
+    }
+    return oss.str();
 }
 
-template <typename T>
-std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec) {
-    std::stringstream str;
-    str << "[";
-    for (auto it = begin(vec); it != end(vec); ++it) {
-        str << *it;
-        if (it != --end(vec)) {
-            str << ", ";
-        }
-    }
-    str << "]";
-    return os << str.str();
+// replace all occurrence of a search string in a target string with another string
+void replaceAll(std::string& target, const std::string& search, const std::string& replace);
 }
