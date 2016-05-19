@@ -63,12 +63,10 @@ void Dispatcher::run() {
                 const auto& binary = result.second;
 
                 // send reply if method returned something
-                if (!json.empty()) {
-                    JsonCpp::Value reply;
-                    reply[mocca::net::resultKey()] = json;
-                    reply[mocca::net::statusKey()] = mocca::net::successStatus();
-                    sendReply(reply, binary, envelope.connectionID);
-                }
+                JsonCpp::Value reply;
+                reply[mocca::net::resultKey()] = json;
+                reply[mocca::net::statusKey()] = mocca::net::successStatus();
+                sendReply(reply, binary, envelope.connectionID);
             } catch (const std::runtime_error& err) {
                 LERROR(err.what());
                 // in case of an error, send error message back to client
