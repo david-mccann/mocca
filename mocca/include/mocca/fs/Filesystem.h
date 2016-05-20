@@ -22,5 +22,6 @@ void createDirectories(const Path& path);
 std::vector<Path> directoryContents(const Path& path);
 std::string readTextFile(const Path& path);
 std::unique_ptr<std::vector<uint8_t>> readBinaryFile(const Path& path);
+Path tempPath();
 }
 }

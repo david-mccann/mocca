@@ -124,3 +124,13 @@ std::unique_ptr<std::vector<uint8_t>> mocca::fs::readBinaryFile(const Path& path
     }
     return nullptr;
 }
+
+mocca::fs::Path mocca::fs::tempPath() {
+#if WIN32
+    TCHAR buffer[MAX_PATH + 1];
+    DWORD size = GetTempPath(MAX_PATH + 1, buffer);
+    return Path(std::string(buffer, size));
+#else
+    return Path("/tmp");
+#endif
+}
