@@ -10,6 +10,7 @@
 
 #include "mocca/base/Error.h"
 #include "mocca/fs/Path.h"
+#include "mocca/base/Memory.h"
 
 #include <fstream>
 #include <list>
@@ -116,7 +117,7 @@ std::unique_ptr<std::vector<uint8_t>> mocca::fs::readBinaryFile(const Path& path
     std::ifstream file(path.toString().data(), std::ios::in | std::ios::binary | std::ios::ate);
     if (file.is_open()) {
         int size = static_cast<int>(file.tellg());
-        auto buffer = std::make_unique<std::vector<uint8_t>>(size);
+        auto buffer = mocca::make_unique<std::vector<uint8_t>>(size);
         file.seekg(0, std::ios::beg);
         file.read(reinterpret_cast<char*>(buffer->data()), size);
         file.close();
