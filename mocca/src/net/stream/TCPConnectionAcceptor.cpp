@@ -17,7 +17,7 @@ namespace net {
 
 TCPConnectionAcceptor::TCPConnectionAcceptor(int port) {
     try {
-        // server_.SetReuseAddress(true);
+        server_.SetReuseAddress(true);
         server_.SetNonBlocking(true);
         server_.Bind(IVDB::NetworkAddress(IVDB::NetworkAddress::Any, port));
         server_.Listen(3); // ???
