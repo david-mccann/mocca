@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
-PROJECT(jsoncpp)
+PROJECT(jsoncpp LANGUAGES CXX)
 
 ADD_LIBRARY(jsoncpp
 	src/jsoncpp.cpp)
@@ -7,5 +7,3 @@ ADD_LIBRARY(jsoncpp
 TARGET_INCLUDE_DIRECTORIES(
 	jsoncpp INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include
 	jsoncpp PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/jsoncpp)
-	
-EXPORT(TARGETS jsoncpp FILE JsonCppConfig.cmake)

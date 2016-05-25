@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
-PROJECT(mocca)
+PROJECT(mocca LANGUAGES CXX)
 
 ADD_LIBRARY(mocca
 	src/base/Thread.cpp
@@ -65,7 +65,7 @@ TARGET_INCLUDE_DIRECTORIES(
 	mocca PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/thirdparty)
 
 TARGET_COMPILE_FEATURES(mocca
-    PUBLIC cxx_auto_type
+	PUBLIC cxx_auto_type
 	PUBLIC cxx_lambdas
 	PUBLIC cxx_nullptr
 	PUBLIC cxx_override
