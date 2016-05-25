@@ -9,10 +9,11 @@ ADD_SUBDIRECTORY(ext/sha1)
 ADD_SUBDIRECTORY(ext/jsoncpp)
 
 ADD_SUBDIRECTORY(mocca)
+
 OPTION(MOCCA_BUILD_TESTS "Build tests for mocca" ON)
 IF (MOCCA_BUILD_TESTS)
 	IF (MSVC)
-		SET(GTEST_MSVC_SEARCH "MT")
+		SET(gtest_force_shared_crt ON CACHE BOOL "Always use msvcrt.dll" FORCE)
 	ENDIF ()
 	ADD_SUBDIRECTORY(ext/googletest)
     ADD_SUBDIRECTORY(tests)
