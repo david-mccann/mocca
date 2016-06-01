@@ -1,7 +1,81 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
 PROJECT(mocca LANGUAGES CXX)
 
-ADD_LIBRARY(mocca
+SET(MOCCA_HEADER
+	include/mocca/base/Thread.h
+	include/mocca/base/BidirectionalMap.h
+	include/mocca/base/CommandLineParser.h
+	include/mocca/base/ContainerTools.h
+	include/mocca/base/Encryption.h
+	include/mocca/base/Endian.h
+	include/mocca/base/Error.h
+	include/mocca/base/Explicit.h
+	include/mocca/base/Memory.h
+	include/mocca/base/MessageQueue.h
+	include/mocca/base/Nullable.h
+	include/mocca/base/ObjectPool.h
+	include/mocca/base/Singleton.h
+	include/mocca/base/StringTools.h
+
+	include/mocca/fs/Filesystem.h
+	include/mocca/fs/Path.h
+	include/mocca/fs/File.h
+
+	include/mocca/log/ConsoleLog.h
+	include/mocca/log/HTMLLog.h
+	include/mocca/log/Log.h
+	include/mocca/log/LogManager.h
+	include/mocca/log/StreamLog.h
+	include/mocca/log/TextLog.h
+	include/mocca/log/CallbackLog.h
+
+	include/mocca/net/NetworkError.h
+	include/mocca/net/ConnectionAggregator.h
+	include/mocca/net/ConnectionFactorySelector.h
+	include/mocca/net/ConnectionID.h
+	include/mocca/net/Endpoint.h
+	include/mocca/net/IMessageConnection.h
+	include/mocca/net/IMessageConnectionAcceptor.h
+	include/mocca/net/IMessageConnectionFactory.h
+	include/mocca/net/IStreamConnection.h
+	include/mocca/net/IStreamConnectionAcceptor.h
+	include/mocca/net/IStreamConnectionFactory.h
+	include/mocca/net/Message.h
+
+	include/mocca/net/framing/SizePrefixedProtocol.h
+	include/mocca/net/framing/WebSocketProtocol.h
+	include/mocca/net/framing/FramingStrategy.h
+	include/mocca/net/framing/FramingUtils.h
+
+	include/mocca/net/message/FramingConnectionAcceptor.h
+	include/mocca/net/message/FramingConnectionFactory.h
+	include/mocca/net/message/LoopbackConnection.h
+	include/mocca/net/message/LoopbackConnectionAcceptor.h
+	include/mocca/net/message/LoopbackConnectionFactory.h
+	include/mocca/net/message/LoopbackConnectionSpawner.h
+	include/mocca/net/message/FramingConnection.h
+
+	include/mocca/net/rpc/Method.h
+	include/mocca/net/rpc/MethodDescription.h
+	include/mocca/net/rpc/RpcClient.h
+	include/mocca/net/rpc/ValueType.h
+	include/mocca/net/rpc/Dispatcher.h
+	include/mocca/net/rpc/JsonKeys.h
+
+	include/mocca/net/stream/QueueConnectionSpawner.h
+	include/mocca/net/stream/Sockets.h
+	include/mocca/net/stream/stddefines.h
+	include/mocca/net/stream/TCPConnection.h
+	include/mocca/net/stream/TCPConnectionAcceptor.h
+	include/mocca/net/stream/TCPConnectionFactory.h
+	include/mocca/net/stream/TCPNetworkAddress.h
+	include/mocca/net/stream/QueueConnection.h
+	include/mocca/net/stream/QueueConnectionAcceptor.h
+	include/mocca/net/stream/QueueConnectionFactory.h
+
+	include/mocca/testing/NetworkTesting.h)
+
+SET(MOCCA_SOURCE
 	src/base/Thread.cpp
 	src/base/CommandLineParser.cpp
 	src/base/Encryption.cpp
@@ -54,6 +128,8 @@ ADD_LIBRARY(mocca
 	src/net/Endpoint.cpp
 
 	src/testing/NetworkTesting.cpp)
+	
+ADD_LIBRARY(mocca ${MOCCA_HEADER} ${MOCCA_SOURCE})
 
 OPTION(MOCCA_RUNTIME_CHECKS "Enable runtime checks (slows down execution)" ON)
 IF (MOCCA_RUNTIME_CHECKS)
