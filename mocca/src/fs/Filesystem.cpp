@@ -112,6 +112,9 @@ std::vector<Path> mocca::fs::directoryContents(const Path& path) {
 
 std::string mocca::fs::readTextFile(const Path& path) {
     std::ifstream file(path);
+    if (!file.is_open()) {
+        throw Error("Could not open file '" + path.toString() + "'", __FILE__, __LINE__);
+    }
     std::stringstream stream;
     std::string line;
     while (std::getline(file, line)) {
@@ -123,15 +126,15 @@ std::string mocca::fs::readTextFile(const Path& path) {
 
 std::unique_ptr<std::vector<uint8_t>> mocca::fs::readBinaryFile(const Path& path) {
     std::ifstream file(path.toString().data(), std::ios::in | std::ios::binary | std::ios::ate);
-    if (file.is_open()) {
-        int size = static_cast<int>(file.tellg());
-        auto buffer = mocca::make_unique<std::vector<uint8_t>>(size);
-        file.seekg(0, std::ios::beg);
-        file.read(reinterpret_cast<char*>(buffer->data()), size);
-        file.close();
-        return buffer;
+    if (!file.is_open()) {
+        throw Error("Could not open file '" + path.toString() + "'", __FILE__, __LINE__);
     }
-    return nullptr;
+    int size = static_cast<int>(file.tellg());
+    auto buffer = mocca::make_unique<std::vector<uint8_t>>(size);
+    file.seekg(0, std::ios::beg);
+    file.read(reinterpret_cast<char*>(buffer->data()), size);
+    file.close();
+    return buffer;
 }
 
 mocca::fs::Path mocca::fs::tempPath() {
