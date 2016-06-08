@@ -16,41 +16,39 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 #include "gtest/gtest.h"
 
-#include "mocca/net/Endpoint.h"
-#include "mocca/base/Error.h"
+#include "mocca/base/BinaryUtil.h"
 
-using namespace mocca::net;
+using namespace mocca;
 
-class EndpointTest : public ::testing::Test {
+class BinaryUtilTest : public ::testing::Test {
 protected:
-    EndpointTest() {
+    BinaryUtilTest() {
         // You can do set-up work for each test here.
     }
 
-    virtual ~EndpointTest() {
+    virtual ~BinaryUtilTest() {
         // You can do clean-up work that doesn't throw exceptions here.
     }
 };
 
-TEST_F(EndpointTest, Ctor) {
-    {
-        Endpoint ep("protocol", "machine", "port");
-        ASSERT_EQ("protocol", ep.protocol);
-        ASSERT_EQ("machine", ep.machine);
-    }
-    {
-        Endpoint ep("protocol:machine:port");
-        ASSERT_EQ("protocol", ep.protocol);
-        ASSERT_EQ("machine", ep.machine);
-        ASSERT_EQ("port", ep.port);
-    }
-    {
-        ASSERT_THROW(Endpoint("malformed"), mocca::Error);
-    }
-}
+TEST_F(BinaryUtilTest, ReadWrite) {
+    std::vector<uint8_t> buffer(sizeof(int) + sizeof(double) + sizeof(bool));
+    uint8_t* writePtr = buffer.data();
+    
+    writePtr = binaryWrite(writePtr, 42);
+    writePtr = binaryWrite(writePtr, 3.14);
+    writePtr = binaryWrite(writePtr, true);
 
-TEST_F(EndpointTest, ToString) {
-    Endpoint ep("protocol", "machine", "port");
-    Endpoint ep2(ep.toString());
-    ASSERT_EQ(ep, ep2);
+    const uint8_t* readPtr = buffer.data();
+    int intVal;
+    readPtr = binaryRead(readPtr, intVal);
+    ASSERT_EQ(42, intVal);
+
+    double doubleVal;
+    readPtr = binaryRead(readPtr, doubleVal);
+    ASSERT_EQ(3.14, doubleVal);
+
+    bool boolVal;
+    readPtr = binaryRead(readPtr, boolVal);
+    ASSERT_EQ(true, boolVal);
 }

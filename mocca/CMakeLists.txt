@@ -16,6 +16,7 @@ SET(MOCCA_HEADER
 	include/mocca/base/ObjectPool.h
 	include/mocca/base/Singleton.h
 	include/mocca/base/StringTools.h
+	include/mocca/base/BinaryUtil.h
 
 	include/mocca/fs/Filesystem.h
 	include/mocca/fs/Path.h

@@ -14,43 +14,20 @@ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVEN
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
-#include "gtest/gtest.h"
+#pragma once
 
-#include "mocca/net/Endpoint.h"
-#include "mocca/base/Error.h"
+#include <cstdint>
 
-using namespace mocca::net;
+namespace mocca {
 
-class EndpointTest : public ::testing::Test {
-protected:
-    EndpointTest() {
-        // You can do set-up work for each test here.
-    }
-
-    virtual ~EndpointTest() {
-        // You can do clean-up work that doesn't throw exceptions here.
-    }
-};
-
-TEST_F(EndpointTest, Ctor) {
-    {
-        Endpoint ep("protocol", "machine", "port");
-        ASSERT_EQ("protocol", ep.protocol);
-        ASSERT_EQ("machine", ep.machine);
-    }
-    {
-        Endpoint ep("protocol:machine:port");
-        ASSERT_EQ("protocol", ep.protocol);
-        ASSERT_EQ("machine", ep.machine);
-        ASSERT_EQ("port", ep.port);
-    }
-    {
-        ASSERT_THROW(Endpoint("malformed"), mocca::Error);
-    }
+template <typename T> const uint8_t* binaryRead(const uint8_t* buffer, T& value) {
+    value = *reinterpret_cast<const T*>(buffer);
+    return buffer + sizeof(T);
 }
 
-TEST_F(EndpointTest, ToString) {
-    Endpoint ep("protocol", "machine", "port");
-    Endpoint ep2(ep.toString());
-    ASSERT_EQ(ep, ep2);
+template<typename T> uint8_t* binaryWrite(uint8_t* buffer, const T& value) {
+    *reinterpret_cast<T*>(buffer) = value;
+    return buffer + sizeof(T);
+}
+
 }

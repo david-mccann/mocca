@@ -13,6 +13,7 @@ ADD_EXECUTABLE(mocca-test
 	base/CommandLineParserTest.cpp
 	base/ContainerToolsTest.cpp
 	base/EncryptionTest.cpp
+	base/BinaryUtilTest.cpp
 
 	fs/PathTest.cpp
 
