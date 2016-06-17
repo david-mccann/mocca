@@ -23,6 +23,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 #include "mocca/base/Error.h"
 
+#define MAKE_STRING(x) (static_cast<std::stringstream&>(std::stringstream() << x)).str()
+
 namespace mocca {
 
 // split a string into a number of substrings, e.g., splitString("Sherlock,Mycroft,Moriarty", ',')
