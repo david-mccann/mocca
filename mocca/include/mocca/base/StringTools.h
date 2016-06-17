@@ -23,7 +23,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 #include "mocca/base/Error.h"
 
-#define MAKE_STRING(x) (static_cast<std::stringstream&>(std::stringstream() << x)).str()
+#define MAKE_STRING(x) (static_cast<const std::stringstream&>(std::stringstream() << x)).str()
 
 namespace mocca {
 
