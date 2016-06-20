@@ -77,3 +77,7 @@ Path mocca::fs::operator+(const Path& lhs, const std::string& rhs) {
     std::string infix = lhs.toString().back() == '/' ? "" : "/";
     return Path(lhs.toString() + infix + rhs);
 }
+
+std::ostream& mocca::fs::operator<<(std::ostream& os, const Path& obj) {
+    return os << obj.toString();
+}

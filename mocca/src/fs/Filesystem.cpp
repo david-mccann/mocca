@@ -17,8 +17,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 #include "mocca/fs/Filesystem.h"
 
 #include "mocca/base/Error.h"
-#include "mocca/fs/Path.h"
 #include "mocca/base/Memory.h"
+#include "mocca/fs/Path.h"
 
 #include <fstream>
 #include <list>
@@ -125,7 +125,7 @@ std::string mocca::fs::readTextFile(const Path& path) {
 }
 
 std::unique_ptr<std::vector<uint8_t>> mocca::fs::readBinaryFile(const Path& path) {
-    std::ifstream file(path.toString().data(), std::ios::in | std::ios::binary | std::ios::ate);
+    std::ifstream file(path.toString().c_str(), std::ios::in | std::ios::binary | std::ios::ate);
     if (!file.is_open()) {
         throw Error("Could not open file '" + path.toString() + "'", __FILE__, __LINE__);
     }
@@ -135,6 +135,18 @@ std::unique_ptr<std::vector<uint8_t>> mocca::fs::readBinaryFile(const Path& path
     file.read(reinterpret_cast<char*>(buffer->data()), size);
     file.close();
     return buffer;
+}
+
+void mocca::fs::writeBinaryFile(const Path& path, const std::vector<uint8_t>& data) {
+    std::ofstream file(path.toString().c_str(), std::ofstream::binary);
+    file.write(reinterpret_cast<const char*>(data.data()), data.size());
+    file.close();
+}
+
+void mocca::fs::writeTextFile(const Path& path, const std::string& text) {
+    std::ofstream file(path.toString().c_str());
+    file.write(text.c_str(), text.size());
+    file.close();
 }
 
 mocca::fs::Path mocca::fs::tempPath() {

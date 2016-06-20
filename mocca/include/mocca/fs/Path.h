@@ -17,6 +17,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 #pragma once
 
 #include <string>
+#include <ostream>
 
 namespace mocca {
 namespace fs {
@@ -42,5 +43,6 @@ private:
 
 bool operator==(const Path& lhs, const Path& rhs);
 Path operator+(const Path& lhs, const std::string& rhs);
+std::ostream& operator<<(std::ostream& os, const Path& obj);
 }
 }
