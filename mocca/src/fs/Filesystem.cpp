@@ -52,6 +52,30 @@ void mocca::fs::removeFile(const Path& path) {
 #endif
 }
 
+void mocca::fs::removeDirectoryRecursive(const Path& path) {
+    if (!exists(path)) {
+        return;
+    }
+    auto files = directoryContents(path);
+    for (const auto& file : files) {
+        if (isDirectory(file)) {
+            removeDirectoryRecursive(file);
+#ifdef WIN32
+            RemoveDirectory(file.toString().c_str());
+#else
+            rmdir(file.toString().c_str());
+#endif
+        } else {
+            removeFile(file);
+        }
+    }
+#ifdef WIN32
+    RemoveDirectory(path.toString().c_str());
+#else
+    rmdir(path.toString().c_str());
+#endif
+}
+
 bool mocca::fs::isDirectory(const Path& path) {
 #ifdef _WIN32
     DWORD dwAttrib = GetFileAttributesA(path.toString().c_str());
