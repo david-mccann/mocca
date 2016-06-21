@@ -2,6 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
 PROJECT(mocca-test LANGUAGES CXX)
 
 ADD_EXECUTABLE(mocca-test
+	base/CompressionTest.cpp
 	base/EndianTest.cpp
 	base/ExplicitTest.cpp
 	base/MessageQueueTest.cpp

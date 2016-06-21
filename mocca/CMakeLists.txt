@@ -2,6 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
 PROJECT(mocca LANGUAGES CXX)
 
 SET(MOCCA_HEADER
+	include/mocca/base/Compression.h
 	include/mocca/base/Thread.h
 	include/mocca/base/BidirectionalMap.h
 	include/mocca/base/CommandLineParser.h
@@ -77,6 +78,7 @@ SET(MOCCA_HEADER
 	include/mocca/testing/NetworkTesting.h)
 
 SET(MOCCA_SOURCE
+	src/base/Compression.cpp
 	src/base/Thread.cpp
 	src/base/CommandLineParser.cpp
 	src/base/Encryption.cpp
@@ -157,7 +159,8 @@ TARGET_LINK_LIBRARIES(mocca
 	PUBLIC AES
 	PUBLIC sha1
 	PUBLIC base64
-	PUBLIC jsoncpp)
+	PUBLIC jsoncpp
+	PUBLIC liblz4)
 IF (UNIX)
 	TARGET_LINK_LIBRARIES(mocca PUBLIC pthread)
 ENDIF()
