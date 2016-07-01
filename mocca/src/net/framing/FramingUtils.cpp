@@ -29,7 +29,7 @@ void mocca::net::readUntil(IStreamConnection& stream, std::vector<uint8_t>& buff
         if (Runnable::isCurrentInterrupted()) {
             throw ThreadInterrupt(__FILE__, __LINE__);
         }
-        auto bytesReceived = stream.receive(&byte, 1);
+        stream.receive(&byte, 1);
         auto offset = buffer.size() - std::min(static_cast<uint32_t>(delim.size()), static_cast<uint32_t>(buffer.size()));
         buffer.push_back(byte);
         auto searchBegin = buffer.data() + offset;

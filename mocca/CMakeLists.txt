@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.2.0)
 PROJECT(mocca LANGUAGES CXX)
 
 SET(MOCCA_HEADER
@@ -143,17 +143,8 @@ TARGET_INCLUDE_DIRECTORIES(
 	mocca PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 	mocca PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/thirdparty)
 
-TARGET_COMPILE_FEATURES(mocca
-	PUBLIC cxx_auto_type
-	PUBLIC cxx_lambdas
-	PUBLIC cxx_nullptr
-	PUBLIC cxx_override
-	PUBLIC cxx_range_for
-	PUBLIC cxx_rvalue_references
-	PUBLIC cxx_static_assert
-	PUBLIC cxx_strong_enums
-	PUBLIC cxx_uniform_initialization
-	PUBLIC cxx_variadic_templates)
+SET_PROPERTY(TARGET mocca PROPERTY CXX_STANDARD 11)
+SET_PROPERTY(TARGET mocca PROPERTY CXX_STANDARD_REQUIRED ON)
 	
 TARGET_LINK_LIBRARIES(mocca
 	PUBLIC AES

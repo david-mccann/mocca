@@ -17,6 +17,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 #include "mocca/base/Compression.h"
 
 #include "mocca/base/BinaryUtil.h"
+#include "mocca/base/Memory.h"
 
 #include "lz4/lz4.h"
 
@@ -24,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 std::unique_ptr<std::vector<uint8_t>> mocca::compressData(const std::vector<uint8_t>& data) {
     int32_t maxCompressSize = LZ4_compressBound(data.size());
-    auto buffer = std::make_unique<std::vector<uint8_t>>(maxCompressSize + sizeof(int32_t));
+    auto buffer = mocca::make_unique<std::vector<uint8_t>>(maxCompressSize + sizeof(int32_t));
     binaryWrite(buffer->data(), static_cast<int32_t>(data.size()));
     int32_t compressSize = LZ4_compress_default(reinterpret_cast<const char*>(data.data()),
                                                 reinterpret_cast<char*>(buffer->data() + sizeof(int32_t)), data.size(), maxCompressSize);
@@ -36,7 +37,7 @@ std::unique_ptr<std::vector<uint8_t>> mocca::compressData(const std::vector<uint
 std::unique_ptr<std::vector<uint8_t>> mocca::uncompressData(const std::vector<uint8_t>& data) {
     int32_t uncompressedSize;
     binaryRead(data.data(), uncompressedSize);
-    auto buffer = std::make_unique<std::vector<uint8_t>>(uncompressedSize);
+    auto buffer = mocca::make_unique<std::vector<uint8_t>>(uncompressedSize);
     int result = LZ4_decompress_safe(reinterpret_cast<const char*>(data.data() + sizeof(int32_t)), reinterpret_cast<char*>(buffer->data()),
                                      data.size() - sizeof(int32_t), uncompressedSize);
     assert(result == uncompressedSize);
