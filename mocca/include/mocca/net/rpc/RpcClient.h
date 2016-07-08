@@ -28,9 +28,9 @@ namespace mocca {
 namespace net {
 class RpcClient {
 public:
-    using ReturnType = std::pair<JsonCpp::Value, std::vector<mocca::net::MessagePart>>;
+    using ReturnType = std::pair<JsonCpp::Value, std::vector<MessagePart>>;
 
-    RpcClient(const mocca::net::Endpoint& endpoint);
+    RpcClient(const Endpoint& endpoint);
 
     std::vector<MethodDescription> describe() const;
     void send(const std::string& method, const JsonCpp::Value& params) const;
@@ -38,7 +38,8 @@ public:
     bool isConnected() const;
 
 private:
-    std::unique_ptr<mocca::net::IMessageConnection> connection_;
+    Endpoint m_endpoint;
+    mutable std::unique_ptr<IMessageConnection> m_connection;
 };
 }
 }
