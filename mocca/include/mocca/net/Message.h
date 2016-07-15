@@ -16,6 +16,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 #pragma once
 
+#include "jsoncpp/json.h"
+
 #include <string>
 #include <vector>
 #include <memory>
@@ -25,7 +27,20 @@ namespace net {
 using MessagePart = std::shared_ptr<std::vector<uint8_t>>;
 using Message = std::vector<MessagePart>;
 
+class MessageBuf : public std::basic_streambuf<char, std::char_traits<char>> {
+public:
+    MessageBuf(std::vector<uint8_t>& vec);
+
+    int overflow(int ch) override;
+    std::streamsize xsputn(const char_type* s, std::streamsize count) override;
+
+private:
+    std::vector<uint8_t>& m_vec;
+};
+
+
 MessagePart createMessagePart(const std::string& str);
 std::string readMessagePart(const std::vector<uint8_t>& part);
+MessagePart createMessagePartFromJson(const JsonCpp::Value& json);
 }
 }

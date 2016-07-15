@@ -20,6 +20,28 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 using namespace mocca::net;
 
+MessageBuf::MessageBuf(std::vector<uint8_t>& vec)
+    : m_vec(vec) {
+    vec.clear();
+    auto casted = reinterpret_cast<char*>(vec.data());
+    setp(casted, casted);
+}
+
+int MessageBuf::overflow(int ch) {
+    if (ch != traits_type::eof()) {
+        m_vec.push_back(ch);
+        pbump(1);
+        return ch;
+    }
+    return traits_type::eof();
+}
+
+std::streamsize MessageBuf::xsputn(const char_type* s, std::streamsize count) {
+    m_vec.insert(end(m_vec), s, s + count);
+    return count;
+}
+
+
 MessagePart mocca::net::createMessagePart(const std::string& str) {
     MessagePart part = std::make_shared<std::vector<uint8_t>>();
     part->assign(begin(str), end(str));
@@ -28,4 +50,13 @@ MessagePart mocca::net::createMessagePart(const std::string& str) {
 
 std::string mocca::net::readMessagePart(const std::vector<uint8_t>& part) {
     return std::string(reinterpret_cast<const char*>(part.data()), part.size());
+}
+
+mocca::net::MessagePart mocca::net::createMessagePartFromJson(const JsonCpp::Value& json) {
+    auto messagePart = std::make_shared<std::vector<uint8_t>>();
+    MessageBuf buf(*messagePart);
+    std::ostream os(&buf);
+    JsonCpp::StyledStreamWriter streamWriter;
+    streamWriter.write(os, json);
+    return messagePart;
 }
