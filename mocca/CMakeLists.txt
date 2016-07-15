@@ -43,6 +43,7 @@ SET(MOCCA_HEADER
 	include/mocca/net/IStreamConnectionAcceptor.h
 	include/mocca/net/IStreamConnectionFactory.h
 	include/mocca/net/Message.h
+	include/mocca/net/AutoConnection.h
 
 	include/mocca/net/framing/SizePrefixedProtocol.h
 	include/mocca/net/framing/WebSocketProtocol.h
@@ -129,6 +130,7 @@ SET(MOCCA_SOURCE
 	src/net/ConnectionAggregator.cpp
 	src/net/ConnectionFactorySelector.cpp
 	src/net/Endpoint.cpp
+	src/net/AutoConnection.cpp
 
 	src/testing/NetworkTesting.cpp)
 	
