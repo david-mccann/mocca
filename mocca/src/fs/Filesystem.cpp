@@ -1,14 +1,23 @@
-/****************************************************************
-* Copyright (C) 2016 Andrey Krekhov, David McCann
-*
-* The content of this file may not be copied and/or distributed
-* without the expressed permission of the copyright owner.
-*
-****************************************************************/
+/*The MIT License(MIT)
+
+Copyright(c) 2016 David McCann
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files(the
+"Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and / or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to
+the following conditions :
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.*/
 
 #include "mocca/fs/Filesystem.h"
 
 #include "mocca/base/Error.h"
+#include "mocca/base/Memory.h"
 #include "mocca/fs/Path.h"
 
 #include <fstream>
@@ -40,6 +49,30 @@ void mocca::fs::removeFile(const Path& path) {
     DeleteFileA(path.toString().c_str());
 #else
     unlink(path.toString().c_str());
+#endif
+}
+
+void mocca::fs::removeDirectoryRecursive(const Path& path) {
+    if (!exists(path)) {
+        return;
+    }
+    auto files = directoryContents(path);
+    for (const auto& file : files) {
+        if (isDirectory(file)) {
+            removeDirectoryRecursive(file);
+#ifdef WIN32
+            RemoveDirectory(file.toString().c_str());
+#else
+            rmdir(file.toString().c_str());
+#endif
+        } else {
+            removeFile(file);
+        }
+    }
+#ifdef WIN32
+    RemoveDirectory(path.toString().c_str());
+#else
+    rmdir(path.toString().c_str());
 #endif
 }
 
@@ -103,6 +136,9 @@ std::vector<Path> mocca::fs::directoryContents(const Path& path) {
 
 std::string mocca::fs::readTextFile(const Path& path) {
     std::ifstream file(path);
+    if (!file.is_open()) {
+        throw Error("Could not open file '" + path.toString() + "'", __FILE__, __LINE__);
+    }
     std::stringstream stream;
     std::string line;
     while (std::getline(file, line)) {
@@ -110,4 +146,39 @@ std::string mocca::fs::readTextFile(const Path& path) {
     }
     file.close();
     return stream.str();
+}
+
+std::unique_ptr<std::vector<uint8_t>> mocca::fs::readBinaryFile(const Path& path) {
+    std::ifstream file(path.toString().c_str(), std::ios::in | std::ios::binary | std::ios::ate);
+    if (!file.is_open()) {
+        throw Error("Could not open file '" + path.toString() + "'", __FILE__, __LINE__);
+    }
+    int size = static_cast<int>(file.tellg());
+    auto buffer = mocca::make_unique<std::vector<uint8_t>>(size);
+    file.seekg(0, std::ios::beg);
+    file.read(reinterpret_cast<char*>(buffer->data()), size);
+    file.close();
+    return buffer;
+}
+
+void mocca::fs::writeBinaryFile(const Path& path, const std::vector<uint8_t>& data) {
+    std::ofstream file(path.toString().c_str(), std::ofstream::binary);
+    file.write(reinterpret_cast<const char*>(data.data()), data.size());
+    file.close();
+}
+
+void mocca::fs::writeTextFile(const Path& path, const std::string& text) {
+    std::ofstream file(path.toString().c_str());
+    file.write(text.c_str(), text.size());
+    file.close();
+}
+
+mocca::fs::Path mocca::fs::tempPath() {
+#if WIN32
+    TCHAR buffer[MAX_PATH + 1];
+    DWORD size = GetTempPath(MAX_PATH + 1, buffer);
+    return Path(std::string(buffer, size));
+#else
+    return Path("/tmp");
+#endif
 }
