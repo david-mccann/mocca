@@ -16,6 +16,7 @@
 #include "mocca/net/stream/QueueConnectionFactory.h"
 
 #include <array>
+#include <cstring>
 
 using namespace mocca;
 using namespace mocca::net;
